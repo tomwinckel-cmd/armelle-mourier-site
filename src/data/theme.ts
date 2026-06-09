@@ -95,6 +95,19 @@ export type ThemeSaleMode = {
   highlightOnHome: boolean;
 };
 
+export type ThemeFragment = {
+  /**
+   * Rendu du visuel d'attente (ArtworkPlaceholder) :
+   * 'fragment' = fragment pictural (bleu/or, matière, cadre carte de visite) ;
+   * 'plain' = aplat sobre.
+   */
+  placeholderStyle: 'fragment' | 'plain';
+  /** Intensité des couches picturales (placeholder + halo du hero). */
+  intensity: 'subtle' | 'medium' | 'vivid';
+  /** Trait de geste doré (SVG léger) sur le fragment. */
+  accentStroke: boolean;
+};
+
 export type Theme = {
   colors: ThemeColors;
   typography: ThemeTypography;
@@ -103,6 +116,7 @@ export type Theme = {
   artworkCards: ThemeArtworkCards;
   buttons: ThemeButtons;
   texture: ThemeTexture;
+  fragment: ThemeFragment;
   contact: ThemeContact;
   saleMode: ThemeSaleMode;
 };
@@ -151,6 +165,11 @@ export const theme: Theme = {
     enabled: true,
     intensity: 'subtle',
   },
+  fragment: {
+    placeholderStyle: 'fragment',
+    intensity: 'medium',
+    accentStroke: true,
+  },
   contact: {
     showPhone: false,
     phone: '',
@@ -197,6 +216,13 @@ const TEXTURE_STRENGTH: Record<ThemeTexture['intensity'], string> = {
   medium: '0.09',
 };
 
+// Force des couches picturales du fragment (placeholder + halo hero).
+const FRAGMENT_STRENGTH: Record<ThemeFragment['intensity'], string> = {
+  subtle: '0.55',
+  medium: '0.8',
+  vivid: '1',
+};
+
 /** Construit l'ensemble des variables CSS injectées dans :root par Base. */
 export function themeCssVars(t: Theme): Record<string, string> {
   return {
@@ -205,6 +231,7 @@ export function themeCssVars(t: Theme): Record<string, string> {
     '--border-hair': t.layout.borderHair,
     '--btn-radius': t.buttons.radius === 'full' ? '999px' : 'var(--radius-card)',
     '--texture-strength': t.texture.enabled ? TEXTURE_STRENGTH[t.texture.intensity] : '0',
+    '--fragment-strength': FRAGMENT_STRENGTH[t.fragment.intensity],
     '--font-serif': `'${t.typography.serif}', Georgia, serif`,
     '--font-sans': `'${t.typography.sans}', system-ui, sans-serif`,
   };
