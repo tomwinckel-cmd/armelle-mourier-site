@@ -51,6 +51,30 @@
 3. **Déposer / horodater** via un service de preuve (ex. **e-Soleau**) **si
    l'œuvre est importante**.
 
+## Générateur « Fiche œuvre + preuve de création » (cockpit, prototype)
+
+Dans `/cockpit-roadmap` (interne, noindex, hors nav), une section
+**« Fiche œuvre + preuve de création »** aide à documenter une œuvre en quelques
+minutes. Modèle : `src/data/proof.ts`.
+
+- **Comment l'utiliser** : choisir une œuvre existante pour pré-remplir (ou
+  partir du modèle vide), compléter les champs, puis **copier la fiche** et la
+  **checklist**. Tout se calcule **côté navigateur** ; **rien n'est sauvegardé,
+  téléversé ni publié**.
+- **Pourquoi conserver la HD** : c'est l'original de référence (qualité, preuve,
+  réédition). On la **garde hors du site**, en privé.
+- **Pourquoi préparer une version web** : on publie une **image compressée**
+  (site / réseaux), jamais le fichier HD pleine résolution — pour limiter la
+  réutilisation non souhaitée.
+- **Pourquoi garder une preuve datée** : le droit d'auteur est déjà à l'artiste ;
+  une **preuve datée** (e-Soleau ou autre) aide surtout à **démontrer la date et
+  la paternité** en cas de contestation, pour une **œuvre importante**.
+- **Limites juridiques** : le cockpit **organise et prépare** ; il **ne protège
+  pas juridiquement à lui seul** et ne remplace ni un dépôt officiel, ni un
+  avocat. En cas d'enjeu réel : **consulter un professionnel**.
+- **Décision humaine** : l'artiste garde la main. Rien n'est diffusé sans
+  **validation humaine** (Armelle décide · Tom valide · Claude Code exécute).
+
 ## Limites (à garder en tête)
 
 - Aucune méthode ne garantit une **protection absolue** ni n'empêche toute copie.

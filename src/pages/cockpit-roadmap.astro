@@ -10,6 +10,7 @@ import { splitExhibitions } from '../data/exhibitions';
 import { operations, operationsPrinciple, type OperationStatus } from '../data/operations';
 import { artworkWorkflow, workflowBadges } from '../data/artworkWorkflow';
 import { designModes } from '../data/theme';
+import { artworkProof, webPublicationTips, protectionChecklist, proofBadges } from '../data/proof';
 
 // ---- Données (lecture seule) ----
 const totalArtworks = artworks.length;
@@ -49,6 +50,7 @@ const sections = [
   { id: 'operations', label: 'Centre opérationnel' },
   { id: 'oeuvres', label: 'Œuvres' },
   { id: 'intake', label: 'Ajouter une œuvre' },
+  { id: 'proof', label: 'Fiche œuvre + preuve' },
   { id: 'disponibilites', label: 'Disponibilités' },
   { id: 'pages', label: 'Pages' },
   { id: 'expositions', label: 'Expositions' },
@@ -329,6 +331,216 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       </p>
     </section>
 
+    <!-- FICHE ŒUVRE + PREUVE DE CRÉATION (prototype, ne sauvegarde pas) -->
+    <section id="proof" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">{artworkProof.title}</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">{artworkProof.intro}</p>
+
+      <!-- Avertissement non juridique -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ {artworkProof.disclaimer}
+      </p>
+
+      <!-- Repères de propriété intellectuelle -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Ce qu’il faut savoir (repères)</h3>
+      <ul class="mt-4 max-w-prose space-y-2 text-sm text-noir/80">
+        {artworkProof.legalPoints.map((p) => (
+          <li class="flex items-start gap-2"><span class="mt-1 text-or" aria-hidden="true">·</span><span>{p}</span></li>
+        ))}
+      </ul>
+
+      <!-- Parties de la fiche -->
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {artworkProof.sections.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h4 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h4>
+            {s.note && <p class="mt-1 text-sm text-noir/70">{s.note}</p>}
+            <p class="mt-2 text-xs text-cendre">{s.fields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Générer une fiche œuvre -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Générer une fiche œuvre</h3>
+      <p class="mt-2 max-w-prose text-sm text-cendre">
+        Choisissez une œuvre existante pour pré-remplir, ou partez du modèle vide.
+        <strong>Rien n’est sauvegardé ni téléversé</strong> — on prépare un dossier texte à copier.
+      </p>
+
+      <label class="mt-4 block max-w-md text-sm">Pré-remplir depuis une œuvre existante
+        <select id="p-pick" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          <option value="">— Modèle vide —</option>
+          {artworks.map((a) => (
+            <option
+              value={a.slug}
+              data-title={a.title}
+              data-series={a.series ?? ''}
+              data-year={a.year ?? ''}
+              data-dimensions={a.dimensions ?? ''}
+              data-technique={a.technique ?? ''}
+              data-description={a.description ?? ''}
+              data-status={a.status}
+              data-statuslabel={statusLabel[a.status]}
+              data-alt={a.alt}
+              data-image={a.image ?? ''}
+            >{a.title}</option>
+          ))}
+        </select>
+      </label>
+
+      <form id="p-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <p class="sm:col-span-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Identité & description</p>
+        <label class="text-sm">Titre
+          <input id="p-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Série <span class="text-cendre">(optionnel)</span>
+          <input id="p-series" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Année <span class="text-cendre">(sinon vide)</span>
+          <input id="p-year" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut
+          <select id="p-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="available">Disponible</option>
+            <option value="reserved">Réservée</option>
+            <option value="sold">Vendue</option>
+            <option value="on-request">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm sm:col-span-2">Description (quelques mots)
+          <textarea id="p-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Données techniques</p>
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="p-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="p-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Support
+          <input id="p-support" type="text" placeholder="Toile recyclée" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Preuve de création</p>
+        <label class="text-sm">Date de création
+          <input id="p-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Lieu de création <span class="text-cendre">(optionnel)</span>
+          <input id="p-place" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Images à conserver</p>
+        <label class="text-sm">HD originale (où elle est conservée)
+          <input id="p-hd" type="text" placeholder="disque privé / cloud privé" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Version web compressée
+          <input id="p-web" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Photos de détail <span class="text-cendre">(optionnel)</span>
+          <input id="p-details" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Alt text (décrire vraiment l’œuvre)
+          <input id="p-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Vente / statut · publication</p>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « Prix sur demande »)</span>
+          <input id="p-price" type="text" placeholder="laisser vide" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Publication web recommandée
+          <input id="p-webpub" type="text" placeholder="version web compressée uniquement" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Demande / acquéreur <span class="text-cendre">(optionnel)</span>
+          <input id="p-request" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Remise / logistique <span class="text-cendre">(optionnel)</span>
+          <input id="p-logistics" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes de protection <span class="text-cendre">(preuve datée, filigrane…)</span>
+          <textarea id="p-protect" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Historique d’exposition <span class="text-cendre">(optionnel)</span>
+          <input id="p-history" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Réseaux sociaux</p>
+        <label class="text-sm sm:col-span-2">Réseaux sociaux (légende brouillon)
+          <textarea id="p-social" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Hashtags
+          <input id="p-hashtags" type="text" placeholder="#ArmelleMourier #BleuCendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="p-hd-kept" type="checkbox" /> HD originale conservée hors du site (privée)</label>
+          <label class="flex items-center gap-2"><input id="p-web-ready" type="checkbox" /> Version web compressée prête</label>
+          <label class="flex items-center gap-2"><input id="p-proof-kept" type="checkbox" /> Œuvre importante : preuve datée envisagée (e-Soleau / autre)</label>
+          <label class="flex items-center gap-2"><input id="p-exchanges" type="checkbox" /> Échanges importants archivés</label>
+          <label class="flex items-center gap-2"><input id="p-saleok" type="checkbox" /> Vente douce vérifiée — « Prix sur demande » si rien n’est validé</label>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation du dossier</p>
+          <p id="p-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="p-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="p-score">0</span> % préparé — indicatif, pas une note.</p>
+        <ul id="p-badges" class="mt-4 flex flex-wrap gap-2">
+          {proofBadges.map((b) => (
+            <li data-pbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Blocs d'aide : Images à conserver + Publication web -->
+      <div class="mt-8 grid gap-5 lg:grid-cols-2">
+        <article class="frame-gallery p-5">
+          <h4 class="font-serif text-lg italic text-encre">Images à conserver</h4>
+          <ul class="mt-2 space-y-1 text-sm text-noir/80">
+            <li>· HD originale privée (haute résolution, non publiée).</li>
+            <li>· Version web compressée (site / réseaux).</li>
+            <li>· Photos de détail (matière, signature, dos de la toile).</li>
+            <li>· Alt text descriptif pour chaque image publiée.</li>
+          </ul>
+        </article>
+        <article class="frame-gallery p-5">
+          <h4 class="font-serif text-lg italic text-encre">Publication web recommandée</h4>
+          <ul class="mt-2 space-y-1 text-sm text-noir/80">
+            {webPublicationTips.map((t) => <li>· {t}</li>)}
+          </ul>
+        </article>
+      </div>
+
+      <!-- Checklist de protection -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Checklist de protection — avant diffusion</h3>
+      <ul id="p-checklist" class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
+        {protectionChecklist.map((item) => (
+          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+        ))}
+      </ul>
+
+      <!-- Fiche œuvre complète (copiable) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Fiche œuvre complète</h3>
+      <pre id="p-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-fiche-copy>Copier la fiche</button>
+        <button type="button" class="btn btn-ghost" data-checklist-copy>Copier la checklist</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        Organiser ne protège pas à soi seul. Pour une œuvre importante : envisager une preuve
+        datée (e-Soleau / autre) et, en cas d’enjeu réel, consulter un professionnel.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+    </section>
+
     <!-- 3 — DISPONIBILITÉS -->
     <section id="disponibilites" class="scroll-mt-28">
       <h2 class="mt-16 text-h2 font-serif text-encre">Disponibilités · vente douce</h2>
@@ -574,6 +786,105 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       update();
       var rc = document.querySelector('[data-recap-copy]'); if (rc) rc.addEventListener('click', function () { copyText(buildRecap(), rc); });
       var ac = document.querySelector('[data-art-copy]'); if (ac) ac.addEventListener('click', function () { copyText(buildBlock(), ac); });
+    })();
+
+    // --- Fiche œuvre + preuve de création (organise + prépare, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('p-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      function set(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; }
+      var statusFr = { available: 'Disponible', reserved: 'Réservée', sold: 'Vendue', 'on-request': 'Sur demande' };
+
+      // Pré-remplir depuis une œuvre existante.
+      var pick = document.getElementById('p-pick');
+      if (pick) {
+        pick.addEventListener('change', function () {
+          var opt = pick.options[pick.selectedIndex];
+          if (!opt || !opt.value) return;
+          set('p-title', opt.getAttribute('data-title'));
+          set('p-series', opt.getAttribute('data-series'));
+          set('p-year', opt.getAttribute('data-year'));
+          set('p-dimensions', opt.getAttribute('data-dimensions'));
+          set('p-technique', opt.getAttribute('data-technique'));
+          set('p-description', opt.getAttribute('data-description'));
+          set('p-alt', opt.getAttribute('data-alt'));
+          set('p-web', opt.getAttribute('data-image'));
+          var st = document.getElementById('p-status');
+          if (st && opt.getAttribute('data-status')) st.value = opt.getAttribute('data-status');
+          update();
+        });
+      }
+
+      function price() { return v('p-price') || 'Prix sur demande'; }
+      function buildFiche() {
+        return [
+          'FICHE ŒUVRE — PREUVE DE CRÉATION',
+          '',
+          'Titre : ' + v('p-title'),
+          'Série : ' + v('p-series'),
+          'Année : ' + v('p-year'),
+          'Dimensions : ' + v('p-dimensions'),
+          'Technique : ' + v('p-technique'),
+          'Support : ' + v('p-support'),
+          'Description : ' + v('p-description'),
+          'Date de création : ' + v('p-date'),
+          'Lieu de création : ' + v('p-place'),
+          'Images conservées :',
+          '- HD originale : ' + v('p-hd'),
+          '- Version web : ' + v('p-web'),
+          '- Détails : ' + v('p-details'),
+          'Statut : ' + (statusFr[v('p-status')] || v('p-status')),
+          'Prix : ' + price(),
+          'Publication web : ' + v('p-webpub'),
+          'Alt text : ' + v('p-alt'),
+          'Notes de protection : ' + v('p-protect'),
+          'Historique d’exposition : ' + v('p-history'),
+          'Demande / acquéreur : ' + v('p-request'),
+          'Remise / logistique : ' + v('p-logistics'),
+          'Réseaux sociaux : ' + v('p-social'),
+          'Hashtags : ' + v('p-hashtags'),
+          'Validation humaine : à vérifier avant publication',
+        ].join('\n');
+      }
+      function buildChecklist() {
+        var items = ['CHECKLIST DE PROTECTION — avant diffusion', ''];
+        document.querySelectorAll('#p-checklist li span').forEach(function (el) {
+          items.push('[ ] ' + el.textContent);
+        });
+        return items.join('\n');
+      }
+
+      var keys = ['p-title', 'p-series', 'p-year', 'p-dimensions', 'p-technique', 'p-support', 'p-description', 'p-date', 'p-place', 'p-hd', 'p-web', 'p-details', 'p-alt', 'p-webpub', 'p-protect', 'p-history', 'p-social', 'p-hashtags'];
+      var checks = ['p-hd-kept', 'p-web-ready', 'p-proof-kept', 'p-exchanges', 'p-saleok'];
+      function update() {
+        var filled = 1, total = keys.length + checks.length + 1; // statut + prix par défaut
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('p-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('p-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('p-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          fiche: !!(v('p-title') && v('p-dimensions') && v('p-technique') && v('p-description')),
+          images: !!(v('p-web') && v('p-alt') && c('p-web-ready')),
+          protection: !!(v('p-date') && (c('p-proof-kept') || c('p-hd-kept'))),
+          web: !!(v('p-webpub') && v('p-alt')),
+          social: !!(v('p-social') && v('p-hashtags')),
+          sale: c('p-saleok'),
+        };
+        document.querySelectorAll('[data-pbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-pbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var recapEl = document.getElementById('p-recap'); if (recapEl) recapEl.textContent = buildFiche();
+      }
+      form.addEventListener('input', update);
+      update();
+      var fc = document.querySelector('[data-fiche-copy]'); if (fc) fc.addEventListener('click', function () { copyText(buildFiche(), fc); });
+      var cc = document.querySelector('[data-checklist-copy]'); if (cc) cc.addEventListener('click', function () { copyText(buildChecklist(), cc); });
     })();
   </script>
 </Base>

@@ -150,6 +150,33 @@ Parcours guidé dans `/cockpit-roadmap` (modèle : `src/data/artworkWorkflow.ts`
 - **Validation humaine obligatoire** : aucun bouton « Publier », aucune sauvegarde,
   aucun envoi. Armelle décide · Tom valide · Claude Code exécute.
 
+## Générateur « Fiche œuvre + preuve de création » (prototype)
+
+Section opérationnelle dans `/cockpit-roadmap` (modèle : `src/data/proof.ts`) pour
+**documenter, protéger et archiver** une œuvre en quelques minutes.
+
+- **Fonctionnement** : pré-remplir depuis une œuvre existante (ou modèle vide) →
+  compléter identité, technique, **preuve de création**, images, vente, web,
+  réseaux → **copier la fiche** + **copier la checklist**. Calcul **côté client**,
+  **aucune sauvegarde**, **aucun upload**.
+- **Fiche copiable** : bloc texte structuré « FICHE ŒUVRE — PREUVE DE CRÉATION »
+  (titre, série, année, dimensions, technique, support, description, date/lieu,
+  images conservées HD/web/détails, statut, **« Prix sur demande » par défaut**,
+  publication web, alt text, notes de protection, historique, demande/acquéreur,
+  logistique, réseaux, hashtags, **« Validation humaine : à vérifier avant
+  publication »**).
+- **Checklist de protection** (12 points) + blocs d'aide « Images à conserver »
+  et « Publication web recommandée ».
+- **Garde-fous PI** : ce n'est **pas un avis juridique** ; le droit d'auteur naît
+  à la création ; l'enjeu pratique est la **preuve de date et de paternité** ;
+  pour une œuvre importante, envisager **e-Soleau** ou un autre service de preuve
+  datée ; **ne pas publier la HD complète** ; conserver originaux et échanges.
+- **Gamification douce** (adulte, sobre) : préparation du dossier (brouillon /
+  presque prêt / prêt à valider) + badges (Fiche complète · Images prêtes ·
+  Protection pensée · Web prêt · Réseaux prêts · Vente douce prête).
+- **Limite assumée** : le cockpit **organise**, il ne **protège pas** à lui seul.
+  L'artiste garde la décision. Voir `docs/ip-protection-artist.md`.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
