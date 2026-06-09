@@ -121,7 +121,6 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
   <script is:inline>
     const email = "armellemourier02@gmail.com";
     const endpoint = "";
-    const subjects = ["Acquisition d’une œuvre", "Demande de catalogue", "Exposition", "Résidence", "Atelier", "Presse", "Commande spéciale", "Autre"];
     const form = document.getElementById('contact-form');
     const nameEl = document.getElementById('name');
     const emailEl = document.getElementById('email');
@@ -129,6 +128,8 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
     const messageEl = document.getElementById('message');
     const errEl = document.getElementById('form-error');
     const okEl = document.getElementById('form-ok');
+    // Sujets dérivés des options du <select> (source : shop.ts) — pas de doublon.
+    const subjects = Array.from(subjectSel ? subjectSel.options : []).map((o) => o.value);
 
     // --- Pré-remplissage depuis l'URL (?oeuvre=... / ?objet=...) ---
     const params = new URLSearchParams(window.location.search);
@@ -137,6 +138,7 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
 
     const objetMap = {
       'acquisition': 'Acquisition d’une œuvre',
+      'reservation': 'Réservation d’une œuvre',
       'catalogue': 'Demande de catalogue',
       'exposition': 'Exposition',
       'residence': 'Résidence',
@@ -152,12 +154,17 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
     }
 
     if (oeuvre) {
-      selectSubject('Acquisition d’une œuvre');
-      messageEl.value = `Bonjour,\n\nJe suis intéressé·e par l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer son prix et sa disponibilité ?\n\nMerci.`;
+      const reserve = objet === 'reservation';
+      selectSubject(reserve ? 'Réservation d’une œuvre' : 'Acquisition d’une œuvre');
+      messageEl.value = reserve
+        ? `Bonjour,\n\nJe souhaiterais réserver l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer les conditions et sa disponibilité ?\n\nMerci.`
+        : `Bonjour,\n\nJe suis intéressé·e par l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer son prix et sa disponibilité ?\n\nMerci.`;
     } else if (objet && objetMap[objet]) {
       selectSubject(objetMap[objet]);
       if (objet === 'catalogue' || objet === 'bleu-cendres') {
         messageEl.value = 'Bonjour,\n\nJe souhaiterais recevoir le catalogue des œuvres.\n\nMerci.';
+      } else if (objet === 'reservation') {
+        messageEl.value = 'Bonjour,\n\nJe souhaiterais réserver une œuvre. Pourriez-vous m’indiquer les conditions ?\n\nMerci.';
       }
     }
 

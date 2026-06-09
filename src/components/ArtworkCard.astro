@@ -1,7 +1,8 @@
 ---
 import ArtworkPlaceholder from './ArtworkPlaceholder.astro';
-import { type Artwork, statusLabel, priceLabel } from '../data/artworks';
+import { type Artwork, statusLabel, priceLabel, getArtworkRequestUrl } from '../data/artworks';
 import { theme } from '../data/theme';
+import { shop } from '../data/shop';
 
 interface Props {
   artwork: Artwork;
@@ -12,15 +13,15 @@ const { artwork, variant = 'default' } = Astro.props;
 const a = artwork;
 const isFeature = variant === 'feature';
 
-// Pilotage par le thème (cockpit / vente douce).
+// Pilotage par le thème (affichage) et par shop.ts (commerce doux).
 const { showStatus, showTechnique } = theme.artworkCards;
-const cta = theme.saleMode.cta;
+const cta = shop.cta.artwork;
 const priceText =
   a.status === 'sold'
     ? 'Vendue'
-    : theme.saleMode.showPrices
+    : shop.showPrices
       ? priceLabel(a)
-      : 'Prix sur demande';
+      : shop.defaultPriceLabel;
 
 const statusColor: Record<string, string> = {
   available: 'text-encre',
@@ -29,7 +30,7 @@ const statusColor: Record<string, string> = {
   sold: 'text-cendre',
 };
 
-const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
+const askHref = getArtworkRequestUrl(a);
 const metaParts = [a.technique, a.dimensions, a.year].filter(Boolean);
 ---
 {/* Carte traitée comme un CARTEL d'exposition : cadre de galerie, nom en

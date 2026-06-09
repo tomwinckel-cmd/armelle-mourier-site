@@ -257,3 +257,23 @@ export function priceLabel(a: Artwork): string {
   if (a.status === 'sold') return 'Vendue';
   return a.price && a.price.trim() ? a.price : 'Prix sur demande';
 }
+
+// ---------- Helpers « commerce doux » (fiches œuvre futures) ----------
+/** Œuvres mises en avant (accueil). */
+export const getFeaturedArtworks = (): Artwork[] => artworks.filter((a) => a.featured);
+
+/** Œuvres proposées à l'acquisition (respecte le statut + showInAvailable). */
+export const getAvailableArtworks = (): Artwork[] => artworks.filter(isForSale);
+
+/** Retrouve une œuvre par son slug (prépare une future page détail /oeuvres/[slug]). */
+export function getArtworkBySlug(slug: string): Artwork | undefined {
+  return artworks.find((a) => a.slug === slug);
+}
+
+/** Lien de contact prérempli depuis une œuvre (objet + titre de l'œuvre). */
+export function getArtworkRequestUrl(
+  a: Artwork,
+  objet: 'acquisition' | 'reservation' | 'catalogue' = 'acquisition',
+): string {
+  return `/contact?objet=${objet}&oeuvre=${encodeURIComponent(a.title)}`;
+}
