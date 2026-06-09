@@ -53,7 +53,11 @@ const visualArtistLd = {
            filet or discret, lueur bleu clair, signature en surimpression. -->
       <figure class="relative mx-auto max-w-md lg:max-w-none">
         {theme.hero.showArtworkFragment && (
-          <div class="absolute -inset-5 -z-10 rounded-[1.5rem] bg-[radial-gradient(70%_70%_at_70%_20%,rgb(var(--c-blue-soft)/0.28),transparent_70%)]" aria-hidden="true"></div>
+          <div
+            class="absolute -inset-5 -z-10 rounded-[1.5rem]"
+            aria-hidden="true"
+            style="background: radial-gradient(70% 70% at 70% 20%, rgb(var(--c-blue-soft) / calc(0.3 * var(--fragment-strength))), transparent 70%);"
+          ></div>
         )}
         <div class={`overflow-hidden rounded-card bg-brume shadow-soft ${theme.hero.showArtworkFragment ? 'ring-1 ring-or/30 ring-offset-4 ring-offset-paper' : ''}`}>
           <div class="aspect-[4/5]">
@@ -69,6 +73,9 @@ const visualArtistLd = {
             <span class="font-serif italic text-encre">{featured[0].title}</span>
             {featured[0].series && <span class="text-eyebrow uppercase tracking-[0.16em]">{featured[0].series}</span>}
           </figcaption>
+        )}
+        {theme.hero.showArtworkFragment && !featured[0]?.image && (
+          <p class="mt-1 text-sm italic text-cendre">Fragment d’univers — bleu, matière et lumière.</p>
         )}
       </figure>
     </div>
