@@ -1,0 +1,31 @@
+name: claude-auto-merge
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
+jobs:
+  enable-auto-merge:
+    name: enable auto-merge for Claude PRs
+    runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.draft == false &&
+      (
+        contains(github.event.pull_request.user.login, 'claude') ||
+        contains(github.event.pull_request.title, '[claude]') ||
+        contains(join(github.event.pull_request.labels.*.name, ','), 'claude-auto-merge')
+      )
+    steps:
+      - name: Enable GitHub auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr merge --auto --squash "$PR_URL"

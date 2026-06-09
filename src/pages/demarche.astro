@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import Trait from '../components/Trait.astro';
+import { demarche } from '../content/bio';
+import { site } from '../data/site';
+---
+<Base
+  title={`Démarche artistique — ${site.artistName}`}
+  description="La démarche d’Armelle Mourier : la couleur d’abord, la peinture comme catharsis et joie de vivre, la matière et le geste, le dialogue entre peinture, écriture et danse."
+  keywords={['démarche artistique', 'peinture abstraite', 'peinture acrylique', 'Armelle Mourier', 'art contemporain']}
+>
+  <!-- INTRO -->
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <p class="eyebrow reveal is-visible mb-3">L’atelier intérieur</p>
+    <h1 class="reveal is-visible text-h1 font-serif text-encre">Démarche artistique</h1>
+    <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
+    <p class="reveal mt-7 max-w-prose text-lg leading-relaxed text-noir/85">
+      {demarche.lead}
+    </p>
+  </section>
+
+  <!-- AXES -->
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <div class="grid gap-x-10 gap-y-12 sm:grid-cols-2">
+        {demarche.axes.map((axe, i) => (
+          <div class="reveal flex gap-5">
+            <span class="shrink-0 font-serif text-2xl leading-none text-or">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <div>
+              <h2 class="text-h3 font-serif text-encre">{axe.title}</h2>
+              <p class="mt-2 leading-relaxed text-noir/80">{axe.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="shell py-section">
+    <div class="rounded-sm border border-cendre/25 px-6 py-12 text-center sm:px-12">
+      <h2 class="text-h2 font-serif text-encre">Voir la démarche à l’œuvre</h2>
+      <p class="mx-auto mt-4 max-w-xl text-noir/75">
+        Les fils de cette démarche se rejoignent dans les toiles et dans le recueil Bleu Cendres.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/oeuvres" class="btn-primary">Voir les œuvres</a>
+        <a href="/bleu-cendres" class="btn-ghost">Découvrir Bleu Cendres</a>
+      </div>
+    </div>
+  </section>
+</Base>

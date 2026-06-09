@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import ArtworkGrid from '../components/ArtworkGrid.astro';
+import { artworks, allSeries } from '../data/artworks';
+import { site } from '../data/site';
+
+// Donnée structurée : galerie d'œuvres (ItemList)
+const galleryLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `Œuvres — ${site.artistName}`,
+  about: 'Peintures contemporaines à l’acrylique',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: artworks.map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'VisualArtwork',
+        name: a.title,
+        artform: 'Peinture',
+        artMedium: a.technique ?? 'Acrylique sur toile',
+        creator: { '@type': 'VisualArtist', name: site.artistName },
+        ...(a.dimensions ? { width: a.dimensions } : {}),
+      },
+    })),
+  },
+};
+---
+<Base
+  title={`Œuvres — ${site.artistName}, artiste peintre`}
+  description="Le portfolio d’Armelle Mourier : peintures à l’acrylique, abstraction, couleur et matière. Séries Bleu Cendres, La couleur des sentiments, Impression Collioure et grands formats."
+  keywords={['tableaux contemporains', 'peinture acrylique', 'peinture abstraite', 'Armelle Mourier', 'œuvre originale artiste française', 'Bleu Cendres']}
+  jsonld={galleryLd}
+>
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <SectionTitle eyebrow="Le portfolio" title="Les œuvres" as="h1" />
+    <p class="reveal mt-6 max-w-prose text-noir/80">
+      Une peinture de la couleur et de la matière, le plus souvent à l’acrylique, sur toile recyclée,
+      achetée ou créée. Du grand format au plus petit, chaque toile naît d’un même élan&nbsp;:
+      coucher l’émotion et transmettre la joie d’être en vie.
+    </p>
+    <p class="reveal mt-3 max-w-prose text-sm text-cendre">
+      Les visuels haute définition seront ajoutés prochainement&nbsp;; un aperçu d’attente s’affiche
+      en attendant. Pour le prix ou la disponibilité d’une œuvre, contactez directement l’artiste.
+    </p>
+
+    <div class="mt-12">
+      <ArtworkGrid artworks={artworks} filterable={allSeries.length > 1} />
+    </div>
+  </section>
+
+  <section class="shell pb-section">
+    <div class="rounded-sm border border-cendre/25 bg-brume px-6 py-12 text-center sm:px-12">
+      <h2 class="text-h2 font-serif text-encre">Une œuvre vous attire&nbsp;?</h2>
+      <p class="mx-auto mt-4 max-w-xl text-noir/75">
+        Pour connaître le prix, la disponibilité ou recevoir le catalogue, écrivez à l’artiste.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/contact" class="btn-primary">Contacter l’artiste</a>
+        <a href="/disponibles" class="btn-ghost">Voir les tableaux disponibles</a>
+      </div>
+    </div>
+  </section>
+</Base>

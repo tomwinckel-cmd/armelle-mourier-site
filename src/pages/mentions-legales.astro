@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Trait from '../components/Trait.astro';
+import { site, contact } from '../data/site';
+---
+<Base
+  title={`Mentions légales — ${site.artistName}`}
+  description="Mentions légales du site d’Armelle Mourier, artiste peintre et plasticienne."
+  keywords={['mentions légales', 'Armelle Mourier']}
+>
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <p class="eyebrow mb-3">Informations légales</p>
+    <h1 class="text-h1 font-serif text-encre">Mentions légales</h1>
+    <Trait class="mt-5 text-or" width="7rem" />
+
+    <div class="mt-10 max-w-prose space-y-8 text-noir/85">
+      <p class="rounded-sm border border-or/40 bg-or/5 px-4 py-3 text-sm text-noir/75">
+        Modèle prêt à compléter. Remplacez les éléments entre crochets par les informations
+        réelles avant la mise en ligne. (Texte modifiable dans
+        <code class="text-encre">src/pages/mentions-legales.astro</code>.)
+      </p>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Éditeur du site</h2>
+        <p class="mt-3">
+          {site.artistName}, artiste peintre et plasticienne.<br />
+          [Adresse postale]<br />
+          [Statut / SIRET le cas échéant]<br />
+          E-mail&nbsp;: <a href={`mailto:${contact.email}`} class="link-quiet">{contact.email}</a>
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Directeur de la publication</h2>
+        <p class="mt-3">{site.artistName}.</p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Hébergement</h2>
+        <p class="mt-3">
+          [Nom de l’hébergeur, ex. Vercel Inc. / Netlify / OVH]<br />
+          [Adresse de l’hébergeur]<br />
+          [Site web de l’hébergeur]
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Propriété intellectuelle</h2>
+        <p class="mt-3">
+          L’ensemble des œuvres, images, textes et éléments graphiques présents sur ce site est la
+          propriété exclusive de {site.artistName}, sauf mention contraire. Toute reproduction,
+          représentation ou diffusion, totale ou partielle, sans autorisation écrite préalable, est
+          interdite et constituerait une contrefaçon au sens du Code de la propriété intellectuelle.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Crédits</h2>
+        <p class="mt-3">
+          Photographies des œuvres&nbsp;: [à préciser]. Conception et développement du site&nbsp;:
+          [à préciser]. Typographies&nbsp;: Fraunces et Mulish (Google Fonts, licence libre).
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Données personnelles</h2>
+        <p class="mt-3">
+          Le traitement des données transmises via le formulaire de contact est détaillé dans la
+          <a href="/confidentialite" class="link-quiet">politique de confidentialité</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import ArtworkGrid from '../components/ArtworkGrid.astro';
+import Trait from '../components/Trait.astro';
+import { artworks } from '../data/artworks';
+import { site } from '../data/site';
+
+// Œuvres présentables à l'acquisition : tout sauf « vendue ».
+const forSale = artworks.filter((a) => a.status !== 'sold');
+const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1;
+---
+<Base
+  title={`Tableaux disponibles — ${site.artistName}`}
+  description="Œuvres originales d’Armelle Mourier disponibles à l’acquisition. Une galerie privée, sobre et humaine : prix sur demande, réservation et catalogue par contact direct avec l’artiste."
+  keywords={['acheter tableau artiste peintre', 'œuvre originale artiste française', 'tableaux contemporains', 'Armelle Mourier', 'acquisition tableau']}
+>
+  <!-- INTRO « galerie privée » -->
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <p class="eyebrow reveal is-visible mb-3">Galerie privée</p>
+    <h1 class="reveal is-visible text-h1 font-serif text-encre">Tableaux disponibles</h1>
+    <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
+    <p class="reveal mt-7 max-w-prose text-lg leading-relaxed text-noir/85">
+      Certaines œuvres sont disponibles à l’acquisition. Pour connaître les conditions,
+      réserver une œuvre ou recevoir le catalogue, vous pouvez contacter directement l’artiste.
+    </p>
+    <p class="reveal mt-4 max-w-prose text-noir/70">
+      Chaque toile est une pièce unique. L’acquisition se fait dans l’échange&nbsp;: pas de paiement
+      en ligne, simplement une conversation, le temps de répondre à vos questions sur le format,
+      la technique ou l’encadrement.
+    </p>
+  </section>
+
+  <!-- GRILLE DES ŒUVRES DISPONIBLES -->
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <SectionTitle eyebrow="À acquérir" title="Les œuvres proposées" />
+      {forSale.length > 0 ? (
+        <div class="mt-12">
+          <ArtworkGrid artworks={forSale} filterable={hasFilter} />
+        </div>
+      ) : (
+        <p class="mt-10 max-w-prose text-noir/75">
+          Aucune œuvre n’est proposée à l’acquisition pour le moment. N’hésitez pas à écrire à
+          l’artiste pour être informé·e des prochaines disponibilités.
+        </p>
+      )}
+    </div>
+  </section>
+
+  <!-- COMMENT ACQUÉRIR -->
+  <section class="shell py-section">
+    <SectionTitle eyebrow="En pratique" title="Comment acquérir une œuvre" />
+    <div class="mt-10 grid gap-8 sm:grid-cols-3">
+      <div class="reveal">
+        <span class="font-serif text-3xl text-or">01</span>
+        <h3 class="mt-2 text-h3 font-serif text-encre">Vous écrivez</h3>
+        <p class="mt-2 text-noir/75">
+          Indiquez l’œuvre qui vous intéresse via le formulaire ou par e-mail. Le titre est
+          repris automatiquement quand vous cliquez sur «&nbsp;Demander cette œuvre&nbsp;».
+        </p>
+      </div>
+      <div class="reveal">
+        <span class="font-serif text-3xl text-or">02</span>
+        <h3 class="mt-2 text-h3 font-serif text-encre">L’artiste répond</h3>
+        <p class="mt-2 text-noir/75">
+          Prix, disponibilité, dimensions exactes, possibilités d’encadrement et d’expédition&nbsp;:
+          tout se précise dans l’échange.
+        </p>
+      </div>
+      <div class="reveal">
+        <span class="font-serif text-3xl text-or">03</span>
+        <h3 class="mt-2 text-h3 font-serif text-encre">L’œuvre vous rejoint</h3>
+        <p class="mt-2 text-noir/75">
+          Remise en main propre dans la région de Dijon, ou expédition soignée. Une œuvre
+          originale, signée, qui ne ressemble à aucune autre.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-wrap gap-3">
+      <a href="/contact?objet=acquisition" class="btn-primary">Demander une œuvre</a>
+      <a href="/contact?objet=catalogue" class="btn-ghost">Recevoir le catalogue</a>
+    </div>
+  </section>
+</Base>

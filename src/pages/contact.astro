@@ -1,0 +1,214 @@
+---
+import Base from '../layouts/Base.astro';
+import Trait from '../components/Trait.astro';
+import { site, contact } from '../data/site';
+
+// ---------------------------------------------------------------------
+//  ENVOI DU FORMULAIRE
+//  Par défaut, le formulaire ouvre le logiciel de messagerie du visiteur
+//  (lien mailto) avec l'objet et le message pré-remplis. C'est robuste,
+//  sans compte ni serveur, et ça fonctionne dès la mise en ligne.
+//
+//  POUR RECEVOIR LES MESSAGES DIRECTEMENT (sans ouvrir la messagerie),
+//  deux options simples — voir le README, section « Formulaire » :
+//   • Formspree : créez un formulaire, puis remplacez FORM_ENDPOINT
+//     ci-dessous par votre URL (ex. https://formspree.io/f/abcdwxyz).
+//   • Netlify Forms : ajoutez l'attribut  data-netlify="true"  au <form>.
+// ---------------------------------------------------------------------
+const FORM_ENDPOINT = ''; // '' = mode mailto ; sinon URL Formspree
+void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est déclarée dans le script client.
+---
+<Base
+  title={`Contact — ${site.artistName}`}
+  description="Contactez Armelle Mourier : acquisition d’une œuvre, demande de catalogue, exposition, résidence, atelier, presse ou commande spéciale. Réponse directe par l’artiste."
+  keywords={['contact artiste peintre', 'acheter tableau', 'Armelle Mourier', 'demande de catalogue', 'commande tableau']}
+>
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+      <!-- COLONNE GAUCHE : invitation + e-mail direct -->
+      <div class="reveal is-visible">
+        <p class="eyebrow mb-3">Échanger</p>
+        <h1 class="text-h1 font-serif text-encre">Contact</h1>
+        <Trait class="mt-5 text-or" width="7rem" />
+        <p class="mt-7 max-w-prose leading-relaxed text-noir/85">
+          Une œuvre vous touche, vous souhaitez recevoir le catalogue, proposer une exposition
+          ou simplement échanger&nbsp;? Écrivez en quelques mots&nbsp;: Armelle vous répondra
+          personnellement.
+        </p>
+
+        <div class="mt-8">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Par e-mail</p>
+          <a href={`mailto:${contact.email}`} class="link-quiet mt-1 inline-block font-serif text-lg">
+            {contact.email}
+          </a>
+        </div>
+
+        {contact.social.length > 0 && (
+          <div class="mt-8">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Sur les réseaux</p>
+            <ul class="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+              {contact.social.map((s) => (
+                <li>
+                  <a href={s.href} class="link-quiet font-semibold" target="_blank" rel="noopener noreferrer">{s.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="mt-8">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Atelier</p>
+          <p class="mt-1 text-noir/80">{site.city}, {site.region}</p>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE : formulaire -->
+      <div class="reveal">
+        <form
+          id="contact-form"
+          class="rounded-sm border border-cendre/25 bg-brume p-6 sm:p-8"
+          method="POST"
+          novalidate
+        >
+          <!-- Piège anti-spam (honeypot) : invisible pour les humains -->
+          <div aria-hidden="true" class="absolute -left-[9999px]">
+            <label>Ne pas remplir<input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label>
+          </div>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="sm:col-span-1">
+              <label for="name" class="block text-sm font-semibold text-encre">Nom <span class="text-or">*</span></label>
+              <input id="name" name="name" type="text" required autocomplete="name"
+                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none" />
+            </div>
+            <div class="sm:col-span-1">
+              <label for="email" class="block text-sm font-semibold text-encre">E-mail <span class="text-or">*</span></label>
+              <input id="email" name="email" type="email" required autocomplete="email"
+                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <label for="subject" class="block text-sm font-semibold text-encre">Objet</label>
+            <select id="subject" name="subject"
+              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none">
+              {contact.subjects.map((s) => <option value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div class="mt-5">
+            <label for="message" class="block text-sm font-semibold text-encre">Message <span class="text-or">*</span></label>
+            <textarea id="message" name="message" rows="6" required
+              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none"></textarea>
+          </div>
+
+          <p id="form-error" class="mt-4 text-sm text-or" hidden></p>
+          <p id="form-ok" class="mt-4 text-sm text-encre" hidden></p>
+
+          <button type="submit" class="btn-primary mt-6 w-full sm:w-auto">Envoyer le message</button>
+          <p class="mt-4 text-xs text-cendre">
+            Vos informations servent uniquement à répondre à votre message. Voir la
+            <a href="/confidentialite" class="underline decoration-cendre/50 underline-offset-2">politique de confidentialité</a>.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    const email = "armellemourier02@gmail.com";
+    const endpoint = "";
+    const subjects = ["Acquisition d’une œuvre", "Demande de catalogue", "Exposition", "Résidence", "Atelier", "Presse", "Commande spéciale", "Autre"];
+    const form = document.getElementById('contact-form');
+    const nameEl = document.getElementById('name');
+    const emailEl = document.getElementById('email');
+    const subjectSel = document.getElementById('subject');
+    const messageEl = document.getElementById('message');
+    const errEl = document.getElementById('form-error');
+    const okEl = document.getElementById('form-ok');
+
+    // --- Pré-remplissage depuis l'URL (?oeuvre=... / ?objet=...) ---
+    const params = new URLSearchParams(window.location.search);
+    const oeuvre = params.get('oeuvre');
+    const objet = params.get('objet');
+
+    const objetMap = {
+      'acquisition': 'Acquisition d’une œuvre',
+      'catalogue': 'Demande de catalogue',
+      'exposition': 'Exposition',
+      'residence': 'Résidence',
+      'atelier': 'Atelier',
+      'presse': 'Presse',
+      'commande': 'Commande spéciale',
+      'bleu-cendres': 'Demande de catalogue',
+    };
+
+    function selectSubject(label) {
+      const match = subjects.find((s) => s === label);
+      if (match) subjectSel.value = match;
+    }
+
+    if (oeuvre) {
+      selectSubject('Acquisition d’une œuvre');
+      messageEl.value = `Bonjour,\n\nJe suis intéressé·e par l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer son prix et sa disponibilité ?\n\nMerci.`;
+    } else if (objet && objetMap[objet]) {
+      selectSubject(objetMap[objet]);
+      if (objet === 'catalogue' || objet === 'bleu-cendres') {
+        messageEl.value = 'Bonjour,\n\nJe souhaiterais recevoir le catalogue des œuvres.\n\nMerci.';
+      }
+    }
+
+    // --- Envoi ---
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errEl.hidden = true;
+      okEl.hidden = true;
+
+      // Honeypot : si rempli, on ignore silencieusement (robot).
+      if (form.querySelector('[name="_gotcha"]').value) return;
+
+      const data = {
+        name: nameEl.value.trim(),
+        email: emailEl.value.trim(),
+        subject: subjectSel.value,
+        message: messageEl.value.trim(),
+      };
+
+      if (!data.name || !data.email || !data.message) {
+        errEl.textContent = 'Merci de renseigner votre nom, votre e-mail et votre message.';
+        errEl.hidden = false;
+        return;
+      }
+
+      // Mode Formspree (si une URL est configurée)
+      if (endpoint) {
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+          if (res.ok) {
+            form.reset();
+            okEl.textContent = 'Merci, votre message a bien été envoyé. Armelle vous répondra bientôt.';
+            okEl.hidden = false;
+          } else {
+            throw new Error('Échec de l’envoi');
+          }
+        } catch {
+          errEl.textContent = 'L’envoi a échoué. Vous pouvez écrire directement à ' + email + '.';
+          errEl.hidden = false;
+        }
+        return;
+      }
+
+      // Mode par défaut : ouverture du logiciel de messagerie (mailto)
+      const subject = `[Site] ${data.subject} — ${data.name}`;
+      const body = `${data.message}\n\n— ${data.name}\n${data.email}`;
+      window.location.href =
+        `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      okEl.textContent = 'Votre messagerie va s’ouvrir avec le message pré-rempli. Si rien ne se passe, écrivez à ' + email + '.';
+      okEl.hidden = false;
+    });
+  </script>
+</Base>
