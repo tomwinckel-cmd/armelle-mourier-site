@@ -20,15 +20,20 @@
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
+// Palette d'ARTISTE (pigment/papier/encre), pas une palette de marque.
+// Inspirée de l'œuvre imprimée sur la carte de visite : bleus picturaux,
+// ocre pigment, noir encre, papier chaud.
 export type ThemeColors = {
-  paper: string;     // fond principal (ivoire chaud)
-  brume: string;     // fond secondaire (ivoire plus profond)
-  white: string;     // blanc pur (cartes, contrastes)
-  blueDeep: string;  // bleu profond — sombre principal (« encre »)
-  blueSoft: string;  // bleu clair — accent lumineux de la carte
-  gold: string;      // or doux — accent discret (jamais criard)
-  ash: string;       // gris-bleu cendré — texte secondaire, filets
-  ink: string;       // noir doux — texte courant
+  paper: string;        // papier chaud / carnet (fond principal)
+  paperRaw: string;     // papier brut (fond secondaire, plus profond)
+  white: string;        // blanc cassé papier (pas un blanc pur premium)
+  bluePigment: string;  // bleu outremer / Collioure — bleu vivant pictural
+  blueDeep: string;     // bleu nuit pictural — masses sombres
+  blueWash: string;     // bleu clair aquatique — lavis
+  ochreGold: string;    // ocre-pigment — trace, pas accent luxe
+  inkBlack: string;     // noir encre — signature, texte
+  charcoal: string;     // noir doux / charbon — masses sombres
+  ashBlue: string;      // bleu-gris cendre — texte secondaire, filets
 };
 
 export type ThemeTypography = {
@@ -161,14 +166,16 @@ export type Theme = {
 /* ------------------------------------------------------------------ */
 export const theme: Theme = {
   colors: {
-    paper: '#F5F2EB',
-    brume: '#E9E5DA',
-    white: '#FFFFFF',
-    blueDeep: '#173039',
-    blueSoft: '#7FAEC6',
-    gold: '#A9791F',
-    ash: '#6F7C82',
-    ink: '#211F1B',
+    paper: '#F4EFE3',       // papier chaud / carnet
+    paperRaw: '#E7DECB',    // papier brut
+    white: '#FBF9F3',       // blanc cassé papier
+    bluePigment: '#2B4C92', // outremer / Collioure
+    blueDeep: '#15223B',    // bleu nuit pictural
+    blueWash: '#8FB7C7',    // bleu clair aquatique
+    ochreGold: '#A2762E',   // ocre-pigment
+    inkBlack: '#1A1613',    // noir encre
+    charcoal: '#2C2A2B',    // charbon / masse sombre
+    ashBlue: '#73808B',     // bleu-gris cendre
   },
   typography: {
     serif: 'Fraunces',
@@ -252,17 +259,23 @@ export function hexToRgbChannels(hex: string): string {
   return `${r} ${g} ${b}`;
 }
 
-/** Mappe les couleurs du thème vers les variables CSS attendues. */
+/** Mappe la palette d'artiste vers les variables CSS consommées par Tailwind.
+ *  Les noms historiques (--c-encre, --c-or, --c-cendre, --c-noir, --c-brume)
+ *  sont conservés pour ne rien casser, mais pointent vers les nouveaux pigments.
+ *  De nouveaux tokens (--c-blue-pigment, --c-charcoal, --c-paper-raw) s'ajoutent. */
 export function themeColorVars(colors: ThemeColors): Record<string, string> {
   return {
     '--c-paper': hexToRgbChannels(colors.paper),
-    '--c-brume': hexToRgbChannels(colors.brume),
+    '--c-brume': hexToRgbChannels(colors.paperRaw),       // fond secondaire
+    '--c-paper-raw': hexToRgbChannels(colors.paperRaw),
     '--c-white': hexToRgbChannels(colors.white),
-    '--c-encre': hexToRgbChannels(colors.blueDeep),
-    '--c-blue-soft': hexToRgbChannels(colors.blueSoft),
-    '--c-or': hexToRgbChannels(colors.gold),
-    '--c-cendre': hexToRgbChannels(colors.ash),
-    '--c-noir': hexToRgbChannels(colors.ink),
+    '--c-encre': hexToRgbChannels(colors.blueDeep),       // masses sombres / dark
+    '--c-blue-pigment': hexToRgbChannels(colors.bluePigment),
+    '--c-blue-soft': hexToRgbChannels(colors.blueWash),   // lavis aquatique
+    '--c-or': hexToRgbChannels(colors.ochreGold),         // ocre-pigment
+    '--c-cendre': hexToRgbChannels(colors.ashBlue),
+    '--c-noir': hexToRgbChannels(colors.inkBlack),
+    '--c-charcoal': hexToRgbChannels(colors.charcoal),
   };
 }
 

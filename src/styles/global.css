@@ -11,14 +11,17 @@
    appliquer les opacités (ex. bg-encre/10, border-cendre/25).
    ===================================================================== */
 :root {
-  --c-paper: 245 242 235;     /* ivoire chaud */
-  --c-brume: 233 229 218;     /* ivoire plus profond */
-  --c-white: 255 255 255;     /* blanc pur */
-  --c-encre: 23 48 57;        /* bleu profond */
-  --c-blue-soft: 127 174 198; /* bleu clair (carte de visite) */
-  --c-or: 169 121 31;         /* or doux */
-  --c-cendre: 111 124 130;    /* gris-bleu cendré */
-  --c-noir: 33 31 27;         /* noir doux */
+  --c-paper: 244 239 227;       /* papier chaud / carnet */
+  --c-paper-raw: 231 222 203;   /* papier brut */
+  --c-brume: 231 222 203;       /* fond secondaire (= papier brut) */
+  --c-white: 251 249 243;       /* blanc cassé papier */
+  --c-encre: 21 34 59;          /* bleu nuit pictural (masses sombres) */
+  --c-blue-pigment: 43 76 146;  /* outremer / Collioure */
+  --c-blue-soft: 143 183 199;   /* bleu clair aquatique */
+  --c-or: 162 118 46;           /* ocre-pigment */
+  --c-cendre: 115 128 139;      /* bleu-gris cendre */
+  --c-noir: 26 22 19;           /* noir encre */
+  --c-charcoal: 44 42 43;       /* charbon / masse sombre */
 
   --radius-card: 0.5rem;      /* arrondi des cartes/visuels */
   --border-hair: 1px;         /* filets fins type galerie */
@@ -281,7 +284,7 @@ body[data-buttons="handline"] .btn-gold {
   padding: 0.4rem 0.15rem 0.7rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 38 2 66 9 104 5 S 168 3 198 6' fill='none' stroke='%23A9791F' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 38 2 66 9 104 5 S 168 3 198 6' fill='none' stroke='%23A2762E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: left bottom;
   background-size: 100% 7px;

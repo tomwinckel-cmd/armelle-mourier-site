@@ -20,14 +20,16 @@ const hasLabel = Boolean(title || note);
     {/* Composition picturale — blocs verticaux bleu profond / noir / bleu clair,
         bords coupés (overflow) pour des limites imparfaites. Décoratif. */}
     <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-      {/* masse bleu profond */}
-      <span class="absolute" style="left:12%; top:-4%; width:27%; height:92%; transform: rotate(-1.6deg); background: rgb(var(--c-encre) / calc(0.78 + 0.2 * var(--blue-depth)));"></span>
-      {/* colonne noire (signature/masse sombre) */}
-      <span class="absolute" style="left:39%; top:10%; width:9%; height:82%; transform: rotate(1deg); background: rgb(var(--c-noir) / 0.9);"></span>
-      {/* bloc bleu clair (matière, lumière) */}
-      <span class="absolute" style="left:58%; top:20%; width:24%; height:66%; transform: rotate(-1deg); background: rgb(var(--c-blue-soft) / calc(0.5 + 0.4 * var(--blue-depth)));"></span>
-      {/* petit aplat bleu clair secondaire */}
-      <span class="absolute" style="left:80%; top:6%; width:11%; height:34%; transform: rotate(2deg); background: rgb(var(--c-blue-soft) / 0.45);"></span>
+      {/* masse bleu nuit (profondeur) */}
+      <span class="absolute" style="left:12%; top:-4%; width:27%; height:92%; transform: rotate(-1.6deg); background: rgb(var(--c-encre) / calc(0.82 + 0.18 * var(--blue-depth)));"></span>
+      {/* colonne d'encre noire (masse sombre / signature) */}
+      <span class="absolute" style="left:39%; top:10%; width:9%; height:82%; transform: rotate(1deg); background: rgb(var(--c-noir) / 0.92);"></span>
+      {/* bloc bleu outremer pigment (vivant) */}
+      <span class="absolute" style="left:58%; top:20%; width:24%; height:66%; transform: rotate(-1deg); background: rgb(var(--c-blue-pigment) / calc(0.6 + 0.35 * var(--blue-depth)));"></span>
+      {/* aplat bleu clair aquatique (lavis, lumière) */}
+      <span class="absolute" style="left:80%; top:6%; width:11%; height:38%; transform: rotate(2deg); background: rgb(var(--c-blue-soft) / 0.5);"></span>
+      {/* petit aplat charbon */}
+      <span class="absolute" style="left:6%; top:64%; width:9%; height:30%; transform: rotate(-2deg); background: rgb(var(--c-charcoal) / 0.55);"></span>
       {/* traces / filets d'or (pigment) */}
       <span class="absolute" style="left:35%; top:4%; width:2px; height:90%; transform: rotate(0.6deg); background: rgb(var(--c-or) / var(--gold-trace));"></span>
       <span class="absolute" style="left:69%; top:14%; width:2px; height:74%; background: rgb(var(--c-or) / calc(0.8 * var(--gold-trace)));"></span>
