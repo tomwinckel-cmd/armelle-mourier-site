@@ -270,10 +270,11 @@ export function getArtworkBySlug(slug: string): Artwork | undefined {
   return artworks.find((a) => a.slug === slug);
 }
 
-/** Lien de contact prérempli depuis une œuvre (objet + titre de l'œuvre). */
+/** Lien de contact prérempli depuis une œuvre (objet + slug stable de l'œuvre).
+ *  La page /contact résout le slug → titre pour un message lisible. */
 export function getArtworkRequestUrl(
   a: Artwork,
   objet: 'acquisition' | 'reservation' | 'catalogue' = 'acquisition',
 ): string {
-  return `/contact?objet=${objet}&oeuvre=${encodeURIComponent(a.title)}`;
+  return `/contact?objet=${objet}&oeuvre=${encodeURIComponent(a.slug)}`;
 }
