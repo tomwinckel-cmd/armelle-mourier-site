@@ -11,6 +11,8 @@ interface Props {
   keywords?: string[];
   image?: string;
   jsonld?: Record<string, unknown> | Record<string, unknown>[];
+  /** Empêche l'indexation (pages internes : ex. /cockpit-roadmap). */
+  noindex?: boolean;
 }
 const {
   title = `${site.artistName} — ${site.role}`,
@@ -18,6 +20,7 @@ const {
   keywords = [],
   image = '/images/og/og-default.jpg',
   jsonld,
+  noindex = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, site.url).href;
@@ -38,6 +41,7 @@ const themeColor = `rgb(${cssVars['--c-encre'].split(' ').join(', ')})`;
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={mergedKeywords} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 

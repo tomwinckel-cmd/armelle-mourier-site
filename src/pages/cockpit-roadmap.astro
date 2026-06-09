@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import { cockpit } from '../data/cockpit';
+import { socialPublishing } from '../data/social';
+
+// Page INTERNE, non listée dans la navigation. Aucune donnée sensible,
+// aucun formulaire fonctionnel, aucune authentification : c'est une carte
+// du futur cockpit, pas un admin.
+const alreadyEditable = [
+  { label: 'Identité, navigation, Carnet, contact', file: 'src/data/site.ts' },
+  { label: 'Œuvres (titres, statuts, photos, séries…)', file: 'src/data/artworks.ts' },
+  { label: 'Vente douce (prix sur demande, CTA, sujets)', file: 'src/data/shop.ts' },
+  { label: 'Expositions', file: 'src/data/exhibitions.ts' },
+  { label: 'Biographie, démarche, Bleu Cendres', file: 'src/content/bio.ts' },
+  { label: 'Textes d’accueil & galerie', file: 'src/content/pages.ts' },
+  { label: 'Ambiance visuelle (couleurs, intensités)', file: 'src/data/theme.ts' },
+];
+
+const nextSteps = [
+  'Fichiers de configuration éditables (état actuel).',
+  'Mini-cockpit / admin statique qui écrit ces fichiers.',
+  'Stockage et association des images.',
+  'Édition des œuvres et des textes via des formulaires humains.',
+  'Assistant Instagram (légendes + mots-clés à copier-coller).',
+  'Authentification privée (éventuelle).',
+  'CMS / base de données (éventuel, si le besoin grandit).',
+];
+---
+<Base
+  title="Cockpit (prototype à venir) — Armelle Mourier"
+  description="Feuille de route interne du futur cockpit artiste."
+  noindex={true}
+>
+  <section class="shell pb-section pt-10 sm:pt-14">
+    <p class="eyebrow mb-3">Document interne</p>
+    <h1 class="signature text-display text-encre">Cockpit d’artiste</h1>
+    <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-noir/80">
+      <strong>Prototype à venir.</strong> Cette page décrit l’outil qu’Armelle pourra
+      utiliser pour piloter son site elle-même. Ce n’est pas encore une interface :
+      rien n’est cliquable ici, aucune donnée n’est enregistrée.
+    </p>
+    <p class="mt-5 max-w-prose font-serif text-xl italic leading-snug text-encre">
+      {cockpit.philosophy}
+    </p>
+
+    <!-- DÉJÀ PILOTABLE -->
+    <h2 class="mt-14 text-h2 font-serif text-encre">Ce qui est déjà pilotable</h2>
+    <div class="rule-gold mt-4" aria-hidden="true"></div>
+    <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+      {alreadyEditable.map((d) => (
+        <li class="border-l-2 border-cendre/30 pl-4">
+          <span class="block text-encre">{d.label}</span>
+          <code class="text-xs text-cendre">{d.file}</code>
+        </li>
+      ))}
+    </ul>
+
+    <!-- MODULES PRÉVUS -->
+    <h2 class="mt-14 text-h2 font-serif text-encre">Modules prévus</h2>
+    <div class="rule-gold mt-4" aria-hidden="true"></div>
+    <div class="mt-6 grid gap-6 sm:grid-cols-2">
+      {cockpit.modules.map((m) => (
+        <article class="frame-gallery p-5">
+          <h3 class="font-serif text-h3 italic text-encre">{m.label}</h3>
+          <p class="mt-2 text-noir/75">{m.description}</p>
+          <p class="mt-3 text-eyebrow uppercase tracking-[0.16em] text-cendre">Actions</p>
+          <ul class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-noir/70">
+            {m.actions.map((a) => <li>· {a}</li>)}
+          </ul>
+        </article>
+      ))}
+    </div>
+
+    <!-- ASSISTANT RÉSEAUX SOCIAUX -->
+    <h2 class="mt-14 text-h2 font-serif text-encre">Assistant réseaux sociaux</h2>
+    <div class="rule-gold mt-4" aria-hidden="true"></div>
+    <p class="mt-6 max-w-prose text-noir/80">{socialPublishing.instruction}</p>
+    <p class="mt-2 max-w-prose text-sm text-cendre">
+      Aucune connexion à Instagram, aucune publication automatique : on prépare des
+      textes à copier-coller. Formats conseillés :
+      {socialPublishing.formats.map((f) => ` ${f.label} (${f.ratio})`).join(' ·')}.
+    </p>
+    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {socialPublishing.templates.map((t) => (
+        <article class="border-l-2 border-or/40 pl-4">
+          <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
+          <p class="mt-1 text-sm text-noir/70">{t.description}</p>
+          <p class="mt-2 whitespace-pre-line text-sm text-noir/80">{t.caption}</p>
+        </article>
+      ))}
+    </div>
+    <p class="mt-6 text-sm text-cendre">
+      Mots-clés de base : {socialPublishing.defaultHashtags.join(' ')}
+    </p>
+
+    <!-- CHEMIN PROGRESSIF -->
+    <h2 class="mt-14 text-h2 font-serif text-encre">Étapes à venir</h2>
+    <div class="rule-gold mt-4" aria-hidden="true"></div>
+    <ol class="mt-6 max-w-prose space-y-2">
+      {nextSteps.map((s, i) => (
+        <li class="flex gap-3">
+          <span class="font-serif italic text-or">{String(i + 1).padStart(2, '0')}</span>
+          <span class="text-noir/80">{s}</span>
+        </li>
+      ))}
+    </ol>
+
+    <p class="mt-12 max-w-prose text-sm text-cendre">
+      Volontairement exclu pour l’instant : paiement en ligne, publication
+      Instagram automatique, stockage de secrets, complexité inutile.
+    </p>
+  </section>
+</Base>
