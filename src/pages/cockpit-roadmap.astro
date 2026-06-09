@@ -8,6 +8,8 @@ import { cockpit } from '../data/cockpit';
 import { theme } from '../data/theme';
 import { splitExhibitions } from '../data/exhibitions';
 import { operations, operationsPrinciple, type OperationStatus } from '../data/operations';
+import { artworkWorkflow, workflowBadges } from '../data/artworkWorkflow';
+import { designModes } from '../data/theme';
 
 // ---- Données (lecture seule) ----
 const totalArtworks = artworks.length;
@@ -19,7 +21,6 @@ const byStatus = Object.fromEntries(
 const { upcoming, past } = splitExhibitions();
 
 // Champs requis pour ajouter une œuvre (depuis le schéma cockpit).
-const artworkFields = cockpit.modules.find((m) => m.id === 'artworks')?.fields ?? [];
 
 // Zones éditoriales pilotables et où elles vivent aujourd'hui.
 const editorialZones = [
@@ -47,6 +48,7 @@ const sections = [
   { id: 'apercu', label: 'Vue d’ensemble' },
   { id: 'operations', label: 'Centre opérationnel' },
   { id: 'oeuvres', label: 'Œuvres' },
+  { id: 'intake', label: 'Ajouter une œuvre' },
   { id: 'disponibilites', label: 'Disponibilités' },
   { id: 'pages', label: 'Pages' },
   { id: 'expositions', label: 'Expositions' },
@@ -184,46 +186,147 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         ))}
       </ul>
 
-      <!-- Préparer une nouvelle œuvre (NON fonctionnel) -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer une nouvelle œuvre</h3>
-      <p class="mt-2 max-w-prose text-sm text-cendre">
-        Champs attendus : {artworkFields.map((f) => f.label).join(' · ')}.
+      <p class="mt-10 max-w-prose text-noir/75">
+        Pour saisir une œuvre pas à pas — avec un <strong>garde-fou avant publication</strong> —
+        utilisez l’<a href="#intake" class="link-quiet font-semibold">assistant « Ajouter une œuvre »</a> ci-dessous.
       </p>
-      <form id="art-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+    </section>
+
+    <!-- ASSISTANT « AJOUTER UNE ŒUVRE » (prototype, ne sauvegarde pas) -->
+    <section id="intake" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Ajouter une œuvre — assistant prototype</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        On prépare la fiche pas à pas, on vérifie, on copie le récapitulatif.
+        <strong>Rien n’est sauvegardé ni publié ici</strong> : aucune base de données, aucun envoi.
+        La publication se fait ensuite, <em>à valider humainement</em>.
+      </p>
+
+      <!-- Étapes du parcours -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {artworkWorkflow.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h3>
+            <p class="mt-1 text-sm text-noir/75">{s.description}</p>
+            <p class="mt-2 text-xs text-cendre">À préparer : {s.requiredFields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Préparation de la fiche (NE SAUVEGARDE PAS) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer la fiche</h3>
+      <form id="w-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
         <label class="text-sm">Titre
-          <input id="f-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+          <input id="w-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
         </label>
-        <label class="text-sm">Dimensions <span class="text-cendre">(sinon vide)</span>
-          <input id="f-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        <label class="text-sm">Série <span class="text-cendre">(optionnel)</span>
+          <input id="w-series" type="text" placeholder="Bleu Cendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
         </label>
-        <label class="text-sm">Technique
-          <input id="f-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
-        <label class="text-sm">Série
-          <input id="f-series" type="text" placeholder="Bleu Cendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        <label class="text-sm">Année <span class="text-cendre">(sinon vide)</span>
+          <input id="w-year" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
         </label>
         <label class="text-sm">Statut
-          <select id="f-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          <select id="w-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
             <option value="available">Disponible</option>
             <option value="reserved">Réservée</option>
             <option value="sold">Vendue</option>
             <option value="on-request">Sur demande</option>
           </select>
         </label>
-        <label class="text-sm">Photo (nom de fichier)
-          <input id="f-image" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="w-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="w-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Support
+          <input id="w-support" type="text" placeholder="Toile recyclée" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Mots-clés / ambiance
+          <input id="w-keywords" type="text" placeholder="bleu, or, matière" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
         </label>
         <label class="text-sm sm:col-span-2">Description (quelques mots)
-          <textarea id="f-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+          <textarea id="w-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
         </label>
-        <label class="text-sm sm:col-span-2">Description de l’image (accessibilité)
-          <input id="f-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        <label class="text-sm">Photo principale (nom de fichier)
+          <input id="w-image" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
         </label>
-        <div class="sm:col-span-2">
-          <button type="button" class="btn btn-primary" data-art-copy>Copier le bloc à coller dans artworks.ts</button>
-          <p class="mt-3 text-sm italic text-or">Prototype : la sauvegarde sera activée dans une prochaine version. Ce bouton copie un bloc de code à coller, rien n’est enregistré ici.</p>
-        </div>
+        <label class="text-sm">Photos de détail <span class="text-cendre">(optionnel)</span>
+          <input id="w-detail" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Alt text (décrire vraiment l’œuvre)
+          <input id="w-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « Prix sur demande »)</span>
+          <input id="w-price" type="text" placeholder="laisser vide" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Date de création
+          <input id="w-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Légende Instagram (brouillon)
+          <textarea id="w-caption" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Hashtags
+          <input id="w-hashtags" type="text" placeholder="#ArmelleMourier #BleuCendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="w-web" type="checkbox" /> Version web compressée prête</label>
+          <label class="flex items-center gap-2"><input id="w-hd" type="checkbox" /> HD originale conservée hors du site (privée)</label>
+          <label class="flex items-center gap-2"><input id="w-proof" type="checkbox" /> Œuvre importante : preuve de création prévue (e-Soleau)</label>
+          <label class="flex items-center gap-2"><input id="w-saleok" type="checkbox" /> Vente douce vérifiée — « Prix sur demande » si rien n’est validé</label>
+        </fieldset>
       </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Niveau de préparation</p>
+          <p id="w-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="w-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="w-score">0</span> % de complétude — indicatif, pas une note.</p>
+        <ul id="w-badges" class="mt-4 flex flex-wrap gap-2">
+          {workflowBadges.map((b) => (
+            <li data-badge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Garde-fou : avant de publier -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Avant de publier cette œuvre, vérifier :</h3>
+      <ul class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
+        {[
+          'Le titre est correct.',
+          'La série est correcte.',
+          'Les dimensions sont renseignées.',
+          'La technique est renseignée.',
+          'Le statut est correct.',
+          'L’image principale existe.',
+          'L’alt text décrit vraiment l’œuvre.',
+          'La HD originale est conservée hors site.',
+          'La version web est compressée.',
+          'L’œuvre importante est documentée (preuve de création).',
+          'Le prix n’est pas inventé.',
+          'La vente reste « Prix sur demande » si rien n’est validé.',
+        ].map((item) => (
+          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+        ))}
+      </ul>
+
+      <!-- Récapitulatif copiable -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Récapitulatif avant publication</h3>
+      <p class="mt-2 text-sm text-cendre" id="w-missing">Champs manquants : —</p>
+      <pre id="w-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-recap-copy>Copier le récapitulatif</button>
+        <button type="button" class="btn btn-ghost" data-art-copy>Copier le bloc artworks.ts</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        À valider humainement. Rien n’est publié automatiquement : Armelle décide, Tom valide.
+      </p>
     </section>
 
     <!-- 3 — DISPONIBILITÉS -->
@@ -329,6 +432,23 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         Modifiables plus tard : couleur papier, bleu pigment, ocre, intensité de matière,
         style des cartes, style des boutons — sans casser le design.
       </p>
+
+      <h3 class="mt-8 text-h3 font-serif text-encre">Ambiances visuelles activables plus tard</h3>
+      <p class="mt-2 max-w-prose text-sm text-cendre">
+        Préparation : un futur cockpit pourra proposer ces ambiances. Aujourd’hui,
+        l’ambiance active reste « {designModes[0].label} ».
+      </p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+        {designModes.map((d, i) => (
+          <article class={`frame-gallery p-4 ${i === 0 ? 'border-or/45' : ''}`}>
+            <div class="flex items-baseline justify-between gap-2">
+              <h4 class="font-serif italic text-encre">{d.label}</h4>
+              {i === 0 && <span class="text-eyebrow uppercase tracking-[0.14em] text-or">active</span>}
+            </div>
+            <p class="mt-1 text-sm text-noir/75">{d.description}</p>
+          </article>
+        ))}
+      </div>
     </section>
 
     <!-- 8 — PROCHAINES ÉTAPES -->
@@ -363,35 +483,97 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       btn.textContent = msg;
       setTimeout(function () { btn.textContent = old; }, 1600);
     }
+    function copyText(text, btn) {
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copie OK'); }); }
+      else { flash(btn, 'Selectionnez et copiez'); }
+    }
     document.querySelectorAll('[data-copy]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const text = btn.getAttribute('data-copy') || '';
-        if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copie OK'); }); }
-        else { flash(btn, 'Selectionnez et copiez'); }
-      });
+      btn.addEventListener('click', function () { copyText(btn.getAttribute('data-copy') || '', btn); });
     });
-    // Construit un bloc artworks.ts a partir du formulaire (ne sauvegarde rien).
-    var artBtn = document.querySelector('[data-art-copy]');
-    if (artBtn) {
-      artBtn.addEventListener('click', function () {
-        function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
-        function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-        var q = String.fromCharCode(0x2019);
-        var title = v('f-title') || 'Sans titre';
+
+    // --- Assistant « Ajouter une œuvre » (guide + vérifie, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('w-form');
+      if (!form) return;
+      var q = String.fromCharCode(0x2019);
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+      var statusFr = { available: 'Disponible', reserved: 'Réservée', sold: 'Vendue', 'on-request': 'Sur demande' };
+
+      function protectionNote() {
+        var p = [];
+        if (v('w-date')) p.push('date ' + v('w-date'));
+        if (c('w-hd')) p.push('HD privée conservée hors site');
+        if (c('w-proof')) p.push('preuve de création prévue (e-Soleau)');
+        return p.join(' ; ') || 'à compléter';
+      }
+      function buildRecap() {
+        return [
+          'Fiche œuvre prête à transmettre',
+          'Titre : ' + v('w-title'),
+          'Série : ' + v('w-series'),
+          'Année : ' + v('w-year'),
+          'Dimensions : ' + v('w-dimensions'),
+          'Technique : ' + v('w-technique'),
+          'Support : ' + v('w-support'),
+          'Description : ' + v('w-description'),
+          'Statut : ' + (statusFr[v('w-status')] || v('w-status')),
+          'Image principale : ' + v('w-image'),
+          'Alt text : ' + v('w-alt'),
+          'Notes protection : ' + protectionNote(),
+          'Caption Instagram : ' + v('w-caption'),
+          'Hashtags : ' + v('w-hashtags'),
+        ].join('\n');
+      }
+      function buildBlock() {
+        var title = v('w-title') || 'Sans titre';
         var slug = slugify(title) || 'oeuvre';
         var lines = ['{', "  id: '" + slug + "',", "  title: '" + title.split("'").join(q) + "',", "  slug: '" + slug + "',"];
-        if (v('f-dimensions')) { lines.push("  dimensions: '" + v('f-dimensions') + "',"); }
-        if (v('f-technique')) { lines.push("  technique: '" + v('f-technique') + "',"); }
-        if (v('f-series')) { lines.push("  series: '" + v('f-series') + "',"); }
-        if (v('f-description')) { lines.push("  description: '" + v('f-description').split("'").join(q) + "',"); }
-        lines.push("  image: '" + v('f-image') + "',");
-        lines.push("  alt: '" + (v('f-alt') || title).split("'").join(q) + "',");
-        lines.push("  status: '" + v('f-status') + "',");
+        if (v('w-dimensions')) { lines.push("  dimensions: '" + v('w-dimensions') + "',"); }
+        if (v('w-technique')) { lines.push("  technique: '" + v('w-technique') + "',"); }
+        if (v('w-series')) { lines.push("  series: '" + v('w-series') + "',"); }
+        if (v('w-year')) { lines.push("  year: '" + v('w-year') + "',"); }
+        if (v('w-description')) { lines.push("  description: '" + v('w-description').split("'").join(q) + "',"); }
+        lines.push("  image: '" + v('w-image') + "',");
+        lines.push("  alt: '" + (v('w-alt') || title).split("'").join(q) + "',");
+        lines.push("  status: '" + v('w-status') + "',");
         lines.push('},');
-        var block = lines.join('\n');
-        if (navigator.clipboard) { navigator.clipboard.writeText(block).then(function () { flash(artBtn, 'Bloc copie OK'); }); }
-        else { flash(artBtn, 'Copie indisponible'); }
-      });
-    }
+        return lines.join('\n');
+      }
+      var keys = ['w-title', 'w-series', 'w-year', 'w-dimensions', 'w-technique', 'w-support', 'w-description', 'w-keywords', 'w-image', 'w-alt', 'w-caption', 'w-hashtags', 'w-date'];
+      var checks = ['w-web', 'w-hd', 'w-proof', 'w-saleok'];
+      function update() {
+        var filled = 1, total = keys.length + checks.length + 1; // statut toujours renseigné
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('w-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('w-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('w-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          fiche: !!(v('w-title') && v('w-dimensions') && v('w-technique') && v('w-description')),
+          image: !!(v('w-image') && v('w-alt') && c('w-web') && c('w-hd')),
+          protection: !!(v('w-date') && c('w-proof')),
+          social: !!(v('w-caption') && v('w-hashtags')),
+          sale: c('w-saleok'),
+        };
+        document.querySelectorAll('[data-badge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-badge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var labels = { 'w-title': 'titre', 'w-dimensions': 'dimensions', 'w-technique': 'technique', 'w-image': 'image', 'w-alt': 'alt text' };
+        var miss = [];
+        Object.keys(labels).forEach(function (k) { if (!v(k)) miss.push(labels[k]); });
+        var mEl = document.getElementById('w-missing');
+        if (mEl) mEl.textContent = 'Champs manquants : ' + (miss.length ? miss.join(', ') : 'aucun');
+        var recapEl = document.getElementById('w-recap'); if (recapEl) recapEl.textContent = buildRecap();
+      }
+      form.addEventListener('input', update);
+      update();
+      var rc = document.querySelector('[data-recap-copy]'); if (rc) rc.addEventListener('click', function () { copyText(buildRecap(), rc); });
+      var ac = document.querySelector('[data-art-copy]'); if (ac) ac.addEventListener('click', function () { copyText(buildBlock(), ac); });
+    })();
   </script>
 </Base>

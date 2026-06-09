@@ -317,3 +317,27 @@ export function themeCssVars(t: Theme): Record<string, string> {
     '--font-sans': `'${t.typography.sans}', system-ui, sans-serif`,
   };
 }
+
+// =====================================================================
+//  AMBIANCES VISUELLES activables PLUS TARD (préparation, pas de switch global)
+//  ---------------------------------------------------------------------
+//  Données seulement : un futur cockpit pourra proposer ces ambiances.
+//  Aujourd'hui, l'ambiance active reste `theme.identity` (artist-studio).
+// =====================================================================
+export const designModes = [
+  {
+    id: 'artist-studio',
+    label: 'Atelier pigment',
+    description: 'Papier, bleu pigment, ocre, cartels.',
+  },
+  {
+    id: 'gallery-minimal',
+    label: 'Galerie claire',
+    description: 'Plus blanc, plus sobre, priorité aux œuvres.',
+  },
+  {
+    id: 'blue-cendres',
+    label: 'Bleu Cendres',
+    description: 'Bleus profonds, or, paysages intérieurs.',
+  },
+] as const;
