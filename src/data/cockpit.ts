@@ -43,6 +43,8 @@ export type CockpitModule = {
   /** Actions simples proposées à l'artiste. */
   actions: string[];
   fields: CockpitField[];
+  /** Activable progressivement : 'planned' (à venir) | 'prototype' | 'active'. */
+  status?: 'planned' | 'prototype' | 'active';
 };
 
 export const cockpit = {
@@ -133,6 +135,63 @@ export const cockpit = {
         { id: 'goldTraceOpacity', label: 'Présence de l’or', type: 'range', help: 'Plus ou moins de trace dorée.' },
         { id: 'paperTexture', label: 'Matière du papier', type: 'range' },
       ],
+    },
+
+    // --- Modules OPÉRATIONNELS (activables progressivement) -----------
+    // Détail des actions dans src/data/operations.ts.
+    {
+      id: 'ip',
+      label: 'Propriété intellectuelle',
+      description: 'Constituer une preuve de création par œuvre (sans publier les HD).',
+      status: 'planned',
+      actions: ['Fiche œuvre complète', 'Photos datées (HD privée + web)', 'Filigrane léger', 'Rappel dépôt de preuve (e-Soleau)'],
+      fields: [
+        { id: 'date', label: 'Date de création', type: 'date' },
+        { id: 'proofHD', label: 'Photo HD (privée, non publiée)', type: 'image', help: 'Ne jamais publier la HD pleine résolution.' },
+        { id: 'registry', label: 'Note de registre interne', type: 'longtext', optional: true },
+      ],
+    },
+    {
+      id: 'invoicing',
+      label: 'Facturation (brouillon)',
+      description: 'Préparer un BROUILLON de facture — pas de comptabilité légale.',
+      status: 'planned',
+      actions: ['Générer un brouillon', 'Lister les mentions à compléter', 'Suivre le statut'],
+      fields: [
+        { id: 'invoiceNumber', label: 'Numéro (à valider)', type: 'text', optional: true },
+        { id: 'amount', label: 'Montant (à valider)', type: 'text', optional: true, help: 'Ne pas inventer de prix.' },
+        { id: 'status', label: 'Statut', type: 'choice', choices: ['Brouillon', 'Envoyée', 'Réglée'] },
+      ],
+    },
+    {
+      id: 'logistics',
+      label: 'Logistique / récupération',
+      description: 'Organiser la remise : retrait atelier, livraison locale, expédition.',
+      status: 'planned',
+      actions: ['Préparer un retrait/livraison', 'Noter l’état avant départ', 'Préparer une preuve de remise'],
+      fields: [
+        { id: 'method', label: 'Mode', type: 'choice', choices: ['Retrait atelier', 'Livraison locale', 'Expédition'] },
+        { id: 'condition', label: 'État de l’œuvre avant départ', type: 'longtext', optional: true },
+      ],
+    },
+    {
+      id: 'catalog',
+      label: 'Catalogue',
+      description: 'Composer une sélection d’œuvres (collectionneur ou exposition).',
+      status: 'planned',
+      actions: ['Choisir une sélection', 'Version collectionneur / exposition', 'PDF (futur)'],
+      fields: [
+        { id: 'selection', label: 'Œuvres sélectionnées', type: 'text', help: 'Liste de slugs/titres.' },
+        { id: 'version', label: 'Version', type: 'choice', choices: ['Collectionneur', 'Exposition'] },
+      ],
+    },
+    {
+      id: 'human-relation',
+      label: 'Relation humaine / validation',
+      description: 'Armelle décide · Tom valide · Claude Code exécute. Rien d’irréversible sans validation.',
+      status: 'active',
+      actions: ['Valider avant toute action sensible'],
+      fields: [],
     },
   ] as CockpitModule[],
 };
