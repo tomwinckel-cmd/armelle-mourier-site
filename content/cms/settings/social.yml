@@ -1,0 +1,21 @@
+# EXEMPLE de préparation — non utilisé par le site pour l'instant.
+# Source active aujourd'hui : src/data/social.ts  (préparation copier-coller, sans API)
+defaultHashtags:
+  - "#ArmelleMourier"
+  - "#ArtistePeintre"
+  - "#PeintureContemporaine"
+  - "#ArtDijon"
+  - "#Bourgogne"
+  - "#Collioure"
+  - "#BleuCendres"
+formats:
+  - { label: "Carré", ratio: "1:1", size: "1080 × 1080 px" }
+  - { label: "Portrait", ratio: "4:5", size: "1080 × 1350 px" }
+  - { label: "Story", ratio: "9:16", size: "1080 × 1920 px" }
+templates:
+  - label: "Nouvelle œuvre"
+    format: "portrait"
+    caption: "Nouvelle toile : « {titre} »{serie}. La couleur d'abord, puis la matière — peindre comme on respire."
+  - label: "Œuvre disponible"
+    format: "portrait"
+    caption: "« {titre} » est disponible. Acquisition en lien direct avec l'artiste — prix sur demande."

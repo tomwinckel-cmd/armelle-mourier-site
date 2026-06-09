@@ -1,0 +1,16 @@
+# EXEMPLE de préparation — non utilisé par le site pour l'instant.
+# Source active aujourd'hui : src/data/site.ts
+artistName: "Armelle Mourier"
+role: "Artiste peintre & plasticienne"
+email: "armellemourier02@gmail.com"
+city: "Dijon"
+region: "Bourgogne"
+social: []
+nav:
+  - { label: "Œuvres", href: "/oeuvres", note: "Galerie complète, séries, formats et matières." }
+  - { label: "Disponibles", href: "/disponibles", note: "Sélection d'atelier à découvrir ou réserver." }
+  - { label: "Biographie", href: "/biographie", note: "Le parcours, les lieux, les épreuves et la couleur." }
+  - { label: "Démarche", href: "/demarche", note: "Pigments, gestes, toile, danse et catharsis." }
+  - { label: "Bleu Cendres", href: "/bleu-cendres", note: "Le recueil, les bleus, les ors et les paysages intérieurs." }
+  - { label: "Expositions", href: "/expositions", note: "Chronologie, lieux, rencontres et projets." }
+  - { label: "Contact", href: "/contact", note: "Écrire à l'artiste pour une œuvre, une exposition ou une rencontre." }

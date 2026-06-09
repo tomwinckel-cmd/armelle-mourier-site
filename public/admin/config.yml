@@ -1,0 +1,216 @@
+# =====================================================================
+#  DECAP CMS — configuration préparatoire (Phase 2A)
+#  ---------------------------------------------------------------------
+#  ⚠️ AUCUN secret / token / clé / cloud_name privé dans ce fichier.
+#  L'authentification n'est pas encore branchée : voir docs/decap-cms-setup.md.
+#  Tant que le backend n'est pas finalisé, /admin s'affiche mais ne publie pas.
+#
+#  Le site PUBLIC continue de lire les données TypeScript actuelles
+#  (src/data/*.ts, src/content/*.ts). Les fichiers édités ici (content/cms/…)
+#  sont une PRÉPARATION : ils ne sont pas encore la source de vérité.
+#  Stratégie de transition : voir docs/decap-cms-setup.md.
+# =====================================================================
+
+# --- BACKEND (à FINALISER, sans secret dans le repo) -----------------
+# Choix d'auth possibles (un seul) :
+#   1) Netlify Identity + Git Gateway  → décommenter `git-gateway`.
+#   2) OAuth GitHub (via Vercel/un proxy OAuth) → name: github + base_url du proxy.
+# Aucune clé n'est stockée ici : elles vivront dans les Variables Netlify/Vercel.
+backend:
+  name: git-gateway        # placeholder — nécessite Netlify Identity (à brancher)
+  branch: main
+  # commit_messages personnalisés (facultatif) :
+  # commit_messages:
+  #   create: 'cockpit: ajout {{collection}} “{{slug}}”'
+  #   update: 'cockpit: modification {{collection}} “{{slug}}”'
+
+# Permet d'éditer en local sans backend distant (dev) :
+local_backend: true
+
+# Flux éditorial (brouillon → relecture → publication) :
+publish_mode: editorial_workflow
+
+# --- MÉDIAS / IMAGES -------------------------------------------------
+# Cloudinary RECOMMANDÉ (upload + optimisation hors dépôt). À configurer
+# SANS clé dans le repo (panneau Decap / variables). Voir docs/cloudinary-setup.md.
+#
+# media_library:
+#   name: cloudinary
+#   config:
+#     cloud_name: <DÉFINI HORS REPO>     # ne jamais committer
+#     # api_key géré côté Decap, jamais ici
+#
+# En attendant Cloudinary, dépôt local (préparation, léger) :
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+# --- COLLECTIONS -----------------------------------------------------
+collections:
+  # 1) ŒUVRES ---------------------------------------------------------
+  - name: artworks
+    label: "Œuvres"
+    label_singular: "Œuvre"
+    folder: "content/cms/artworks"
+    create: true
+    slug: "{{slug}}"
+    summary: "{{title}} — {{fields.status}}"
+    fields:
+      - { name: title, label: "Titre", widget: string }
+      - { name: slug, label: "Identifiant (auto)", widget: string, required: false, hint: "Laisser vide : généré depuis le titre." }
+      - { name: status, label: "Statut", widget: select, default: "available", options: ["available", "reserved", "sold", "on-request"] }
+      - { name: featured, label: "Mise en avant (accueil)", widget: boolean, default: false }
+      - { name: showInAvailable, label: "Afficher dans « Disponibles »", widget: boolean, required: false, default: true }
+      - { name: series, label: "Série", widget: string, required: false }
+      - { name: year, label: "Année", widget: string, required: false }
+      - { name: dimensions, label: "Dimensions", widget: string, required: false, hint: "Ex. 60 × 73 cm. Laisser vide si inconnu — ne pas inventer." }
+      - { name: technique, label: "Technique", widget: string, required: false }
+      - { name: image, label: "Photo principale", widget: image, required: false }
+      - { name: gallery, label: "Photos secondaires", widget: list, required: false, field: { name: image, label: "Image", widget: image } }
+      - { name: description, label: "Quelques mots", widget: text, required: false }
+      - { name: alt, label: "Description de l'image (accessibilité)", widget: string }
+      # Champs vente douce — PAS de prix imposé. Vide = « Prix sur demande ».
+      - { name: price, label: "Prix (optionnel)", widget: string, required: false, hint: "Laisser vide = « Prix sur demande ». Ne pas inventer." }
+      # Préparation réseaux sociaux (copier-coller, pas d'API) :
+      - { name: instagramCaptionDraft, label: "Brouillon de légende Instagram", widget: text, required: false }
+      - { name: hashtags, label: "Mots-clés (#)", widget: string, required: false }
+
+  # 2) EXPOSITIONS ----------------------------------------------------
+  - name: exhibitions
+    label: "Expositions"
+    label_singular: "Exposition"
+    folder: "content/cms/exhibitions"
+    create: true
+    slug: "{{year}}-{{slug}}"
+    fields:
+      - { name: title, label: "Titre / événement", widget: string }
+      - { name: location, label: "Lieu", widget: string, required: false }
+      - { name: city, label: "Ville", widget: string, required: false }
+      - { name: startDate, label: "Date de début", widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false }
+      - { name: endDate, label: "Date de fin", widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false }
+      - { name: type, label: "Type", widget: select, required: false, options: ["solo", "group", "residence", "performance", "event"] }
+      - { name: description, label: "Description", widget: text, required: false }
+
+  # 3) PAGES (textes éditoriaux) --------------------------------------
+  - name: pages
+    label: "Pages"
+    files:
+      - name: home
+        label: "Accueil"
+        file: "content/cms/pages/home.md"
+        fields:
+          - { name: eyebrow, label: "Petit intitulé", widget: string, required: false }
+          - { name: title, label: "Titre", widget: string, required: false }
+          - { name: lead, label: "Accroche", widget: text, required: false }
+          - { name: body, label: "Texte", widget: markdown, required: false }
+      - name: biographie
+        label: "Biographie"
+        file: "content/cms/pages/biographie.md"
+        fields:
+          - { name: title, label: "Titre", widget: string, required: false }
+          - { name: body, label: "Récit", widget: markdown, required: false }
+      - name: demarche
+        label: "Démarche"
+        file: "content/cms/pages/demarche.md"
+        fields:
+          - { name: title, label: "Titre", widget: string, required: false }
+          - { name: body, label: "Texte", widget: markdown, required: false }
+      - name: bleu-cendres
+        label: "Bleu Cendres"
+        file: "content/cms/pages/bleu-cendres.md"
+        fields:
+          - { name: title, label: "Titre", widget: string, required: false }
+          - { name: body, label: "Texte", widget: markdown, required: false }
+      - name: contact
+        label: "Contact"
+        file: "content/cms/pages/contact.md"
+        fields:
+          - { name: title, label: "Titre", widget: string, required: false }
+          - { name: body, label: "Invitation", widget: markdown, required: false }
+
+  # 4) SITE (identité, contact, navigation) ---------------------------
+  - name: site
+    label: "Site"
+    files:
+      - name: settings
+        label: "Réglages du site"
+        file: "content/cms/settings/site.yml"
+        fields:
+          - { name: artistName, label: "Nom de l'artiste", widget: string }
+          - { name: role, label: "Rôle", widget: string }
+          - { name: email, label: "E-mail public", widget: string }
+          - { name: city, label: "Ville", widget: string, required: false }
+          - { name: region, label: "Région", widget: string, required: false }
+          - name: social
+            label: "Réseaux"
+            widget: list
+            required: false
+            fields:
+              - { name: label, label: "Nom", widget: string }
+              - { name: href, label: "Lien", widget: string }
+          - name: nav
+            label: "Navigation (Carnet)"
+            widget: list
+            fields:
+              - { name: label, label: "Libellé", widget: string }
+              - { name: href, label: "Lien", widget: string }
+              - { name: note, label: "Note du Carnet", widget: string, required: false }
+
+  # 5) THÈME (ambiance visuelle) --------------------------------------
+  - name: theme
+    label: "Ambiance visuelle"
+    files:
+      - name: settings
+        label: "Couleurs & intensités"
+        file: "content/cms/settings/theme.yml"
+        fields:
+          - { name: paper, label: "Papier (fond)", widget: color }
+          - { name: bluePigment, label: "Bleu pigment", widget: color }
+          - { name: ochreGold, label: "Ocre / or", widget: color }
+          - { name: textureIntensity, label: "Intensité de matière", widget: select, options: ["none", "subtle", "medium"] }
+          - { name: buttonMode, label: "Style des boutons", widget: select, options: ["handline", "artist-line", "pill"] }
+          - { name: cardMode, label: "Style des cartes", widget: select, options: ["exhibition-label", "cartel", "card"] }
+
+  # 6) BOUTIQUE DOUCE -------------------------------------------------
+  - name: shop
+    label: "Boutique douce"
+    files:
+      - name: settings
+        label: "Vente douce"
+        file: "content/cms/settings/shop.yml"
+        fields:
+          - { name: showPrices, label: "Afficher les prix", widget: boolean, default: false }
+          - { name: defaultPriceLabel, label: "Texte par défaut", widget: string, default: "Prix sur demande" }
+          - { name: enableReservation, label: "Activer la réservation", widget: boolean, default: true }
+          - { name: enableCatalogRequest, label: "Activer la demande de catalogue", widget: boolean, default: true }
+          - name: cta
+            label: "Libellés des boutons"
+            widget: object
+            fields:
+              - { name: artwork, label: "Demander une œuvre", widget: string }
+              - { name: info, label: "Recevoir les informations", widget: string }
+              - { name: catalog, label: "Demander le catalogue", widget: string }
+              - { name: reserve, label: "Réserver", widget: string }
+
+  # 7) RÉSEAUX SOCIAUX ------------------------------------------------
+  - name: social
+    label: "Réseaux sociaux"
+    files:
+      - name: settings
+        label: "Préparation des publications"
+        file: "content/cms/settings/social.yml"
+        fields:
+          - { name: defaultHashtags, label: "Mots-clés par défaut", widget: list, field: { name: tag, label: "#", widget: string } }
+          - name: formats
+            label: "Formats"
+            widget: list
+            fields:
+              - { name: label, label: "Nom", widget: string }
+              - { name: ratio, label: "Ratio", widget: string }
+              - { name: size, label: "Taille", widget: string }
+          - name: templates
+            label: "Modèles de légendes"
+            widget: list
+            fields:
+              - { name: label, label: "Type", widget: string }
+              - { name: format, label: "Format", widget: string }
+              - { name: caption, label: "Légende", widget: text }
