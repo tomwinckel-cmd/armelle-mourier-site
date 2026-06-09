@@ -5,22 +5,12 @@ import { theme } from '../data/theme';
 
 interface Props {
   artwork: Artwork;
-  /** 'feature' = mise en avant (cadre filet or, visuel plus présent). */
+  /** 'feature' = mise en avant (cadre or, visuel plus présent). */
   variant?: 'default' | 'feature';
 }
 const { artwork, variant = 'default' } = Astro.props;
 const a = artwork;
 const isFeature = variant === 'feature';
-
-const badgeClass: Record<string, string> = {
-  available: 'bg-encre/10 text-encre',
-  reserved: 'bg-or/15 text-or',
-  'on-request': 'border border-cendre/40 text-cendre',
-  sold: 'bg-noir/10 text-cendre',
-};
-
-const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
-const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
 
 // Pilotage par le thème (cockpit / vente douce).
 const { showStatus, showTechnique } = theme.artworkCards;
@@ -31,53 +21,71 @@ const priceText =
     : theme.saleMode.showPrices
       ? priceLabel(a)
       : 'Prix sur demande';
+
+const statusColor: Record<string, string> = {
+  available: 'text-encre',
+  reserved: 'text-or',
+  'on-request': 'text-cendre',
+  sold: 'text-cendre',
+};
+
+const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
+const metaParts = [a.technique, a.dimensions, a.year].filter(Boolean);
 ---
-<article class="reveal group flex flex-col transition-transform duration-500 ease-soft hover:-translate-y-1">
-  <div class={`relative aspect-[4/5] w-full overflow-hidden rounded-card bg-brume shadow-soft ${isFeature ? 'ring-1 ring-or/40 ring-offset-2 ring-offset-paper' : ''}`}>
-    {a.image ? (
-      <img
-        src={a.image}
-        alt={a.alt}
-        loading="lazy"
-        decoding="async"
-        width="800"
-        height="1000"
-        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
-        class="h-full w-full object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.03]"
-      />
-    ) : (
-      <ArtworkPlaceholder title={a.title} dimensions={a.dimensions} class="transition-transform duration-700 ease-soft group-hover:scale-[1.02]" />
-    )}
-    {showStatus && (
-      <span class={`badge absolute left-3 top-3 backdrop-blur-sm ${badgeClass[a.status]} ${a.status === 'on-request' ? 'bg-paper/80' : ''}`}>
-        {statusLabel[a.status]}
-      </span>
-    )}
+{/* Carte traitée comme un CARTEL d'exposition : cadre de galerie, nom en
+    italique, filet or, statut discret — volontairement pas une « card » SaaS. */}
+<article class="reveal group flex flex-col">
+  <div class={`frame-gallery relative aspect-[4/5] w-full overflow-hidden p-[6px] ${isFeature ? 'border-or/45' : ''}`}>
+    <div class="h-full w-full overflow-hidden">
+      {a.image ? (
+        <img
+          src={a.image}
+          alt={a.alt}
+          loading="lazy"
+          decoding="async"
+          width="800"
+          height="1000"
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+          class="h-full w-full object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.02]"
+        />
+      ) : (
+        <ArtworkPlaceholder title={a.title} dimensions={a.dimensions} />
+      )}
+    </div>
   </div>
 
-  <div class="mt-4 flex flex-1 flex-col">
+  <figcaption class="mt-4 flex flex-1 flex-col">
     <div class="flex items-baseline justify-between gap-3">
-      <h3 class={`font-serif text-encre ${isFeature ? 'text-h2' : 'text-h3'}`}>{a.title}</h3>
+      <h3 class={`font-serif italic leading-tight text-encre ${isFeature ? 'text-h2' : 'text-h3'}`}>{a.title}</h3>
       {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{a.series}</span>}
     </div>
 
     {showTechnique && metaParts.length > 0 && (
-      <p class="mt-1 text-sm text-cendre">{metaParts.join(' · ')}</p>
+      <p class="mt-1.5 text-xs uppercase tracking-[0.14em] text-cendre">{metaParts.join(' · ')}</p>
     )}
 
     {a.description && (
       <p class="mt-3 text-[0.95rem] leading-relaxed text-noir/80">{a.description}</p>
     )}
 
-    <div class="mt-4 flex items-center justify-between gap-4 border-t border-cendre/20 pt-4">
-      <span class={`font-serif text-lg ${a.status === 'sold' ? 'text-cendre' : 'text-encre'}`}>
-        {priceText}
-      </span>
-      {a.status !== 'sold' && (
-        <a href={askHref} class="text-[0.92rem] font-semibold text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or">
-          {cta} →
-        </a>
-      )}
+    <hr class="cartel-rule mt-4" />
+
+    <div class="mt-3 flex items-center justify-between gap-4">
+      {showStatus ? (
+        <span class={`inline-flex items-center gap-1.5 text-[0.7rem] uppercase tracking-[0.18em] ${statusColor[a.status]}`}>
+          <span class="status-dot" aria-hidden="true"></span>{statusLabel[a.status]}
+        </span>
+      ) : <span></span>}
+      <span class={`font-serif text-base italic ${a.status === 'sold' ? 'text-cendre' : 'text-encre'}`}>{priceText}</span>
     </div>
-  </div>
+
+    {a.status !== 'sold' && (
+      <a
+        href={askHref}
+        class="mt-3 inline-block self-start text-[0.92rem] font-medium text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or"
+      >
+        {cta} →
+      </a>
+    )}
+  </figcaption>
 </article>

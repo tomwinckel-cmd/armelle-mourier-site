@@ -23,7 +23,8 @@
   --radius-card: 0.5rem;      /* arrondi des cartes/visuels */
   --border-hair: 1px;         /* filets fins type galerie */
   --btn-radius: 999px;        /* arrondi des boutons */
-  --shadow-soft: 0 22px 60px rgb(var(--c-encre) / 0.10);
+  /* Ombre volontairement légère : on privilégie les filets de galerie. */
+  --shadow-soft: 0 14px 40px rgb(var(--c-encre) / 0.07);
 
   /* Typographie (pilotable depuis theme.ts ; police chargée dans Base.astro). */
   --font-serif: 'Fraunces', Georgia, serif;
@@ -31,6 +32,12 @@
 
   /* Intensité du voile de matière (peut être mise à 0 pour le couper). */
   --texture-strength: 0.05;
+
+  /* Tokens « atelier-galerie » (surchargés par theme.identity via Base). */
+  --border-irregular: 0.6;    /* coins organiques des cadres */
+  --brush-strength: 0.7;      /* force des gestes/traits */
+  --gold-trace: 0.55;         /* l'or comme trace */
+  --soft-blue-wash: 0.5;      /* lavis bleu clair des sections */
 }
 
 * { box-sizing: border-box; }
@@ -197,6 +204,82 @@ body[data-btn-style="line-gold"] .btn-primary {
 }
 body[data-btn-style="line-gold"] .btn-primary:hover {
   box-shadow: inset 0 0 0 1px rgb(var(--c-or) / 0.6), var(--shadow-soft);
+}
+
+/* ---------------------------------------------------------------------
+   IDENTITÉ « artist-line » (theme.identity.buttonMode = 'artist-line')
+   Sort du look « pilule startup » : appel principal = bloc encre sobre à
+   filet or ; appels secondaires = liens soulignés façon cartel de galerie.
+   --------------------------------------------------------------------- */
+body[data-buttons="artist-line"] .btn,
+body[data-buttons="artist-line"] .btn-primary,
+body[data-buttons="artist-line"] .btn-ghost,
+body[data-buttons="artist-line"] .btn-gold {
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+body[data-buttons="artist-line"] .btn-primary {
+  border-bottom: 2px solid rgb(var(--c-or) / 0.85);
+  box-shadow: none;
+}
+body[data-buttons="artist-line"] .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: none;
+  background: rgb(var(--c-encre) / 0.92);
+}
+/* Secondaires : pas de cadre fermé, un simple filet (lien d'atelier). */
+body[data-buttons="artist-line"] .btn-ghost,
+body[data-buttons="artist-line"] .btn-gold {
+  border-radius: 0;
+  border-color: transparent;
+  border-bottom: 1px solid rgb(var(--c-encre) / 0.35);
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+}
+body[data-buttons="artist-line"] .btn-gold {
+  border-bottom-color: rgb(var(--c-or) / 0.6);
+}
+body[data-buttons="artist-line"] .btn-ghost:hover,
+body[data-buttons="artist-line"] .btn-gold:hover {
+  border-bottom-color: rgb(var(--c-or));
+}
+
+/* ---------------------------------------------------------------------
+   CADRE DE GALERIE — filet fin, coins légèrement organiques (pas une card)
+   --------------------------------------------------------------------- */
+.frame-gallery {
+  border: var(--border-hair) solid rgb(var(--c-cendre) / 0.35);
+  border-radius:
+    calc(2px + var(--border-irregular) * 8px)
+    calc(2px + var(--border-irregular) * 3px)
+    calc(2px + var(--border-irregular) * 7px)
+    calc(2px + var(--border-irregular) * 4px);
+  background: rgb(var(--c-white));
+}
+
+/* Filet de cartel (sous le nom de l'œuvre) — or discret comme une trace. */
+.cartel-rule {
+  height: 1px;
+  width: 100%;
+  border: 0;
+  background: linear-gradient(to right, rgb(var(--c-or) / calc(0.7 * var(--gold-trace))), transparent 75%);
+}
+
+/* Point de statut discret (disponible / réservée / vendue). */
+.status-dot {
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Lavis bleu clair très doux pour différencier des sections (atelier). */
+.wash-blue {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(var(--c-blue-soft) / calc(0.10 * var(--soft-blue-wash) * 2)), transparent 60%),
+    rgb(var(--c-brume));
 }
 
 /* ---------------------------------------------------------------------

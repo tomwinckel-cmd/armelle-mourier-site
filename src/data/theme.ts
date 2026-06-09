@@ -108,10 +108,31 @@ export type ThemeFragment = {
   accentStroke: boolean;
 };
 
+// Identité visuelle « atelier-galerie » — modes futurs + tokens picturaux.
+// Pensé pour piloter une DA d'artiste (carnet/cartel/galerie), pas un template.
+export type ThemeIdentity = {
+  visualIdentity: 'atelier-gallery' | 'clean';
+  textureMode: 'pictorial' | 'flat';
+  cardMode: 'cartel' | 'card';
+  buttonMode: 'artist-line' | 'pill';
+  heroMode: 'living-atelier' | 'living-card';
+  accentMode: 'blue-gold-trace' | 'plain';
+
+  // Tokens picturaux (0 → 1, sauf indication). Injectés en variables CSS.
+  borderIrregularity: number;       // 0 = filets nets ; 1 = coins organiques
+  paperTexture: number;             // grain papier (voile très subtil)
+  brushStrokeIntensity: number;     // force des gestes/traits
+  artworkFragmentIntensity: number; // densité picturale des fragments
+  goldTraceOpacity: number;         // l'or comme trace, pas comme luxe
+  blueDepth: number;                // profondeur du bleu (réservé/futur)
+  softBlueWash: number;             // lavis bleu clair des sections
+};
+
 export type Theme = {
   colors: ThemeColors;
   typography: ThemeTypography;
   layout: ThemeLayout;
+  identity: ThemeIdentity;
   hero: ThemeHero;
   artworkCards: ThemeArtworkCards;
   buttons: ThemeButtons;
@@ -143,6 +164,21 @@ export const theme: Theme = {
   layout: {
     radiusCard: '0.5rem',
     borderHair: '1px',
+  },
+  identity: {
+    visualIdentity: 'atelier-gallery',
+    textureMode: 'pictorial',
+    cardMode: 'cartel',
+    buttonMode: 'artist-line',
+    heroMode: 'living-atelier',
+    accentMode: 'blue-gold-trace',
+    borderIrregularity: 0.6,
+    paperTexture: 0.5,
+    brushStrokeIntensity: 0.7,
+    artworkFragmentIntensity: 0.85,
+    goldTraceOpacity: 0.55,
+    blueDepth: 0.5,
+    softBlueWash: 0.5,
   },
   hero: {
     mode: 'living-card',
@@ -225,13 +261,23 @@ const FRAGMENT_STRENGTH: Record<ThemeFragment['intensity'], string> = {
 
 /** Construit l'ensemble des variables CSS injectées dans :root par Base. */
 export function themeCssVars(t: Theme): Record<string, string> {
+  // Voile de matière : combine l'ancien réglage texture et le grain papier.
+  const textureBase = t.texture.enabled ? Number(TEXTURE_STRENGTH[t.texture.intensity]) : 0;
+  const textureStrength = Math.max(textureBase, t.identity.paperTexture * 0.06);
+  // Densité picturale des fragments : piloté par l'identité (fallback enum).
+  const fragmentStrength = t.identity.artworkFragmentIntensity || Number(FRAGMENT_STRENGTH[t.fragment.intensity]);
   return {
     ...themeColorVars(t.colors),
     '--radius-card': t.layout.radiusCard,
     '--border-hair': t.layout.borderHair,
     '--btn-radius': t.buttons.radius === 'full' ? '999px' : 'var(--radius-card)',
-    '--texture-strength': t.texture.enabled ? TEXTURE_STRENGTH[t.texture.intensity] : '0',
-    '--fragment-strength': FRAGMENT_STRENGTH[t.fragment.intensity],
+    '--texture-strength': String(textureStrength),
+    '--fragment-strength': String(fragmentStrength),
+    // Tokens identité « atelier-galerie ».
+    '--border-irregular': String(t.identity.borderIrregularity),
+    '--brush-strength': String(t.identity.brushStrokeIntensity),
+    '--gold-trace': String(t.identity.goldTraceOpacity),
+    '--soft-blue-wash': String(t.identity.softBlueWash),
     '--font-serif': `'${t.typography.serif}', Georgia, serif`,
     '--font-sans': `'${t.typography.sans}', system-ui, sans-serif`,
   };
