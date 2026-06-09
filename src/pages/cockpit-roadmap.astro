@@ -1,113 +1,336 @@
 ---
 import Base from '../layouts/Base.astro';
-import { cockpit } from '../data/cockpit';
+import ArtworkPlaceholder from '../components/ArtworkPlaceholder.astro';
+import { artworks, statusLabel, isForSale, hasImage, type ArtworkStatus } from '../data/artworks';
+import { shop } from '../data/shop';
 import { socialPublishing } from '../data/social';
+import { cockpit } from '../data/cockpit';
+import { theme } from '../data/theme';
+import { splitExhibitions } from '../data/exhibitions';
 
-// Page INTERNE, non listée dans la navigation. Aucune donnée sensible,
-// aucun formulaire fonctionnel, aucune authentification : c'est une carte
-// du futur cockpit, pas un admin.
-const alreadyEditable = [
-  { label: 'Identité, navigation, Carnet, contact', file: 'src/data/site.ts' },
-  { label: 'Œuvres (titres, statuts, photos, séries…)', file: 'src/data/artworks.ts' },
-  { label: 'Vente douce (prix sur demande, CTA, sujets)', file: 'src/data/shop.ts' },
+// ---- Données (lecture seule) ----
+const totalArtworks = artworks.length;
+const withImage = artworks.filter(hasImage).length;
+const statuses: ArtworkStatus[] = ['available', 'reserved', 'sold', 'on-request'];
+const byStatus = Object.fromEntries(
+  statuses.map((s) => [s, artworks.filter((a) => a.status === s)]),
+) as Record<ArtworkStatus, typeof artworks>;
+const { upcoming, past } = splitExhibitions();
+
+// Champs requis pour ajouter une œuvre (depuis le schéma cockpit).
+const artworkFields = cockpit.modules.find((m) => m.id === 'artworks')?.fields ?? [];
+
+// Zones éditoriales pilotables et où elles vivent aujourd'hui.
+const editorialZones = [
+  { label: 'Accueil (accroche + récit)', file: 'src/content/pages.ts · src/data/site.ts' },
+  { label: 'Biographie', file: 'src/content/bio.ts' },
+  { label: 'Démarche', file: 'src/content/bio.ts' },
+  { label: 'Bleu Cendres', file: 'src/content/bio.ts' },
   { label: 'Expositions', file: 'src/data/exhibitions.ts' },
-  { label: 'Biographie, démarche, Bleu Cendres', file: 'src/content/bio.ts' },
-  { label: 'Textes d’accueil & galerie', file: 'src/content/pages.ts' },
-  { label: 'Ambiance visuelle (couleurs, intensités)', file: 'src/data/theme.ts' },
+  { label: 'Contact (e-mail, sujets)', file: 'src/data/site.ts · src/data/shop.ts' },
 ];
 
-const nextSteps = [
-  'Fichiers de configuration éditables (état actuel).',
-  'Mini-cockpit / admin statique qui écrit ces fichiers.',
-  'Stockage et association des images.',
-  'Édition des œuvres et des textes via des formulaires humains.',
-  'Assistant Instagram (légendes + mots-clés à copier-coller).',
-  'Authentification privée (éventuelle).',
-  'CMS / base de données (éventuel, si le besoin grandit).',
+// Palette actuelle (depuis theme.ts) pour l'aperçu « Ambiance visuelle ».
+const palette = [
+  { key: 'paper', label: 'Papier (fond)', hex: theme.colors.paper },
+  { key: 'paperRaw', label: 'Papier brut', hex: theme.colors.paperRaw },
+  { key: 'bluePigment', label: 'Bleu pigment', hex: theme.colors.bluePigment },
+  { key: 'blueDeep', label: 'Bleu nuit', hex: theme.colors.blueDeep },
+  { key: 'blueWash', label: 'Bleu aquatique', hex: theme.colors.blueWash },
+  { key: 'ochreGold', label: 'Ocre / or', hex: theme.colors.ochreGold },
+  { key: 'inkBlack', label: 'Noir encre', hex: theme.colors.inkBlack },
+  { key: 'ashBlue', label: 'Cendre', hex: theme.colors.ashBlue },
 ];
+
+const sections = [
+  { id: 'apercu', label: 'Vue d’ensemble' },
+  { id: 'oeuvres', label: 'Œuvres' },
+  { id: 'disponibilites', label: 'Disponibilités' },
+  { id: 'pages', label: 'Pages' },
+  { id: 'expositions', label: 'Expositions' },
+  { id: 'social', label: 'Réseaux sociaux' },
+  { id: 'ambiance', label: 'Ambiance visuelle' },
+  { id: 'etapes', label: 'Prochaines étapes' },
+];
+
+const statusChipClass: Record<ArtworkStatus, string> = {
+  available: 'text-encre',
+  reserved: 'text-or',
+  sold: 'text-cendre',
+  'on-request': 'text-cendre',
+};
 ---
 <Base
-  title="Cockpit (prototype à venir) — Armelle Mourier"
-  description="Feuille de route interne du futur cockpit artiste."
+  title="Cockpit artiste — prototype"
+  description="Cockpit prototype (lecture / préparation) — outil interne, non public."
   noindex={true}
 >
   <section class="shell pb-section pt-10 sm:pt-14">
-    <p class="eyebrow mb-3">Document interne</p>
-    <h1 class="signature text-display text-encre">Cockpit d’artiste</h1>
+    <p class="eyebrow mb-3">Outil interne · non public</p>
+    <h1 class="signature text-display text-encre">Cockpit artiste — prototype</h1>
+
     <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-noir/80">
-      <strong>Prototype à venir.</strong> Cette page décrit l’outil qu’Armelle pourra
-      utiliser pour piloter son site elle-même. Ce n’est pas encore une interface :
-      rien n’est cliquable ici, aucune donnée n’est enregistrée.
-    </p>
-    <p class="mt-5 max-w-prose font-serif text-xl italic leading-snug text-encre">
-      {cockpit.philosophy}
+      <strong>Prototype.</strong> Cet espace montre ce qu’Armelle pourra piloter elle-même.
+      Il <strong>ne sauvegarde rien</strong> pour l’instant : on visualise et on prépare les
+      contenus. Aucune connexion, aucun mot de passe, aucun paiement.
     </p>
 
-    <!-- DÉJÀ PILOTABLE -->
-    <h2 class="mt-14 text-h2 font-serif text-encre">Ce qui est déjà pilotable</h2>
-    <div class="rule-gold mt-4" aria-hidden="true"></div>
-    <ul class="mt-6 grid gap-3 sm:grid-cols-2">
-      {alreadyEditable.map((d) => (
-        <li class="border-l-2 border-cendre/30 pl-4">
-          <span class="block text-encre">{d.label}</span>
-          <code class="text-xs text-cendre">{d.file}</code>
-        </li>
+    <!-- Sommaire -->
+    <nav aria-label="Sections du cockpit" class="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+      {sections.map((s) => (
+        <a href={`#${s.id}`} class="link-quiet font-semibold">{s.label}</a>
       ))}
-    </ul>
+    </nav>
 
-    <!-- MODULES PRÉVUS -->
-    <h2 class="mt-14 text-h2 font-serif text-encre">Modules prévus</h2>
-    <div class="rule-gold mt-4" aria-hidden="true"></div>
-    <div class="mt-6 grid gap-6 sm:grid-cols-2">
-      {cockpit.modules.map((m) => (
-        <article class="frame-gallery p-5">
-          <h3 class="font-serif text-h3 italic text-encre">{m.label}</h3>
-          <p class="mt-2 text-noir/75">{m.description}</p>
-          <p class="mt-3 text-eyebrow uppercase tracking-[0.16em] text-cendre">Actions</p>
-          <ul class="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-noir/70">
-            {m.actions.map((a) => <li>· {a}</li>)}
-          </ul>
-        </article>
-      ))}
-    </div>
+    <!-- 1 — VUE D'ENSEMBLE -->
+    <section id="apercu" class="scroll-mt-28">
+      <h2 class="mt-14 text-h2 font-serif text-encre">Vue d’ensemble</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose font-serif text-lg italic text-encre">{cockpit.philosophy}</p>
+      <dl class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Œuvres</dt><dd class="mt-1 font-serif text-3xl text-encre">{totalArtworks}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Disponibles</dt><dd class="mt-1 font-serif text-3xl text-encre">{artworks.filter(isForSale).length}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Avec photo</dt><dd class="mt-1 font-serif text-3xl text-encre">{withImage}/{totalArtworks}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Expositions</dt><dd class="mt-1 font-serif text-3xl text-encre">{upcoming.length + past.length}</dd></div>
+      </dl>
+      <ul class="mt-6 grid gap-2 sm:grid-cols-2">
+        {cockpit.modules.map((m) => (
+          <li class="border-l-2 border-cendre/30 pl-4">
+            <span class="text-encre">{m.label}</span>
+            <span class="block text-sm text-cendre">{m.description}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
 
-    <!-- ASSISTANT RÉSEAUX SOCIAUX -->
-    <h2 class="mt-14 text-h2 font-serif text-encre">Assistant réseaux sociaux</h2>
-    <div class="rule-gold mt-4" aria-hidden="true"></div>
-    <p class="mt-6 max-w-prose text-noir/80">{socialPublishing.instruction}</p>
-    <p class="mt-2 max-w-prose text-sm text-cendre">
-      Aucune connexion à Instagram, aucune publication automatique : on prépare des
-      textes à copier-coller. Formats conseillés :
-      {socialPublishing.formats.map((f) => ` ${f.label} (${f.ratio})`).join(' ·')}.
-    </p>
-    <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {socialPublishing.templates.map((t) => (
-        <article class="border-l-2 border-or/40 pl-4">
-          <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
-          <p class="mt-1 text-sm text-noir/70">{t.description}</p>
-          <p class="mt-2 whitespace-pre-line text-sm text-noir/80">{t.caption}</p>
-        </article>
-      ))}
-    </div>
-    <p class="mt-6 text-sm text-cendre">
-      Mots-clés de base : {socialPublishing.defaultHashtags.join(' ')}
-    </p>
+    <!-- 2 — ŒUVRES -->
+    <section id="oeuvres" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Œuvres</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">{totalArtworks} œuvres au catalogue · source : <code class="text-cendre">src/data/artworks.ts</code></p>
 
-    <!-- CHEMIN PROGRESSIF -->
-    <h2 class="mt-14 text-h2 font-serif text-encre">Étapes à venir</h2>
-    <div class="rule-gold mt-4" aria-hidden="true"></div>
-    <ol class="mt-6 max-w-prose space-y-2">
-      {nextSteps.map((s, i) => (
-        <li class="flex gap-3">
-          <span class="font-serif italic text-or">{String(i + 1).padStart(2, '0')}</span>
-          <span class="text-noir/80">{s}</span>
-        </li>
-      ))}
-    </ol>
+      <ul class="mt-6 divide-y divide-cendre/20 border-y border-cendre/20">
+        {artworks.map((a) => (
+          <li class="flex items-center gap-4 py-3">
+            <span class="h-12 w-10 shrink-0 overflow-hidden border border-cendre/25">
+              {a.image ? (
+                <img src={a.image} alt={a.alt} class="h-full w-full object-cover" loading="lazy" width="40" height="48" />
+              ) : (
+                <ArtworkPlaceholder />
+              )}
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-serif italic text-encre">{a.title}</span>
+              <span class="block truncate text-xs text-cendre">{[a.series, a.technique].filter(Boolean).join(' · ')}</span>
+            </span>
+            <span class={`shrink-0 text-[0.7rem] uppercase tracking-[0.16em] ${statusChipClass[a.status]}`}>{statusLabel[a.status]}</span>
+            <span class={`hidden shrink-0 text-xs sm:inline ${hasImage(a) ? 'text-encre' : 'text-cendre'}`}>{hasImage(a) ? 'photo presente' : 'photo a venir'}</span>
+          </li>
+        ))}
+      </ul>
 
-    <p class="mt-12 max-w-prose text-sm text-cendre">
-      Volontairement exclu pour l’instant : paiement en ligne, publication
-      Instagram automatique, stockage de secrets, complexité inutile.
-    </p>
+      <!-- Préparer une nouvelle œuvre (NON fonctionnel) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer une nouvelle œuvre</h3>
+      <p class="mt-2 max-w-prose text-sm text-cendre">
+        Champs attendus : {artworkFields.map((f) => f.label).join(' · ')}.
+      </p>
+      <form id="art-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <label class="text-sm">Titre
+          <input id="f-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Dimensions <span class="text-cendre">(sinon vide)</span>
+          <input id="f-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="f-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Série
+          <input id="f-series" type="text" placeholder="Bleu Cendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut
+          <select id="f-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="available">Disponible</option>
+            <option value="reserved">Réservée</option>
+            <option value="sold">Vendue</option>
+            <option value="on-request">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm">Photo (nom de fichier)
+          <input id="f-image" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Description (quelques mots)
+          <textarea id="f-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Description de l’image (accessibilité)
+          <input id="f-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <div class="sm:col-span-2">
+          <button type="button" class="btn btn-primary" data-art-copy>Copier le bloc à coller dans artworks.ts</button>
+          <p class="mt-3 text-sm italic text-or">Prototype : la sauvegarde sera activée dans une prochaine version. Ce bouton copie un bloc de code à coller, rien n’est enregistré ici.</p>
+        </div>
+      </form>
+    </section>
+
+    <!-- 3 — DISPONIBILITÉS -->
+    <section id="disponibilites" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Disponibilités · vente douce</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/75">
+        Mode : <strong>{shop.mode}</strong> — acquisition en lien direct avec l’artiste,
+        <strong>« {shop.defaultPriceLabel} »</strong> par défaut. Pas de panier, pas de paiement en
+        ligne (<code class="text-cendre">enableCheckout = {String(shop.enableCheckout)}</code>).
+      </p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statuses.map((s) => (
+          <div class="frame-gallery p-4">
+            <p class={`text-[0.72rem] uppercase tracking-[0.18em] ${statusChipClass[s]}`}>{statusLabel[s]}</p>
+            <p class="mt-1 font-serif text-2xl text-encre">{byStatus[s].length}</p>
+            <ul class="mt-2 space-y-0.5 text-sm text-noir/70">
+              {byStatus[s].slice(0, 6).map((a) => <li class="truncate">{a.title}</li>)}
+              {byStatus[s].length === 0 && <li class="italic text-cendre">—</li>}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 4 — PAGES -->
+    <section id="pages" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Pages · textes</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+        {editorialZones.map((z) => (
+          <li class="border-l-2 border-cendre/30 pl-4">
+            <span class="block text-encre">{z.label}</span>
+            <code class="text-xs text-cendre">{z.file}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 5 — EXPOSITIONS -->
+    <section id="expositions" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Expositions</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">{upcoming.length} à venir · {past.length} passées · source : <code class="text-cendre">src/data/exhibitions.ts</code></p>
+      {upcoming.length > 0 && (
+        <ul class="mt-4 space-y-1 text-sm text-noir/80">
+          {upcoming.slice(0, 5).map((e) => <li><span class="text-or">{e.dateLabel}</span> — {e.title}</li>)}
+        </ul>
+      )}
+    </section>
+
+    <!-- 6 — RÉSEAUX SOCIAUX -->
+    <section id="social" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Réseaux sociaux · Instagram</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">{socialPublishing.instruction}</p>
+      <p class="mt-2 max-w-prose text-sm italic text-cendre">
+        Le cockpit prépare la publication. L’artiste garde la main et copie-colle vers Instagram.
+        Aucune API, aucune publication automatique.
+      </p>
+      <p class="mt-4 text-sm text-cendre">
+        Formats : {socialPublishing.formats.map((f) => `${f.label} ${f.ratio} (${f.size})`).join(' · ')}
+      </p>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {socialPublishing.templates.map((t) => {
+          const tags = [...(t.hashtags ?? []), ...socialPublishing.defaultHashtags].join(' ');
+          const full = `${t.caption}\n\n${tags}`;
+          return (
+            <article class="frame-gallery p-5">
+              <div class="flex items-baseline justify-between gap-3">
+                <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
+                <span class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{t.format}</span>
+              </div>
+              <p class="mt-2 whitespace-pre-line text-sm text-noir/80">{t.caption}</p>
+              <p class="mt-2 text-xs text-cendre">{tags}</p>
+              <button type="button" class="btn btn-ghost mt-3" data-copy={full}>Copier la légende</button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- 7 — AMBIANCE VISUELLE -->
+    <section id="ambiance" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Ambiance visuelle</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">
+        Identité : <strong>{theme.identity.visualIdentity}</strong> · boutons
+        <strong> {theme.identity.buttonMode}</strong> · cartes <strong>{theme.identity.cardMode}</strong>
+        · fragment <strong>{theme.identity.fragmentStyle}</strong>. Source : <code class="text-cendre">src/data/theme.ts</code>
+      </p>
+      <div class="mt-6 flex flex-wrap gap-4">
+        {palette.map((c) => (
+          <div class="text-center">
+            <span class="block h-14 w-14 rounded-sm border border-cendre/25" style={`background:${c.hex}`}></span>
+            <span class="mt-1 block text-[0.7rem] text-encre">{c.label}</span>
+            <code class="text-[0.65rem] text-cendre">{c.hex}</code>
+          </div>
+        ))}
+      </div>
+      <p class="mt-6 max-w-prose text-sm text-cendre">
+        Modifiables plus tard : couleur papier, bleu pigment, ocre, intensité de matière,
+        style des cartes, style des boutons — sans casser le design.
+      </p>
+    </section>
+
+    <!-- 8 — PROCHAINES ÉTAPES -->
+    <section id="etapes" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Prochaines étapes</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <ol class="mt-6 max-w-prose space-y-2">
+        <li class="flex gap-3"><span class="font-serif italic text-or">V1</span><span class="text-noir/80">Prototype — lecture & préparation (cette page).</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V2</span><span class="text-noir/80">Édition réelle des œuvres et des textes.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V3</span><span class="text-noir/80">Dépôt et association des images.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V4</span><span class="text-noir/80">Assistant réseaux sociaux avancé.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V5</span><span class="text-noir/80">Authentification, si nécessaire.</span></li>
+      </ol>
+      <p class="mt-8 max-w-prose text-sm text-cendre">
+        Volontairement exclu pour l’instant : paiement, publication Instagram automatique,
+        stockage de secrets, complexité inutile.
+      </p>
+      <p class="mt-6 text-sm"><a href="/" class="link-quiet font-semibold">← Retour au site</a></p>
+    </section>
   </section>
+
+  <script is:inline>
+    // Copier dans le presse-papier (sans API externe). Préparation seulement.
+    function flash(btn, msg) {
+      const old = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = old; }, 1600);
+    }
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const text = btn.getAttribute('data-copy') || '';
+        if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copie OK'); }); }
+        else { flash(btn, 'Selectionnez et copiez'); }
+      });
+    });
+    // Construit un bloc artworks.ts a partir du formulaire (ne sauvegarde rien).
+    var artBtn = document.querySelector('[data-art-copy]');
+    if (artBtn) {
+      artBtn.addEventListener('click', function () {
+        function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+        function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+        var q = String.fromCharCode(0x2019);
+        var title = v('f-title') || 'Sans titre';
+        var slug = slugify(title) || 'oeuvre';
+        var lines = ['{', "  id: '" + slug + "',", "  title: '" + title.split("'").join(q) + "',", "  slug: '" + slug + "',"];
+        if (v('f-dimensions')) { lines.push("  dimensions: '" + v('f-dimensions') + "',"); }
+        if (v('f-technique')) { lines.push("  technique: '" + v('f-technique') + "',"); }
+        if (v('f-series')) { lines.push("  series: '" + v('f-series') + "',"); }
+        if (v('f-description')) { lines.push("  description: '" + v('f-description').split("'").join(q) + "',"); }
+        lines.push("  image: '" + v('f-image') + "',");
+        lines.push("  alt: '" + (v('f-alt') || title).split("'").join(q) + "',");
+        lines.push("  status: '" + v('f-status') + "',");
+        lines.push('},');
+        var block = lines.join('\n');
+        if (navigator.clipboard) { navigator.clipboard.writeText(block).then(function () { flash(artBtn, 'Bloc copie OK'); }); }
+        else { flash(artBtn, 'Copie indisponible'); }
+      });
+    }
+  </script>
 </Base>
