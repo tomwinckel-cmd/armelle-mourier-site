@@ -1,6 +1,7 @@
 ---
 import ArtworkPlaceholder from './ArtworkPlaceholder.astro';
 import { type Artwork, statusLabel, priceLabel } from '../data/artworks';
+import { theme } from '../data/theme';
 
 interface Props {
   artwork: Artwork;
@@ -20,8 +21,18 @@ const badgeClass: Record<string, string> = {
 
 const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
 const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
+
+// Pilotage par le thème (cockpit / vente douce).
+const { showStatus, showTechnique } = theme.artworkCards;
+const cta = theme.saleMode.cta;
+const priceText =
+  a.status === 'sold'
+    ? 'Vendue'
+    : theme.saleMode.showPrices
+      ? priceLabel(a)
+      : 'Prix sur demande';
 ---
-<article class="reveal group flex flex-col">
+<article class="reveal group flex flex-col transition-transform duration-500 ease-soft hover:-translate-y-1">
   <div class={`relative aspect-[4/5] w-full overflow-hidden rounded-card bg-brume shadow-soft ${isFeature ? 'ring-1 ring-or/40 ring-offset-2 ring-offset-paper' : ''}`}>
     {a.image ? (
       <img
@@ -34,9 +45,11 @@ const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
     ) : (
       <ArtworkPlaceholder title={a.title} dimensions={a.dimensions} class="transition-transform duration-700 ease-soft group-hover:scale-[1.02]" />
     )}
-    <span class={`badge absolute left-3 top-3 backdrop-blur-sm ${badgeClass[a.status]} ${a.status === 'on-request' ? 'bg-paper/80' : ''}`}>
-      {statusLabel[a.status]}
-    </span>
+    {showStatus && (
+      <span class={`badge absolute left-3 top-3 backdrop-blur-sm ${badgeClass[a.status]} ${a.status === 'on-request' ? 'bg-paper/80' : ''}`}>
+        {statusLabel[a.status]}
+      </span>
+    )}
   </div>
 
   <div class="mt-4 flex flex-1 flex-col">
@@ -45,7 +58,7 @@ const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
       {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{a.series}</span>}
     </div>
 
-    {metaParts.length > 0 && (
+    {showTechnique && metaParts.length > 0 && (
       <p class="mt-1 text-sm text-cendre">{metaParts.join(' · ')}</p>
     )}
 
@@ -55,11 +68,11 @@ const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
 
     <div class="mt-4 flex items-center justify-between gap-4 border-t border-cendre/20 pt-4">
       <span class={`font-serif text-lg ${a.status === 'sold' ? 'text-cendre' : 'text-encre'}`}>
-        {priceLabel(a)}
+        {priceText}
       </span>
       {a.status !== 'sold' && (
         <a href={askHref} class="text-[0.92rem] font-semibold text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or">
-          Demander cette œuvre →
+          {cta} →
         </a>
       )}
     </div>

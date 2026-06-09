@@ -42,7 +42,7 @@ const bookLd = {
       </div>
 
       <figure class="reveal is-visible">
-        <div class="aspect-[5/4] w-full overflow-hidden rounded-sm shadow-[var(--shadow-soft)]">
+        <div class="aspect-[5/4] w-full overflow-hidden rounded-card shadow-soft">
           {bleuCendres.cover ? (
             <img src={bleuCendres.cover} alt={bleuCendres.coverAlt} class="h-full w-full object-cover" loading="eager" />
           ) : (
@@ -88,7 +88,7 @@ const bookLd = {
       <div class="mt-10 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
         {related.map((a) => (
           <figure class="reveal">
-            <div class="aspect-[4/5] overflow-hidden rounded-sm shadow-[var(--shadow-soft)]">
+            <div class="aspect-[4/5] overflow-hidden rounded-card shadow-soft">
               {a.image ? (
                 <img src={a.image} alt={a.alt} class="h-full w-full object-cover" loading="lazy" />
               ) : (
@@ -107,7 +107,7 @@ const bookLd = {
 
   <!-- CTA -->
   <section class="shell pb-section">
-    <div class="rounded-sm bg-encre px-6 py-12 text-center text-paper sm:px-12">
+    <div class="rounded-card bg-encre px-6 py-12 text-center text-paper sm:px-12">
       <Trait class="mx-auto text-or" width="6rem" />
       <h2 class="mt-5 text-h2 font-serif text-paper">Le recueil ou une toile vous intéresse&nbsp;?</h2>
       <p class="mx-auto mt-4 max-w-xl text-paper/75">

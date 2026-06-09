@@ -26,10 +26,10 @@ export default {
         soft: 'var(--shadow-soft)',
       },
       fontFamily: {
-        // Fraunces : serif caractérielle et douce pour les titres.
-        // Mulish : sans-serif humaniste, calme et lisible, pour le texte.
-        serif: ['Fraunces', 'Georgia', 'serif'],
-        sans: ['Mulish', 'system-ui', 'sans-serif'],
+        // Pilotées par theme.typography via les variables CSS (Base.astro).
+        // Fraunces (serif douce, titres/signature) ; Mulish (sans, texte).
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         // Échelle typographique posée, pensée pour la respiration

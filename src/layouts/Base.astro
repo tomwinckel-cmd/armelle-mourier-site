@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { site, defaultKeywords } from '../data/site';
-import { theme, themeColorVars } from '../data/theme';
+import { theme, themeCssVars } from '../data/theme';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
@@ -25,14 +25,10 @@ const mergedKeywords = Array.from(new Set([...defaultKeywords, ...keywords])).jo
 const jsonLdArray = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
 
 // Thème pilotable (cockpit) : on traduit src/data/theme.ts en variables CSS.
-// Modifier les couleurs/arrondis/texture se fait dans theme.ts, pas ici.
-const colorVars = themeColorVars(theme.colors);
-const themeStyle = [
-  ...Object.entries(colorVars).map(([k, v]) => `${k}: ${v};`),
-  `--radius-card: ${theme.ui.radiusCard};`,
-  `--border-hair: ${theme.ui.borderHair};`,
-].join(' ');
-const themeColor = `rgb(${colorVars['--c-encre'].split(' ').join(', ')})`;
+// Modifier couleurs / typo / arrondis / texture se fait dans theme.ts, pas ici.
+const cssVars = themeCssVars(theme);
+const themeStyle = Object.entries(cssVars).map(([k, v]) => `${k}: ${v};`).join(' ');
+const themeColor = `rgb(${cssVars['--c-encre'].split(' ').join(', ')})`;
 ---
 <!doctype html>
 <html lang={site.lang}>
@@ -74,7 +70,9 @@ const themeColor = `rgb(${colorVars['--c-encre'].split(' ').join(', ')})`;
   </head>
   <body
     class="min-h-screen bg-paper font-sans text-noir antialiased"
-    data-texture={theme.ui.showTexture ? 'on' : 'off'}
+    data-texture={theme.texture.enabled && theme.texture.intensity !== 'none' ? 'on' : 'off'}
+    data-btn-style={theme.buttons.style}
+    data-signature={theme.typography.signature}
   >
     <a href="#contenu" class="skip-link">Aller au contenu</a>
 

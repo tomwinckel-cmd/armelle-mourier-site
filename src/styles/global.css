@@ -22,7 +22,12 @@
 
   --radius-card: 0.5rem;      /* arrondi des cartes/visuels */
   --border-hair: 1px;         /* filets fins type galerie */
+  --btn-radius: 999px;        /* arrondi des boutons */
   --shadow-soft: 0 22px 60px rgb(var(--c-encre) / 0.10);
+
+  /* Typographie (pilotable depuis theme.ts ; police chargée dans Base.astro). */
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Mulish', system-ui, sans-serif;
 
   /* Intensité du voile de matière (peut être mise à 0 pour le couper). */
   --texture-strength: 0.05;
@@ -83,11 +88,21 @@ body > * { position: relative; z-index: 1; }
    fragile : on s'appuie sur Fraunces (déjà chargée) en italique, avec
    une légère emphase, soulignée par le trait au pinceau (composant Trait). */
 .signature {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: var(--font-serif);
   font-style: italic;
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 0.98;
+}
+/* Variante de signature pilotable (theme.typography.signature). */
+body[data-signature="serif-upright"] .signature { font-style: normal; }
+
+/* Filet doré dégradé — séparateur « geste » réutilisable. */
+.rule-gold {
+  height: 1px;
+  width: 100%;
+  border: 0;
+  background: linear-gradient(to right, transparent, rgb(var(--c-or) / 0.6), transparent);
 }
 
 .link-quiet {
@@ -133,7 +148,7 @@ body > * { position: relative; z-index: 1; }
   gap: 0.5rem;
   min-height: 2.85rem;
   padding: 0.7rem 1.5rem;
-  border-radius: 999px;
+  border-radius: var(--btn-radius);
   border: var(--border-hair) solid transparent;
   font-weight: 600;
   font-size: 0.98rem;
@@ -174,6 +189,15 @@ body > * { position: relative; z-index: 1; }
   border-color: rgb(var(--c-or) / 0.5);
 }
 .btn-gold:hover { border-color: rgb(var(--c-or)); }
+
+/* Style de boutons « line-gold » (theme.buttons.style) : filet or discret
+   sur le bouton plein, pour une finition picturale plutôt que « solid ». */
+body[data-btn-style="line-gold"] .btn-primary {
+  box-shadow: inset 0 0 0 1px rgb(var(--c-or) / 0.35);
+}
+body[data-btn-style="line-gold"] .btn-primary:hover {
+  box-shadow: inset 0 0 0 1px rgb(var(--c-or) / 0.6), var(--shadow-soft);
+}
 
 /* ---------------------------------------------------------------------
    ACCESSIBILITÉ — lien d'évitement
