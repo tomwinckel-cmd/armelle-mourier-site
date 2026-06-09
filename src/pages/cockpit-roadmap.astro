@@ -7,6 +7,7 @@ import { socialPublishing } from '../data/social';
 import { cockpit } from '../data/cockpit';
 import { theme } from '../data/theme';
 import { splitExhibitions } from '../data/exhibitions';
+import { operations, operationsPrinciple, type OperationStatus } from '../data/operations';
 
 // ---- Données (lecture seule) ----
 const totalArtworks = artworks.length;
@@ -44,6 +45,7 @@ const palette = [
 
 const sections = [
   { id: 'apercu', label: 'Vue d’ensemble' },
+  { id: 'operations', label: 'Centre opérationnel' },
   { id: 'oeuvres', label: 'Œuvres' },
   { id: 'disponibilites', label: 'Disponibilités' },
   { id: 'pages', label: 'Pages' },
@@ -52,6 +54,27 @@ const sections = [
   { id: 'ambiance', label: 'Ambiance visuelle' },
   { id: 'etapes', label: 'Prochaines étapes' },
 ];
+
+// Titres orientés action pour les cartes du centre opérationnel.
+const opCardTitle: Record<string, string> = {
+  ip: 'Protéger une œuvre',
+  social: 'Préparer une publication',
+  'soft-sale': 'Répondre à une demande',
+  invoicing: 'Préparer une facture brouillon',
+  logistics: 'Organiser la remise ou livraison',
+  catalog: 'Préparer un catalogue',
+};
+const opStatusLabel: Record<OperationStatus, string> = {
+  planned: 'à venir',
+  prototype: 'prototype',
+  active: 'actif',
+};
+const opStatusColor: Record<OperationStatus, string> = {
+  planned: 'text-cendre',
+  prototype: 'text-or',
+  active: 'text-encre',
+};
+const opCards = operations.filter((o) => o.id !== 'human-relation');
 
 const statusChipClass: Record<ArtworkStatus, string> = {
   available: 'text-encre',
@@ -101,6 +124,38 @@ const statusChipClass: Record<ArtworkStatus, string> = {
           </li>
         ))}
       </ul>
+    </section>
+
+    <!-- CENTRE OPÉRATIONNEL -->
+    <section id="operations" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Centre opérationnel</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Le cockpit simplifie le quotidien : <strong>préparer, organiser, protéger</strong> —
+        pour qu’Armelle se concentre sur son art. Certaines fonctions sont <em>futures</em>.
+      </p>
+      <p class="mt-2 max-w-prose text-sm italic text-cendre">{operationsPrinciple}</p>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {opCards.map((o) => (
+          <article class="frame-gallery p-5">
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 class="font-serif text-lg italic text-encre">{opCardTitle[o.id] ?? o.label}</h3>
+              <span class={`text-eyebrow uppercase tracking-[0.14em] ${opStatusColor[o.status]}`}>{opStatusLabel[o.status]}</span>
+            </div>
+            <p class="mt-2 text-sm text-noir/75">{o.description}</p>
+            <ul class="mt-2 space-y-0.5 text-sm text-noir/70">
+              {o.actions.slice(0, 3).map((a) => <li>· {a}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <p class="mt-6 max-w-prose rounded-card border border-cendre/30 bg-brume/40 px-5 py-4 text-sm text-noir/80">
+        <strong>Aucune action sensible ne sera automatisée sans validation humaine.</strong>
+        Armelle décide · Tom valide · Claude Code exécute. L’objectif est de laisser l’artiste
+        se concentrer sur son art. Voir aussi <code class="text-cendre">docs/ip-protection-artist.md</code>.
+      </p>
     </section>
 
     <!-- 2 — ŒUVRES -->

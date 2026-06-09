@@ -4,6 +4,26 @@
 > plus simple, fiable et peu coûteuse pour qu'Armelle Mourier (non
 > développeuse) puisse gérer son site elle-même — sans usine à gaz.
 
+## Décision mise à jour — cockpit opérationnel avant services externes
+
+La vision évolue : avant d'ajouter un CMS ou un service d'images, la **priorité
+immédiate** est un **cockpit opérationnel simple**, orchestré par le **dépôt +
+Claude Code + validation humaine (Tom)**. Decap et Cloudinary **restent des
+options valables** (voir plus bas), mais ne seront branchés que lorsqu'ils
+apporteront un gain net.
+
+- Le cockpit doit d'abord **formaliser** : les **données**, les **workflows**,
+  les **documents** (fiches œuvre, brouillons, checklists) et les **actions**.
+- **Aucun service externe** n'est ajouté **sans bénéfice clair**.
+- **Tom reste l'intermédiaire humain et le validateur**, pas un technicien
+  permanent ; **Armelle décide**, **Claude Code exécute** les tâches répétitives.
+
+> **Principe directeur :** *un service externe n'est ajouté que s'il retire plus
+> de charge mentale qu'il n'en crée.*
+
+Le modèle des modules opérationnels vit dans `src/data/operations.ts` ; la
+roadmap orientée opérations est dans `docs/cockpit-roadmap.md`.
+
 ## Le besoin, en clair
 
 Armelle doit pouvoir, depuis une interface simple :

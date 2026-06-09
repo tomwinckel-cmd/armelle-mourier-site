@@ -118,6 +118,22 @@ labels humains, descriptions courtes, actions évidentes, zéro jargon.
 - **Prochaine phase (2B)** : brancher l'auth (Netlify Identity recommandé) +
   **migrer une collection pilote** (Œuvres) sans casser le site.
 
+## Roadmap opérationnelle (centre opérationnel)
+
+Lecture **orientée opérations** : le cockpit doit d'abord **simplifier la vie**
+d'Armelle et de Tom, avant d'ajouter des services. Modèle : `src/data/operations.ts`.
+
+| Version | Objectif |
+|---|---|
+| **V1 — Prototype (actuel)** | Lecture · préparation · copier-coller · **pas de sauvegarde**. |
+| **V2 — Centre opérationnel assisté** | **Générer** : fiche œuvre complète · checklist upload image · légende Instagram · **fiche de preuve de création** · demande d'acquisition · **facture brouillon** · fiche logistique. |
+| **V3 — Cockpit éditorial réel** | Édition œuvres · textes · statuts · expositions · images. |
+| **V4 — Cockpit commercial doux** | Demandes entrantes · réservation · suivi prospect · catalogue · **devis/facture brouillon** · conditions de retrait/livraison. |
+| **V5 — Automatisations optionnelles** | Cloudinary · CMS · paiement · Instagram API — **seulement si bénéfice net**. |
+
+> Garde-fou : **aucune action sensible automatisée sans validation humaine**
+> (Armelle décide · Tom valide · Claude Code exécute).
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
