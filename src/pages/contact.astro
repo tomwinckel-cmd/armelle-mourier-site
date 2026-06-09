@@ -2,6 +2,13 @@
 import Base from '../layouts/Base.astro';
 import Trait from '../components/Trait.astro';
 import { site, contact } from '../data/site';
+import { artworks } from '../data/artworks';
+
+// Correspondance slug → titre, pour préremplir un message lisible quand un
+// lien d'œuvre arrive avec ?oeuvre=<slug> (voir getArtworkRequestUrl).
+const artworkTitles: Record<string, string> = Object.fromEntries(
+  artworks.map((a) => [a.slug, a.title]),
+);
 
 // ---------------------------------------------------------------------
 //  ENVOI DU FORMULAIRE
@@ -118,8 +125,10 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
     </div>
   </section>
 
+  <script is:inline set:html={`window.__artworkTitles = ${JSON.stringify(artworkTitles)};`}></script>
   <script is:inline>
     const email = "armellemourier02@gmail.com";
+    const artworkTitles = window.__artworkTitles || {};
     const endpoint = "";
     const form = document.getElementById('contact-form');
     const nameEl = document.getElementById('name');
@@ -154,11 +163,12 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
     }
 
     if (oeuvre) {
+      const oeuvreTitle = artworkTitles[oeuvre] || oeuvre; // slug → titre lisible
       const reserve = objet === 'reservation';
       selectSubject(reserve ? 'Réservation d’une œuvre' : 'Acquisition d’une œuvre');
       messageEl.value = reserve
-        ? `Bonjour,\n\nJe souhaiterais réserver l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer les conditions et sa disponibilité ?\n\nMerci.`
-        : `Bonjour,\n\nJe suis intéressé·e par l’œuvre « ${oeuvre} ». Pourriez-vous m’indiquer son prix et sa disponibilité ?\n\nMerci.`;
+        ? `Bonjour,\n\nJe souhaiterais réserver l’œuvre « ${oeuvreTitle} ». Pourriez-vous m’indiquer les conditions et sa disponibilité ?\n\nMerci.`
+        : `Bonjour,\n\nJe suis intéressé·e par l’œuvre « ${oeuvreTitle} ». Pourriez-vous m’indiquer son prix et sa disponibilité ?\n\nMerci.`;
     } else if (objet && objetMap[objet]) {
       selectSubject(objetMap[objet]);
       if (objet === 'catalogue' || objet === 'bleu-cendres') {
