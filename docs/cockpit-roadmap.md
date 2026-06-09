@@ -177,6 +177,39 @@ Section opérationnelle dans `/cockpit-roadmap` (modèle : `src/data/proof.ts`) 
 - **Limite assumée** : le cockpit **organise**, il ne **protège pas** à lui seul.
   L'artiste garde la décision. Voir `docs/ip-protection-artist.md`.
 
+## Module « Facture brouillon + remise d’œuvre » (prototype)
+
+Section opérationnelle « **Après une demande d’acquisition** » dans `/cockpit-roadmap`
+(modèle : `src/data/transactionWorkflow.ts`) pour préparer la **suite** d’une demande :
+**demande client → œuvre → réservation → brouillon de facture → paiement à définir →
+remise/livraison → preuve de remise → archivage**.
+
+- **Brouillon de facture** : bloc copiable « BROUILLON DE FACTURE — À VÉRIFIER »
+  (artiste, client, œuvre, dimensions, technique, **« Prix : à valider / prix sur
+  demande »**, date, **« Numéro de facture : à compléter »**, **« Mode de paiement :
+  à définir »**, conditions, remise/livraison, notes, **« Validation humaine :
+  obligatoire avant envoi »**).
+- **Logistique** : bloc copiable « FICHE LOGISTIQUE — REMISE D’ŒUVRE » (mode de remise —
+  retrait atelier / livraison locale / transporteur à définir —, adresse, date,
+  emballage, état avant départ, photos, assurance, responsable, preuve de remise,
+  signature, notes) + checklists « **Avant d’envoyer une facture** » et « **Avant
+  remise ou livraison** ».
+- **Messages client** : modèles copiables (information, réservation, remise/livraison,
+  coordonnées, catalogue) au ton **humain, professionnel, chaleureux** — jamais agressif.
+- **Gamification douce** (sobre, adulte) : badges Demande claire · Facture préparée ·
+  Logistique prête · Remise sécurisée · Archive prévue.
+
+### Limites volontaires (facture / logistique)
+- **Aucun paiement réel** : pas de « payer maintenant », pas de lien, **pas de Stripe /
+  PayPal**, aucune API.
+- **Pas de facture officielle définitive** : ce sont des **brouillons à vérifier
+  humainement**. Numéro « à compléter », montant « à valider », paiement « à définir ».
+- **Aucune comptabilité automatisée** : le cockpit **ne remplace pas un comptable** —
+  pour la comptabilité légale, **consulter un professionnel** si nécessaire.
+- **Aucune sauvegarde, aucun upload, aucune base de données** : tout est calculé
+  côté navigateur, rien n’est enregistré.
+- **Validation humaine obligatoire** : Armelle décide · Tom valide · Claude Code exécute.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.

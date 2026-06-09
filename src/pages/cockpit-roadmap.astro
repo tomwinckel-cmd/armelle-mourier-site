@@ -11,6 +11,7 @@ import { operations, operationsPrinciple, type OperationStatus } from '../data/o
 import { artworkWorkflow, workflowBadges } from '../data/artworkWorkflow';
 import { designModes } from '../data/theme';
 import { artworkProof, webPublicationTips, protectionChecklist, proofBadges } from '../data/proof';
+import { transactionWorkflow, invoiceChecklist, deliveryChecklist, messageTemplates, transactionBadges } from '../data/transactionWorkflow';
 
 // ---- Données (lecture seule) ----
 const totalArtworks = artworks.length;
@@ -51,6 +52,7 @@ const sections = [
   { id: 'oeuvres', label: 'Œuvres' },
   { id: 'intake', label: 'Ajouter une œuvre' },
   { id: 'proof', label: 'Fiche œuvre + preuve' },
+  { id: 'transaction', label: 'Après une demande' },
   { id: 'disponibilites', label: 'Disponibilités' },
   { id: 'pages', label: 'Pages' },
   { id: 'expositions', label: 'Expositions' },
@@ -541,6 +543,201 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       </p>
     </section>
 
+    <!-- APRÈS UNE DEMANDE D'ACQUISITION (prototype, ne sauvegarde pas) -->
+    <section id="transaction" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Après une demande d’acquisition</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Une fois la demande reçue, le cockpit aide à préparer la suite : informations client,
+        réservation, <strong>brouillon de facture</strong>, logistique de remise/livraison,
+        preuve de remise, archivage. <strong>Rien n’est sauvegardé, encaissé ni envoyé ici.</strong>
+      </p>
+
+      <!-- Avertissement comptable / non-paiement -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ <strong>Le cockpit ne remplace pas un comptable</strong> et ne produit pas de facture
+        officielle définitive. Il prépare un <strong>brouillon clair, vérifiable humainement</strong>,
+        pour réduire les erreurs et la charge mentale. <strong>Aucun paiement en ligne</strong>
+        (ni Stripe, ni PayPal), aucun « payer maintenant », aucun numéro de facture automatique.
+        Pour la comptabilité : <strong>consulter un professionnel</strong> si nécessaire.
+      </p>
+
+      <!-- Étapes du parcours -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {transactionWorkflow.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h3>
+            <p class="mt-1 text-sm text-noir/75">{s.description}</p>
+            <p class="mt-2 text-xs text-cendre">{s.fields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Préparer la transaction (NE SAUVEGARDE PAS) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer le dossier</h3>
+      <form id="t-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <p class="sm:col-span-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Client & œuvre</p>
+        <label class="text-sm">Artiste
+          <input id="t-artist" type="text" value="Armelle Mourier" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Client
+          <input id="t-client" type="text" placeholder="Nom du client" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">E-mail client
+          <input id="t-email" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut de l’œuvre
+          <select id="t-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="disponible">Disponible</option>
+            <option value="réservée">Réservée</option>
+            <option value="sur demande">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm sm:col-span-2">Œuvre concernée (titre)
+          <input id="t-oeuvre" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="t-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="t-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Brouillon de facture (à vérifier)</p>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « à valider »)</span>
+          <input id="t-price" type="text" placeholder="à valider / prix sur demande" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Date
+          <input id="t-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Numéro de facture <span class="text-cendre">(à compléter)</span>
+          <input id="t-invnum" type="text" placeholder="à compléter" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Mode de paiement <span class="text-cendre">(à définir)</span>
+          <input id="t-paymode" type="text" placeholder="à définir (hors ligne)" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Conditions <span class="text-cendre">(à compléter / valider)</span>
+          <input id="t-conditions" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes facture
+          <input id="t-notes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Remise / livraison</p>
+        <label class="text-sm">Mode de remise
+          <select id="t-delmode" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="à définir">À définir</option>
+            <option value="Retrait atelier">Retrait atelier</option>
+            <option value="Livraison locale">Livraison locale</option>
+            <option value="Transporteur à définir">Transporteur à définir</option>
+          </select>
+        </label>
+        <label class="text-sm">Date prévue
+          <input id="t-deldate" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Adresse / lieu <span class="text-cendre">(si livraison)</span>
+          <input id="t-address" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Emballage
+          <input id="t-packaging" type="text" placeholder="carton renforcé, coins…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">État de l’œuvre avant départ
+          <input id="t-state" type="text" placeholder="bon état, noté" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Photos avant départ <span class="text-cendre">(où conservées)</span>
+          <input id="t-photos" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Assurance <span class="text-cendre">(si nécessaire)</span>
+          <input id="t-insurance" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Personne responsable
+          <input id="t-responsible" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Signature / confirmation
+          <input id="t-signature" type="text" placeholder="en main propre, e-mail de confirmation…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes logistique
+          <input id="t-delnotes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="t-priceok" type="checkbox" /> Prix validé par l’artiste (jamais inventé)</label>
+          <label class="flex items-center gap-2"><input id="t-proofok" type="checkbox" /> Preuve de remise prévue (photos + confirmation)</label>
+          <label class="flex items-center gap-2"><input id="t-archok" type="checkbox" /> Dossier à archiver (brouillon + logistique + échanges)</label>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation de la transaction</p>
+          <p id="t-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="t-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="t-score">0</span> % préparé — indicatif, pas une note.</p>
+        <ul id="t-badges" class="mt-4 flex flex-wrap gap-2">
+          {transactionBadges.map((b) => (
+            <li data-tbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Checklists -->
+      <div class="mt-8 grid gap-8 lg:grid-cols-2">
+        <div>
+          <h3 class="text-h3 font-serif text-encre">Avant d’envoyer une facture</h3>
+          <ul class="mt-4 grid gap-2 text-sm">
+            {invoiceChecklist.map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-h3 font-serif text-encre">Avant remise ou livraison</h3>
+          <ul id="t-delcheck" class="mt-4 grid gap-2 text-sm">
+            {deliveryChecklist.map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Message client -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Message client</h3>
+      <label class="mt-3 block max-w-md text-sm">Modèle de message
+        <select id="t-msg" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          {messageTemplates.map((m) => (
+            <option value={m.id} data-body={m.body}>{m.label}</option>
+          ))}
+        </select>
+      </label>
+      <pre id="t-msgout" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-ghost mt-3" data-msg-copy>Copier le message</button>
+
+      <!-- Brouillon de facture -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Brouillon de facture</h3>
+      <p class="mt-1 text-sm italic text-or">Document brouillon — à vérifier avant envoi.</p>
+      <pre id="t-invoice" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-primary mt-3" data-invoice-copy>Copier le brouillon de facture</button>
+
+      <!-- Fiche logistique -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Fiche logistique de remise</h3>
+      <pre id="t-logistics" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-3 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-logistics-copy>Copier la fiche logistique</button>
+        <button type="button" class="btn btn-ghost" data-deliverychecklist-copy>Copier la checklist remise</button>
+      </div>
+
+      <p class="mt-6 max-w-prose text-sm italic text-or">
+        Tous ces blocs sont des <strong>brouillons à vérifier humainement</strong>. Aucun paiement,
+        aucune facture officielle, aucune comptabilité automatisée.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+    </section>
+
     <!-- 3 — DISPONIBILITÉS -->
     <section id="disponibilites" class="scroll-mt-28">
       <h2 class="mt-16 text-h2 font-serif text-encre">Disponibilités · vente douce</h2>
@@ -885,6 +1082,104 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       update();
       var fc = document.querySelector('[data-fiche-copy]'); if (fc) fc.addEventListener('click', function () { copyText(buildFiche(), fc); });
       var cc = document.querySelector('[data-checklist-copy]'); if (cc) cc.addEventListener('click', function () { copyText(buildChecklist(), cc); });
+    })();
+
+    // --- Après une demande d'acquisition (prépare brouillons, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('t-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+
+      function buildInvoice() {
+        return [
+          'BROUILLON DE FACTURE — À VÉRIFIER',
+          '',
+          'Artiste : ' + (v('t-artist') || 'Armelle Mourier'),
+          'Client : ' + v('t-client'),
+          'Œuvre : ' + v('t-oeuvre'),
+          'Dimensions : ' + v('t-dimensions'),
+          'Technique : ' + v('t-technique'),
+          'Prix : ' + (v('t-price') || 'à valider / prix sur demande'),
+          'Date : ' + v('t-date'),
+          'Numéro de facture : ' + (v('t-invnum') || 'à compléter'),
+          'Mode de paiement : ' + (v('t-paymode') || 'à définir'),
+          'Conditions : ' + v('t-conditions'),
+          'Remise / livraison : ' + v('t-delmode'),
+          'Notes : ' + v('t-notes'),
+          'Validation humaine : obligatoire avant envoi',
+        ].join('\n');
+      }
+      function buildLogistics() {
+        return [
+          'FICHE LOGISTIQUE — REMISE D’ŒUVRE',
+          '',
+          'Œuvre : ' + v('t-oeuvre'),
+          'Client : ' + v('t-client'),
+          'Mode de remise : ' + (v('t-delmode') || 'à définir'),
+          '  (options : Retrait atelier · Livraison locale · Transporteur à définir)',
+          'Adresse / lieu : ' + v('t-address'),
+          'Date prévue : ' + v('t-deldate'),
+          'Emballage : ' + v('t-packaging'),
+          'État de l’œuvre avant départ : ' + v('t-state'),
+          'Photos avant départ : ' + v('t-photos'),
+          'Assurance : ' + v('t-insurance'),
+          'Personne responsable : ' + v('t-responsible'),
+          'Preuve de remise : ' + (c('t-proofok') ? 'prévue' : 'à prévoir'),
+          'Signature / confirmation : ' + v('t-signature'),
+          'Notes : ' + v('t-delnotes'),
+        ].join('\n');
+      }
+      function buildMessage() {
+        var sel = document.getElementById('t-msg');
+        var opt = sel ? sel.options[sel.selectedIndex] : null;
+        var body = opt ? (opt.getAttribute('data-body') || '') : '';
+        var client = v('t-client') || '…';
+        var oeuvre = v('t-oeuvre') || '…';
+        var statut = v('t-status') || 'disponible';
+        return body.split('{client}').join(client).split('{oeuvre}').join(oeuvre).split('{statut}').join(statut);
+      }
+      function buildDeliveryChecklist() {
+        var items = ['CHECKLIST REMISE / LIVRAISON', ''];
+        document.querySelectorAll('#t-delcheck li span').forEach(function (el) {
+          items.push('[ ] ' + el.textContent);
+        });
+        return items.join('\n');
+      }
+
+      var keys = ['t-client', 't-email', 't-oeuvre', 't-dimensions', 't-technique', 't-price', 't-date', 't-conditions', 't-address', 't-deldate', 't-packaging', 't-state', 't-photos', 't-responsible', 't-signature'];
+      var checks = ['t-priceok', 't-proofok', 't-archok'];
+      function update() {
+        var filled = 0, total = keys.length + checks.length;
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('t-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('t-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('t-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          request: !!(v('t-client') && v('t-email')),
+          invoice: !!(v('t-oeuvre') && c('t-priceok')),
+          logistics: !!(v('t-delmode') && v('t-deldate')),
+          delivery: !!(v('t-photos') && v('t-state') && c('t-proofok')),
+          archive: c('t-archok'),
+        };
+        document.querySelectorAll('[data-tbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-tbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var iv = document.getElementById('t-invoice'); if (iv) iv.textContent = buildInvoice();
+        var lg = document.getElementById('t-logistics'); if (lg) lg.textContent = buildLogistics();
+        var mo = document.getElementById('t-msgout'); if (mo) mo.textContent = buildMessage();
+      }
+      form.addEventListener('input', update);
+      var msg = document.getElementById('t-msg'); if (msg) msg.addEventListener('change', update);
+      update();
+      var ib = document.querySelector('[data-invoice-copy]'); if (ib) ib.addEventListener('click', function () { copyText(buildInvoice(), ib); });
+      var lb = document.querySelector('[data-logistics-copy]'); if (lb) lb.addEventListener('click', function () { copyText(buildLogistics(), lb); });
+      var mb = document.querySelector('[data-msg-copy]'); if (mb) mb.addEventListener('click', function () { copyText(buildMessage(), mb); });
+      var db = document.querySelector('[data-deliverychecklist-copy]'); if (db) db.addEventListener('click', function () { copyText(buildDeliveryChecklist(), db); });
     })();
   </script>
 </Base>
