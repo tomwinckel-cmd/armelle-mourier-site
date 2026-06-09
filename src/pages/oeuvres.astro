@@ -4,6 +4,7 @@ import SectionTitle from '../components/SectionTitle.astro';
 import ArtworkGrid from '../components/ArtworkGrid.astro';
 import { artworks, allSeries } from '../data/artworks';
 import { site } from '../data/site';
+import { pages } from '../content/pages';
 
 // Donnée structurée : galerie d'œuvres (ItemList)
 const galleryLd = {
@@ -35,16 +36,13 @@ const galleryLd = {
   jsonld={galleryLd}
 >
   <section class="shell pb-section pt-12 sm:pt-16">
-    <SectionTitle eyebrow="Le portfolio" title="Les œuvres" as="h1" />
-    <p class="reveal mt-6 max-w-prose text-noir/80">
-      Une peinture de la couleur et de la matière, le plus souvent à l’acrylique, sur toile recyclée,
-      achetée ou créée. Du grand format au plus petit, chaque toile naît d’un même élan&nbsp;:
-      coucher l’émotion et transmettre la joie d’être en vie.
-    </p>
-    <p class="reveal mt-3 max-w-prose text-sm text-cendre">
-      Les visuels haute définition seront ajoutés prochainement&nbsp;; un aperçu d’attente s’affiche
-      en attendant. Pour le prix ou la disponibilité d’une œuvre, contactez directement l’artiste.
-    </p>
+    <SectionTitle eyebrow={pages.oeuvres.eyebrow} title={pages.oeuvres.title} as="h1" />
+    <p class="reveal mt-6 max-w-prose text-lg leading-relaxed text-noir/85">{pages.oeuvres.intro}</p>
+    <p class="reveal mt-4 max-w-prose font-serif text-lg italic leading-snug text-encre">{pages.oeuvres.seriesNote}</p>
+    {allSeries.length > 1 && (
+      <p class="reveal mt-4 max-w-prose text-sm uppercase tracking-[0.16em] text-cendre">{pages.oeuvres.filterNote}</p>
+    )}
+    <p class="reveal mt-3 max-w-prose text-sm text-cendre">{pages.oeuvres.pendingNote}</p>
 
     <div class="mt-12">
       <ArtworkGrid artworks={artworks} filterable={allSeries.length > 1} />

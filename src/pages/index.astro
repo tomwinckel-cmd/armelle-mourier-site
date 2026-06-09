@@ -6,6 +6,7 @@ import ArtworkPlaceholder from '../components/ArtworkPlaceholder.astro';
 import Trait from '../components/Trait.astro';
 import { site } from '../data/site';
 import { theme } from '../data/theme';
+import { pages } from '../content/pages';
 import { featuredArtworks, availableArtworks } from '../data/artworks';
 import { splitExhibitions } from '../data/exhibitions';
 
@@ -81,46 +82,40 @@ const visualArtistLd = {
   <section class="bg-brume py-section">
     <div class="shell">
       <SectionTitle
-        eyebrow="Galerie"
-        title="Œuvres mises en lumière"
-        lead="Une première traversée de l’univers pictural : couleur, matière, mémoire des lieux et souffle intérieur."
+        eyebrow={pages.home.gallery.eyebrow}
+        title={pages.home.gallery.title}
+        lead={pages.home.gallery.lead}
       />
       <div class="mt-12">
         <ArtworkGrid artworks={featured} />
       </div>
       <div class="mt-10">
-        <a href="/oeuvres" class="link-quiet font-semibold">Voir toute la galerie →</a>
+        <a href="/oeuvres" class="link-quiet font-semibold">{pages.home.gallery.more} →</a>
       </div>
     </div>
   </section>
 
   <section class="shell grid gap-10 py-section lg:grid-cols-2 lg:gap-14">
     <div class={`reveal border-l-2 pl-6 sm:pl-8 ${theme.saleMode.highlightOnHome ? 'border-or/60' : 'border-cendre/30'}`}>
-      <p class="eyebrow mb-3">Acquisition</p>
-      <h2 class="text-h1 font-serif text-encre">Tableaux disponibles</h2>
-      <p class="mt-6 leading-relaxed text-noir/80">
-        Certaines œuvres originales peuvent être acquises ou réservées, en lien direct avec l’artiste.
-        L’acquisition reste une conversation : une demande, le temps de choisir, jamais un panier.
-      </p>
-      <a href="/disponibles" class="btn btn-primary mt-7">Voir les tableaux disponibles</a>
+      <p class="eyebrow mb-3">{pages.home.sale.eyebrow}</p>
+      <h2 class="text-h1 font-serif text-encre">{pages.home.sale.title}</h2>
+      <p class="mt-6 leading-relaxed text-noir/80">{pages.home.sale.text}</p>
+      <a href="/disponibles" class="btn btn-primary mt-7">{pages.home.sale.cta}</a>
     </div>
     <div class="reveal border-l-2 border-cendre/30 pl-6 sm:pl-8">
-      <p class="eyebrow mb-3">Livre & poésie</p>
-      <h2 class="text-h1 font-serif text-encre">Bleu Cendres</h2>
-      <p class="mt-6 leading-relaxed text-noir/80">
-        Un recueil de poésie illustré où les toiles dorées et bleues d’Armelle Mourier dialoguent
-        avec les mots de Louise Dupré.
-      </p>
-      <a href="/bleu-cendres" class="btn btn-ghost mt-7">Entrer dans Bleu Cendres</a>
+      <p class="eyebrow mb-3">{pages.home.bleu.eyebrow}</p>
+      <h2 class="text-h1 font-serif text-encre">{pages.home.bleu.title}</h2>
+      <p class="mt-6 leading-relaxed text-noir/80">{pages.home.bleu.text}</p>
+      <a href="/bleu-cendres" class="btn btn-ghost mt-7">{pages.home.bleu.cta}</a>
     </div>
   </section>
 
   <section class="bg-encre py-section text-paper">
     <div class="shell">
       <SectionTitle
-        eyebrow="Présence"
-        title="Expositions récentes & à venir"
-        lead="Une chronologie vivante entre expositions, performances, résidences et rencontres."
+        eyebrow={pages.home.exhib.eyebrow}
+        title={pages.home.exhib.title}
+        lead={pages.home.exhib.lead}
       />
       <div class="mt-12 grid gap-5 md:grid-cols-3">
         {recent.map((e) => (
@@ -131,7 +126,21 @@ const visualArtistLd = {
           </article>
         ))}
       </div>
-      <a href="/expositions" class="mt-10 inline-flex text-paper underline decoration-or underline-offset-4">Voir la chronologie →</a>
+      <a href="/expositions" class="mt-10 inline-flex text-paper underline decoration-or underline-offset-4">{pages.home.exhib.cta} →</a>
+    </div>
+  </section>
+
+  <!-- TRANSITION DE FIN — entrer dans le récit de l'artiste -->
+  <section class="shell py-section">
+    <div class="reveal max-w-prose">
+      <p class="eyebrow mb-3">{pages.home.closing.eyebrow}</p>
+      <h2 class="text-h2 font-serif text-encre">{pages.home.closing.title}</h2>
+      <p class="mt-5 leading-relaxed text-noir/80">{pages.home.closing.text}</p>
+      <div class="mt-7 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+        {pages.home.closing.links.map((l) => (
+          <a href={l.href} class="btn btn-gold">{l.label}</a>
+        ))}
+      </div>
     </div>
   </section>
 </Base>
