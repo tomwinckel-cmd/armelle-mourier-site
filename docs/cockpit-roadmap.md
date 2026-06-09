@@ -110,6 +110,14 @@ labels humains, descriptions courtes, actions évidentes, zéro jargon.
 > garder Astro/Vercel, coût quasi nul, données dans le dépôt ; alternative
 > **Sanity** si l'on privilégie le confort d'édition.
 
+### Phase 2A — structure Decap préparée *(fait)*
+- `public/admin/` (Decap + `config.yml`, 7 collections) + `content/cms/` (exemples)
+  + docs (`decap-cms-setup.md`, `cloudinary-setup.md`).
+- ⚠️ **Le site public n'utilise pas encore les contenus CMS** : la source de vérité
+  reste `src/data` / `src/content`. Auth **non branchée** (volontaire), aucun secret.
+- **Prochaine phase (2B)** : brancher l'auth (Netlify Identity recommandé) +
+  **migrer une collection pilote** (Œuvres) sans casser le site.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.

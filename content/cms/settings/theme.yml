@@ -1,0 +1,8 @@
+# EXEMPLE de préparation — non utilisé par le site pour l'instant.
+# Source active aujourd'hui : src/data/theme.ts
+paper: "#F4EFE3"
+bluePigment: "#2B4C92"
+ochreGold: "#A2762E"
+textureIntensity: "subtle"   # none | subtle | medium
+buttonMode: "handline"       # handline | artist-line | pill
+cardMode: "exhibition-label" # exhibition-label | cartel | card

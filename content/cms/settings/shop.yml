@@ -1,0 +1,11 @@
+# EXEMPLE de préparation — non utilisé par le site pour l'instant.
+# Source active aujourd'hui : src/data/shop.ts  (vente douce, pas de paiement)
+showPrices: false
+defaultPriceLabel: "Prix sur demande"
+enableReservation: true
+enableCatalogRequest: true
+cta:
+  artwork: "Demander cette œuvre"
+  info: "Recevoir les informations"
+  catalog: "Demander le catalogue"
+  reserve: "Réserver cette œuvre"
