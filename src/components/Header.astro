@@ -1,5 +1,5 @@
 ---
-import { site, nav, contact } from '../data/site';
+import { site, nav, contact, carnet } from '../data/site';
 ---
 <header class="site-header" data-open="false">
   <div class="shell flex min-h-[5.5rem] items-center justify-between gap-6">
@@ -30,20 +30,26 @@ import { site, nav, contact } from '../data/site';
   </div>
   <div class="header-rule" aria-hidden="true"></div>
 
-  {/* Carnet d'atelier — menu mobile/tablette */}
+  {/* Le Carnet — menu éditorial (mobile/tablette) : une mini-page d'atelier */}
   <nav id="menu-atelier" class="atelier-menu" aria-label="Navigation" data-nav-menu>
-    <p class="atelier-menu__title">Carnet d’atelier</p>
+    <p class="atelier-menu__title">{carnet.eyebrow}</p>
     <ul>
-      {nav.map((item, i) => (
+      {nav.map((item) => (
         <li>
           <a href={item.href} data-nav-close>
-            <span class="atelier-menu__num">{String(i + 1).padStart(2, '0')}</span>
-            <span class="atelier-menu__label">{item.label}</span>
+            <span class="atelier-menu__num" aria-hidden="true">{item.index}</span>
+            <span class="atelier-menu__body">
+              <span class="atelier-menu__label">{item.label}</span>
+              <span class="atelier-menu__note">{item.note}</span>
+            </span>
           </a>
         </li>
       ))}
     </ul>
-    <a href={`mailto:${contact.email}`} class="atelier-menu__mail" data-nav-close>{contact.email}</a>
+    <div class="atelier-menu__foot">
+      <p class="atelier-menu__intro">{carnet.intro}</p>
+      <a href={`mailto:${contact.email}`} class="atelier-menu__mail" data-nav-close>{contact.email}</a>
+    </div>
   </nav>
   <button class="nav-scrim" type="button" aria-hidden="true" tabindex="-1" data-nav-scrim></button>
 </header>
@@ -92,7 +98,9 @@ import { site, nav, contact } from '../data/site';
       background: rgb(var(--c-paper));
       border-bottom: 1px solid rgb(var(--c-encre) / 0.18);
       box-shadow: 0 18px 40px rgb(var(--c-encre) / 0.08);
-      padding: 1.25rem clamp(1rem, 5vw, 2rem) 1.75rem;
+      padding: 1.25rem clamp(1rem, 5vw, 2rem) 1.5rem;
+      max-height: calc(100dvh - 5.5rem);
+      overflow-y: auto;
       transform: translateY(-10px);
       opacity: 0;
       visibility: hidden;
@@ -107,26 +115,55 @@ import { site, nav, contact } from '../data/site';
     }
     .atelier-menu ul { list-style: none; margin: 0; padding: 0; }
     .atelier-menu li { border-top: 1px solid rgb(var(--c-encre) / 0.12); }
+    .atelier-menu li:last-child { border-bottom: 1px solid rgb(var(--c-encre) / 0.12); }
     .atelier-menu li a {
       display: flex;
-      align-items: baseline;
-      gap: 0.9rem;
-      padding: 0.9rem 0.1rem;
+      align-items: flex-start;
+      gap: 0.95rem;
+      padding: 0.95rem 0.1rem;
       text-decoration: none;
       color: rgb(var(--c-encre));
     }
     .atelier-menu__num {
       font-family: var(--font-serif);
       font-style: italic;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
       color: rgb(var(--c-or));
-      min-width: 1.6rem;
+      min-width: 1.7rem;
     }
-    .atelier-menu__label { font-family: var(--font-serif); font-size: 1.35rem; line-height: 1; }
-    .atelier-menu li a:hover .atelier-menu__label { color: rgb(var(--c-noir)); }
+    .atelier-menu__body { display: flex; flex-direction: column; gap: 0.2rem; }
+    .atelier-menu__label {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      line-height: 1.05;
+      color: rgb(var(--c-encre));
+      transition: color .2s ease;
+    }
+    .atelier-menu__note {
+      font-size: 0.85rem;
+      line-height: 1.35;
+      color: rgb(var(--c-cendre));
+    }
+    .atelier-menu li a:hover .atelier-menu__label,
+    .atelier-menu li a:focus-visible .atelier-menu__label { color: rgb(var(--c-noir)); }
+
+    .atelier-menu__foot {
+      margin-top: 1.25rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid rgb(var(--c-or) / calc(0.7 * var(--gold-trace)));
+    }
+    .atelier-menu__intro {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      color: rgb(var(--c-encre));
+      margin: 0 0 0.6rem;
+      max-width: 34ch;
+    }
     .atelier-menu__mail {
       display: inline-block;
-      margin-top: 1.1rem;
       color: rgb(var(--c-encre));
       text-decoration: underline;
       text-decoration-color: rgb(var(--c-or) / 0.6);

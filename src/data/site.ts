@@ -43,16 +43,35 @@ export const contact = {
   ],
 };
 
-// Navigation principale (ordre = ordre du menu)
-export const nav = [
-  { label: 'Œuvres', href: '/oeuvres' },
-  { label: 'Disponibles', href: '/disponibles' },
-  { label: 'Biographie', href: '/biographie' },
-  { label: 'Démarche', href: '/demarche' },
-  { label: 'Bleu Cendres', href: '/bleu-cendres' },
-  { label: 'Expositions', href: '/expositions' },
-  { label: 'Contact', href: '/contact' },
+// =====================================================================
+//  NAVIGATION ÉDITORIALE — « Le Carnet »
+//  Chaque entrée = une porte d'atelier : numéro, titre, et une courte note
+//  qui donne envie d'entrer dans la page (et non un simple lien).
+//  ➜ Pour MODIFIER un libellé ou une note : éditez ce tableau, c'est tout.
+//     (label/href servent aussi au menu desktop et au pied de page.)
+// =====================================================================
+export type NavItem = {
+  label: string;
+  href: string;
+  index: string; // numéro de carnet (01, 02, …)
+  note: string;  // courte note éditoriale (carnet)
+};
+
+export const nav: NavItem[] = [
+  { label: 'Œuvres', href: '/oeuvres', index: '01', note: 'Galerie complète, séries, formats et matières.' },
+  { label: 'Disponibles', href: '/disponibles', index: '02', note: 'Sélection d’atelier à découvrir ou réserver.' },
+  { label: 'Biographie', href: '/biographie', index: '03', note: 'Le parcours, les lieux, les épreuves et la couleur.' },
+  { label: 'Démarche', href: '/demarche', index: '04', note: 'Pigments, gestes, toile, danse et catharsis.' },
+  { label: 'Bleu Cendres', href: '/bleu-cendres', index: '05', note: 'Le recueil, les bleus, les ors et les paysages intérieurs.' },
+  { label: 'Expositions', href: '/expositions', index: '06', note: 'Chronologie, lieux, rencontres et projets.' },
+  { label: 'Contact', href: '/contact', index: '07', note: 'Écrire à l’artiste pour une œuvre, une exposition ou une rencontre.' },
 ];
+
+// Textes éditoriaux du Carnet (modifiables sans toucher au composant).
+export const carnet = {
+  eyebrow: 'Carnet d’atelier',
+  intro: 'Un carnet pour entrer dans l’atelier, les œuvres et les paysages intérieurs.',
+};
 
 // Mots-clés SEO par défaut (complétés page par page)
 export const defaultKeywords = [
