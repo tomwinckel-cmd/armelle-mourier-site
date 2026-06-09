@@ -5,6 +5,7 @@ import ArtworkGrid from '../components/ArtworkGrid.astro';
 import Trait from '../components/Trait.astro';
 import { availableArtworks } from '../data/artworks';
 import { site } from '../data/site';
+import { shop } from '../data/shop';
 
 // Œuvres présentables à l'acquisition (centralisé dans artworks.ts :
 // respecte le statut et le drapeau showInAvailable).
@@ -29,9 +30,9 @@ const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1
       recevoir les informations, écrivez simplement à l’artiste.
     </p>
     <p class="reveal mt-4 max-w-prose text-noir/70">
-      Chaque toile est une pièce unique. L’acquisition se fait dans l’échange&nbsp;: pas de paiement
-      en ligne, simplement une conversation, le temps de répondre à vos questions sur le format,
-      la technique ou l’encadrement.
+      Ce n’est pas une boutique automatique. Chaque toile est une pièce unique&nbsp;: pas de panier
+      ni de paiement en ligne, simplement une conversation — le temps de répondre à vos questions
+      sur le format, la technique ou l’encadrement, de réserver une œuvre ou de recevoir le catalogue.
     </p>
   </section>
 
@@ -82,9 +83,14 @@ const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1
       </div>
     </div>
 
-    <div class="mt-12 flex flex-wrap gap-3">
+    <div class="mt-12 flex flex-wrap gap-x-8 gap-y-4">
       <a href="/contact?objet=acquisition" class="btn-primary">Demander une œuvre</a>
-      <a href="/contact?objet=catalogue" class="btn-ghost">Recevoir les informations</a>
+      {shop.enableReservation && (
+        <a href="/contact?objet=reservation" class="btn-ghost">{shop.cta.reserve}</a>
+      )}
+      {shop.enableCatalogRequest && (
+        <a href="/contact?objet=catalogue" class="btn-gold">{shop.cta.catalog}</a>
+      )}
     </div>
   </section>
 </Base>

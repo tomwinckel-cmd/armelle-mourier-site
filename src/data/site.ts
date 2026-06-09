@@ -4,6 +4,7 @@
 //  identité, navigation, contact. C'est ici qu'on modifie l'e-mail,
 //  les liens sociaux ou le menu, sans toucher au reste du code.
 // =====================================================================
+import { shop } from './shop';
 
 export const site = {
   artistName: 'Armelle Mourier',
@@ -30,17 +31,8 @@ export const contact = {
     // { label: 'Instagram', href: 'https://instagram.com/votre_compte' },
     // { label: 'Facebook', href: 'https://facebook.com/armelle.mourier' },
   ] as { label: string; href: string }[],
-  // Objets proposés dans le formulaire de contact
-  subjects: [
-    'Acquisition d’une œuvre',
-    'Demande de catalogue',
-    'Exposition',
-    'Résidence',
-    'Atelier',
-    'Presse',
-    'Commande spéciale',
-    'Autre',
-  ],
+  // Objets proposés dans le formulaire de contact (source unique : shop.ts)
+  subjects: shop.contactSubjects,
 };
 
 // =====================================================================
