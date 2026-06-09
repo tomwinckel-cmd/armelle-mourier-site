@@ -7,7 +7,7 @@
 
 export const bio = {
   lead: 'Née dans une famille d’artistes, Armelle Mourier a fait de la peinture une nécessité vitale — une manière de transmettre la joie d’être en vie.',
-  portrait: '', // ex. '/images/portrait-armelle.jpg' (sinon visuel d'attente)
+  portrait: '', // ex. '/images/portraits/armelle-mourier.webp' (sinon visuel d'attente)
   portraitAlt: 'Portrait d’Armelle Mourier, artiste peintre et plasticienne.',
   sections: [
     {
@@ -104,7 +104,7 @@ export const demarche = {
 
 export const bleuCendres = {
   lead: 'Bleu Cendres est un recueil de poésie illustré, où les tableaux dorés et bleus d’Armelle Mourier rencontrent les mots.',
-  cover: '', // ex. '/images/bleu-cendres-couverture.jpg'
+  cover: '', // ex. '/images/projects/bleu-cendres-couverture.webp'
   coverAlt: 'Couverture du recueil Bleu Cendres, tableaux dorés et bleus d’Armelle Mourier.',
   paragraphs: [
     'Paru en mars 2024 aux éditions L’Atelier des Noyers, avec l’éditrice Claire Delbard, Bleu Cendres associe une série de toiles d’Armelle Mourier — dans une gamme de bleus profonds et d’or — aux poèmes de Louise Dupré, poétesse et philosophe québécoise.',

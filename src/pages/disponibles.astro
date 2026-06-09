@@ -3,11 +3,12 @@ import Base from '../layouts/Base.astro';
 import SectionTitle from '../components/SectionTitle.astro';
 import ArtworkGrid from '../components/ArtworkGrid.astro';
 import Trait from '../components/Trait.astro';
-import { artworks } from '../data/artworks';
+import { availableArtworks } from '../data/artworks';
 import { site } from '../data/site';
 
-// Œuvres présentables à l'acquisition : tout sauf « vendue ».
-const forSale = artworks.filter((a) => a.status !== 'sold');
+// Œuvres présentables à l'acquisition (centralisé dans artworks.ts :
+// respecte le statut et le drapeau showInAvailable).
+const forSale = availableArtworks;
 const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1;
 ---
 <Base

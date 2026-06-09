@@ -2,19 +2,23 @@
 //  CATALOGUE DES ŒUVRES
 //  ---------------------------------------------------------------------
 //  Pour AJOUTER une œuvre : copiez un bloc { ... } et changez les valeurs.
-//  Pour AJOUTER LA PHOTO : déposez le fichier dans /public/images/oeuvres/
-//    puis renseignez  image: '/images/oeuvres/mon-fichier.webp'
+//  Pour AJOUTER LA PHOTO : déposez le fichier dans /public/images/artworks/
+//    (voir public/images/README.md pour formats, dimensions et nommage),
+//    puis renseignez  image: '/images/artworks/mon-fichier.webp'
 //    (tant que image est vide, un visuel d'attente élégant s'affiche).
+//  Pour des VUES SECONDAIRES (détail, mise en situation) : renseignez
+//    images: ['/images/artworks/x-detail.webp', '/images/artworks/x-mur.webp'].
 //  Pour fixer un PRIX : renseignez  price: '850 €'  (sinon « Prix sur demande »).
 //  Pour changer la DISPONIBILITÉ : status: 'available' | 'reserved' | 'sold' | 'on-request'.
+//  Pour la VISIBILITÉ : featured (accueil) et showInAvailable (page Disponibles).
 //
 //  ⚠️ INTÉGRITÉ DES DONNÉES
 //  Toutes les œuvres ci-dessous proviennent du site existant d'Armelle Mourier.
 //  • Les 8 toiles de la série « Bleu Cendres » et leurs dimensions sont citées
 //    telles quelles sur la page du recueil (« tableaux que vous pouvez encore acquérir »).
 //  • Pour les autres œuvres, les DIMENSIONS n'étaient pas communiquées : elles sont
-//    laissées vides et marquées « à compléter ». Ne pas inventer de dimensions :
-//    renseignez-les quand Armelle les fournit.
+//    laissées vides et marquées « à compléter ». Ne pas inventer de dimensions
+//    ni de PRIX : renseignez-les quand Armelle les fournit.
 // =====================================================================
 
 export type ArtworkStatus = 'available' | 'sold' | 'reserved' | 'on-request';
@@ -28,11 +32,27 @@ export type Artwork = {
   technique?: string;
   series?: string;
   description?: string; // court texte sensible (optionnel)
-  image: string; // '' = visuel d'attente ; sinon '/images/oeuvres/fichier.webp'
+
+  // --- Visuels ------------------------------------------------------
+  /** Image principale. '' = visuel d'attente ; sinon '/images/artworks/fichier.webp'. */
+  image: string;
+  /** Vues secondaires futures (détail, mise en situation). Optionnel. */
+  images?: string[];
+  /** Texte alternatif (accessibilité + SEO). Toujours renseigné. */
   alt: string;
+
+  // --- Commerce (vente douce : pas de prix imposé) ------------------
   status: ArtworkStatus;
   price?: string; // ex. '850 €' — laisser vide pour « Prix sur demande »
+
+  // --- Visibilité ---------------------------------------------------
+  /** Mise en avant sur la page d'accueil. */
   featured?: boolean;
+  /**
+   * Affichage sur la page « Tableaux disponibles ».
+   * Si non renseigné : déduit du statut (tout sauf « vendue »).
+   */
+  showInAvailable?: boolean;
 };
 
 export const artworks: Artwork[] = [
@@ -205,10 +225,26 @@ export const allSeries = Array.from(
   new Set(artworks.map((a) => a.series).filter(Boolean))
 ) as string[];
 
+/** Une image principale est-elle disponible (sinon visuel d'attente) ? */
+export function hasImage(a: Artwork): boolean {
+  return Boolean(a.image && a.image.trim());
+}
+
+/** Toutes les images (principale + secondaires), sans les vides. */
+export function artworkImages(a: Artwork): string[] {
+  return [a.image, ...(a.images ?? [])].filter((src) => src && src.trim());
+}
+
+/** Œuvre proposée à l'acquisition (page Disponibles) : flag explicite,
+ *  sinon déduit du statut (tout sauf « vendue »). */
+export function isForSale(a: Artwork): boolean {
+  return a.showInAvailable ?? a.status !== 'sold';
+}
+
 export const featuredArtworks = artworks.filter((a) => a.featured);
 
-// Œuvres présentables à l'acquisition (tout sauf « vendue »)
-export const availableArtworks = artworks.filter((a) => a.status !== 'sold');
+// Œuvres présentables à l'acquisition (respecte showInAvailable).
+export const availableArtworks = artworks.filter(isForSale);
 
 export const statusLabel: Record<ArtworkStatus, string> = {
   available: 'Disponible',
