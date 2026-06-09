@@ -59,3 +59,45 @@ de Vercel — **jamais** dans `src/data`, `src/content` ni dans un commit.
 - **Aucun prix inventé** : sans `price`, on affiche « Prix sur demande ».
 - **Pas de téléphone** publié sans validation humaine explicite.
 - Identité **artist-studio** (cartels, boutons handline, Carnet d'atelier).
+
+---
+
+## Vision — un outil d'émancipation pour Armelle
+
+Le site doit être livré **clé en main**. À terme, Armelle Mourier pilote
+elle-même ses œuvres, ses images, ses textes, ses expositions, ses
+disponibilités, sa vente douce et la **préparation** de ses publications
+réseaux sociaux — **sans dépendre du code**. Le cockpit doit rester **simple,
+clair, humain et progressif**, pensé pour une personne non développeuse :
+labels humains, descriptions courtes, actions évidentes, zéro jargon.
+
+> Le schéma des modules vit dans `src/data/cockpit.ts` (description, pas un
+> admin). L'assistant réseaux sociaux (modèles de légendes, formats, mots-clés)
+> vit dans `src/data/social.ts`. Une page interne **non listée** présente la
+> feuille de route : `/cockpit-roadmap`.
+
+### Modules prévus (`src/data/cockpit.ts`)
+1. **Œuvres** — ajouter / modifier / organiser les tableaux.
+2. **Disponibilités** — disponible / réservée / vendue / sur demande.
+3. **Pages** — modifier les textes principaux.
+4. **Expositions** — ajouter une date / un événement.
+5. **Réseaux sociaux** — préparer des publications Instagram (copier-coller).
+6. **Ambiance visuelle** — ajuster quelques couleurs et intensités.
+
+## Chemin progressif (du plus simple au plus avancé)
+
+1. **Fichiers de configuration éditables** (état actuel) — `src/data/`, `src/content/`.
+2. **Mini-cockpit local / admin statique** — une interface simple qui écrit ces fichiers.
+3. **Stockage des images** — dépôt et association aux œuvres.
+4. **Édition œuvres / textes** — formulaires humains (labels du module).
+5. **Assistant Instagram** — légendes + mots-clés + format conseillé, à copier-coller.
+6. **Authentification** *(éventuelle)* — accès privé à l'édition.
+7. **CMS / headless ou base de données** *(éventuel)* — si le besoin grandit.
+
+## Volontairement exclu maintenant
+
+- 💳 **Paiement en ligne** / panier / checkout.
+- 📲 **Publication Instagram automatique** / API Meta / tokens.
+- 🔒 **Stockage de secrets, tokens, clés API, mots de passe** dans le repo.
+- 🧩 Toute **complexité inutile** : on avance par petites étapes utiles.
+
