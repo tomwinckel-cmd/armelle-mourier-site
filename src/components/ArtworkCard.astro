@@ -1,0 +1,64 @@
+---
+import ArtworkPlaceholder from './ArtworkPlaceholder.astro';
+import { type Artwork, statusLabel, priceLabel } from '../data/artworks';
+
+interface Props {
+  artwork: Artwork;
+}
+const { artwork } = Astro.props;
+const a = artwork;
+
+const badgeClass: Record<string, string> = {
+  available: 'bg-encre/10 text-encre',
+  reserved: 'bg-or/15 text-or',
+  'on-request': 'border border-cendre/40 text-cendre',
+  sold: 'bg-noir/10 text-cendre',
+};
+
+const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
+const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
+---
+<article class="reveal group flex flex-col">
+  <div class="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-brume shadow-[var(--shadow-soft)]">
+    {a.image ? (
+      <img
+        src={a.image}
+        alt={a.alt}
+        loading="lazy"
+        decoding="async"
+        class="h-full w-full object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.03]"
+      />
+    ) : (
+      <ArtworkPlaceholder title={a.title} dimensions={a.dimensions} class="transition-transform duration-700 ease-soft group-hover:scale-[1.02]" />
+    )}
+    <span class={`badge absolute left-3 top-3 backdrop-blur-sm ${badgeClass[a.status]} ${a.status === 'on-request' ? 'bg-paper/80' : ''}`}>
+      {statusLabel[a.status]}
+    </span>
+  </div>
+
+  <div class="mt-4 flex flex-1 flex-col">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="text-h3 font-serif text-encre">{a.title}</h3>
+      {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{a.series}</span>}
+    </div>
+
+    {metaParts.length > 0 && (
+      <p class="mt-1 text-sm text-cendre">{metaParts.join(' · ')}</p>
+    )}
+
+    {a.description && (
+      <p class="mt-3 text-[0.95rem] leading-relaxed text-noir/80">{a.description}</p>
+    )}
+
+    <div class="mt-4 flex items-center justify-between gap-4 border-t border-cendre/20 pt-4">
+      <span class={`font-serif text-lg ${a.status === 'sold' ? 'text-cendre' : 'text-encre'}`}>
+        {priceLabel(a)}
+      </span>
+      {a.status !== 'sold' && (
+        <a href={askHref} class="text-[0.92rem] font-semibold text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or">
+          Demander cette œuvre →
+        </a>
+      )}
+    </div>
+  </div>
+</article>

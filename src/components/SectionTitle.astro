@@ -1,0 +1,20 @@
+---
+import Trait from './Trait.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  align?: 'left' | 'center';
+  as?: 'h1' | 'h2' | 'h3';
+}
+const { eyebrow, title, lead, align = 'left', as = 'h2' } = Astro.props as Props;
+const centered = align === 'center';
+const HeadingTag = as;
+---
+<header class={`reveal ${centered ? 'mx-auto text-center' : ''}`}>
+  {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
+  <HeadingTag class={as === 'h3' ? 'text-h2 font-serif text-encre' : 'text-h1 font-serif text-encre'}>{title}</HeadingTag>
+  <Trait class={`mt-5 text-or ${centered ? 'mx-auto' : ''}`} width="7rem" />
+  {lead && <p class={`mt-6 text-lg leading-relaxed text-noir/80 ${centered ? 'mx-auto max-w-prose' : 'max-w-prose'}`}>{lead}</p>}
+</header>

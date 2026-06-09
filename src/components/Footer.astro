@@ -1,0 +1,31 @@
+---
+import { site, nav, contact } from '../data/site';
+---
+<footer class="border-t border-cendre/20 bg-encre text-paper">
+  <div class="shell grid gap-10 py-12 md:grid-cols-[1.1fr_0.9fr_0.8fr]">
+    <div>
+      <p class="font-serif text-3xl">{site.artistName}</p>
+      <p class="mt-3 max-w-sm text-paper/75">{site.manifesto}</p>
+    </div>
+    <div>
+      <p class="text-sm uppercase tracking-[0.22em] text-paper/50">Navigation</p>
+      <div class="mt-4 grid grid-cols-2 gap-2">
+        {nav.map((item) => <a href={item.href} class="text-paper/80 transition hover:text-paper">{item.label}</a>)}
+      </div>
+    </div>
+    <div>
+      <p class="text-sm uppercase tracking-[0.22em] text-paper/50">Contact</p>
+      <a href={`mailto:${contact.email}`} class="mt-4 inline-block text-paper/90 underline decoration-or underline-offset-4">{contact.email}</a>
+      <div class="mt-5 flex flex-wrap gap-3">
+        {contact.social.map((s) => <a href={s.href} class="text-paper/70 transition hover:text-paper" target="_blank" rel="noreferrer">{s.label}</a>)}
+      </div>
+    </div>
+  </div>
+  <div class="shell flex flex-col gap-3 border-t border-paper/10 py-5 text-sm text-paper/55 sm:flex-row sm:items-center sm:justify-between">
+    <p>© {new Date().getFullYear()} {site.artistName}. Tous droits réservés.</p>
+    <div class="flex gap-4">
+      <a href="/mentions-legales" class="hover:text-paper">Mentions légales</a>
+      <a href="/confidentialite" class="hover:text-paper">Confidentialité</a>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import Trait from '../components/Trait.astro';
+import { site, contact } from '../data/site';
+---
+<Base
+  title={`Politique de confidentialité — ${site.artistName}`}
+  description="Politique de confidentialité du site d’Armelle Mourier : traitement des données du formulaire de contact, finalité, conservation et droits."
+  keywords={['confidentialité', 'données personnelles', 'RGPD', 'Armelle Mourier']}
+>
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <p class="eyebrow mb-3">Vos données</p>
+    <h1 class="text-h1 font-serif text-encre">Politique de confidentialité</h1>
+    <Trait class="mt-5 text-or" width="7rem" />
+
+    <div class="mt-10 max-w-prose space-y-8 text-noir/85">
+      <p class="rounded-sm border border-or/40 bg-or/5 px-4 py-3 text-sm text-noir/75">
+        Modèle prêt à compléter, à adapter à votre situation réelle (notamment si vous activez
+        Formspree, Netlify Forms ou un outil de statistiques). Texte modifiable dans
+        <code class="text-encre">src/pages/confidentialite.astro</code>.
+      </p>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Responsable du traitement</h2>
+        <p class="mt-3">
+          {site.artistName} — e-mail&nbsp;:
+          <a href={`mailto:${contact.email}`} class="link-quiet">{contact.email}</a>.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Données collectées</h2>
+        <p class="mt-3">
+          Le formulaire de contact recueille votre nom, votre adresse e-mail et le contenu de votre
+          message. Ces informations sont utilisées uniquement pour répondre à votre demande
+          (acquisition d’une œuvre, exposition, presse, etc.).
+        </p>
+        <p class="mt-3">
+          Dans sa configuration par défaut, le formulaire ouvre votre logiciel de messagerie&nbsp;:
+          aucune donnée n’est stockée sur ce site. Si un service d’envoi (Formspree, Netlify Forms)
+          est activé, vos données transitent par ce prestataire&nbsp;; reportez-vous alors à sa
+          propre politique de confidentialité.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Durée de conservation</h2>
+        <p class="mt-3">
+          Les messages reçus sont conservés le temps nécessaire au traitement de votre demande,
+          puis archivés ou supprimés. [Préciser une durée si vous le souhaitez.]
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Cookies et mesure d’audience</h2>
+        <p class="mt-3">
+          Ce site n’utilise pas de cookie publicitaire. [Si vous ajoutez un outil de statistiques,
+          précisez-le ici et indiquez s’il dépose des cookies.]
+        </p>
+      </div>
+
+      <div>
+        <h2 class="text-h3 font-serif text-encre">Vos droits</h2>
+        <p class="mt-3">
+          Conformément au RGPD et à la loi «&nbsp;Informatique et Libertés&nbsp;», vous disposez d’un
+          droit d’accès, de rectification, d’effacement et d’opposition concernant vos données. Pour
+          l’exercer, écrivez à
+          <a href={`mailto:${contact.email}`} class="link-quiet">{contact.email}</a>.
+          Vous pouvez également introduire une réclamation auprès de la CNIL (www.cnil.fr).
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

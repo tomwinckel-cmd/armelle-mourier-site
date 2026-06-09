@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Plan du site statique — mettez à jour le domaine si vous changez SITE_URL dans astro.config.mjs
+Sitemap: https://www.armellemourier.fr/sitemap.xml

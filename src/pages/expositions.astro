@@ -1,0 +1,134 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import Trait from '../components/Trait.astro';
+import { splitExhibitions, exhibitionYears, type Exhibition, type ExhibitionType } from '../data/exhibitions';
+import { site } from '../data/site';
+
+const { upcoming, past } = splitExhibitions();
+
+// Regroupement des expositions passées par année (décroissant)
+const pastByYear = exhibitionYears
+  .map((y) => ({ year: y, items: past.filter((e) => e.year === y) }))
+  .filter((g) => g.items.length > 0);
+
+const typeLabel: Record<ExhibitionType, string> = {
+  solo: 'Exposition personnelle',
+  group: 'Exposition collective',
+  residence: 'Résidence',
+  performance: 'Performance',
+  event: 'Événement',
+};
+
+// Données structurées Event pour les expositions datées
+function toEventLd(e: Exhibition) {
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'ExhibitionEvent',
+    name: e.title,
+    performer: { '@type': 'VisualArtist', name: site.artistName },
+  };
+  if (e.startDate) ld.startDate = e.startDate;
+  if (e.endDate) ld.endDate = e.endDate;
+  if (e.location || e.city) {
+    ld.location = {
+      '@type': 'Place',
+      name: e.location ?? e.city,
+      ...(e.city ? { address: e.city } : {}),
+    };
+  }
+  return ld;
+}
+const eventsLd = [...upcoming, ...past].filter((e) => e.startDate).map(toEventLd);
+---
+<Base
+  title={`Expositions — ${site.artistName}`}
+  description="Les expositions, résidences et performances d’Armelle Mourier de 2022 à aujourd’hui : Dijon, Bourgogne, Paris, Collioure. Expositions personnelles et collectives, association ArtDi."
+  keywords={['expositions artistiques Dijon', 'Armelle Mourier', 'ArtDi', 'résidence artistique Bourgogne', 'performance peinture danse']}
+  jsonld={eventsLd}
+>
+  <!-- INTRO -->
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <p class="eyebrow reveal is-visible mb-3">La chronologie</p>
+    <h1 class="reveal is-visible text-h1 font-serif text-encre">Expositions</h1>
+    <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
+    <p class="reveal mt-7 max-w-prose text-lg leading-relaxed text-noir/85">
+      Expositions personnelles et collectives, résidences et performances mêlant peinture,
+      poésie et danse — en Bourgogne, à Paris et du côté de Collioure. Depuis 2024, Armelle Mourier
+      préside l’association ArtDi, qui réunit des artistes autour d’événements partagés.
+    </p>
+  </section>
+
+  <!-- À VENIR -->
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <SectionTitle eyebrow="Prochaines dates" title="À venir" />
+      {upcoming.length > 0 ? (
+        <ul class="mt-10 divide-y divide-cendre/20">
+          {upcoming.map((e) => (
+            <li class="reveal flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:gap-6">
+              <span class="w-48 shrink-0 text-sm uppercase tracking-[0.12em] text-or">{e.dateLabel}</span>
+              <div>
+                <p class="font-serif text-lg text-encre">{e.title}</p>
+                {(e.location || e.city) && (
+                  <p class="text-sm text-noir/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
+                )}
+                {e.type && <p class="mt-0.5 text-eyebrow uppercase tracking-[0.14em] text-cendre">{typeLabel[e.type]}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="reveal mt-8 max-w-prose rounded-sm border border-cendre/25 bg-paper px-6 py-8">
+          <p class="text-noir/80">
+            Aucune date n’est annoncée pour l’instant. Les prochaines expositions et performances
+            seront publiées ici.
+          </p>
+          <a href="/contact?objet=exposition" class="link-quiet mt-4 inline-block font-semibold">
+            Être informé·e des prochaines dates →
+          </a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- PASSÉES, PAR ANNÉE -->
+  <section class="shell py-section">
+    <SectionTitle eyebrow="Le parcours d’expositions" title="Expositions passées" />
+    <div class="mt-12 space-y-14">
+      {pastByYear.map((group) => (
+        <div class="reveal">
+          <div class="flex items-baseline gap-4">
+            <h3 class="font-serif text-h2 text-or">{group.year}</h3>
+            <span class="h-px flex-1 bg-cendre/25"></span>
+          </div>
+          <ul class="mt-6 divide-y divide-cendre/15">
+            {group.items.map((e) => (
+              <li class="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-6">
+                <span class="w-48 shrink-0 text-sm uppercase tracking-[0.1em] text-cendre">{e.dateLabel}</span>
+                <div>
+                  <p class="font-serif text-lg text-encre">{e.title}</p>
+                  {(e.location || e.city) && (
+                    <p class="text-sm text-noir/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
+                  )}
+                  {e.description && <p class="mt-1 max-w-prose text-sm text-noir/65">{e.description}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="shell pb-section">
+    <div class="rounded-sm border border-cendre/25 bg-brume px-6 py-12 text-center sm:px-12">
+      <h2 class="text-h2 font-serif text-encre">Un projet d’exposition ou de collaboration&nbsp;?</h2>
+      <p class="mx-auto mt-4 max-w-xl text-noir/75">
+        Galeries, lieux, festivals, résidences&nbsp;: écrivez à l’artiste ou à l’association ArtDi.
+      </p>
+      <a href="/contact?objet=exposition" class="btn-primary mt-8">Proposer un projet</a>
+    </div>
+  </section>
+</Base>

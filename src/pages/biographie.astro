@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import ArtworkPlaceholder from '../components/ArtworkPlaceholder.astro';
+import Trait from '../components/Trait.astro';
+import { bio } from '../content/bio';
+import { site } from '../data/site';
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.artistName,
+  jobTitle: 'Artiste peintre & plasticienne',
+  url: new URL('/biographie', site.url).href,
+  description: bio.lead,
+  homeLocation: { '@type': 'Place', name: `${site.city}, ${site.region}` },
+};
+---
+<Base
+  title={`Biographie — ${site.artistName}`}
+  description="Le parcours d’Armelle Mourier : une enfance entre Collioure et la Bourgogne, la danse, l’écriture, l’épreuve de la maladie transformée en peinture — la couleur comme nécessité vitale."
+  keywords={['Armelle Mourier', 'artiste peintre Dijon', 'artiste plasticienne Bourgogne', 'biographie artiste', 'artiste Collioure']}
+  jsonld={personLd}
+>
+  <!-- INTRO + PORTRAIT -->
+  <section class="shell pb-section pt-12 sm:pt-16">
+    <div class="grid items-start gap-10 lg:grid-cols-[1fr_0.8fr] lg:gap-16">
+      <div class="reveal is-visible">
+        <p class="eyebrow mb-3">Le parcours</p>
+        <h1 class="text-h1 font-serif text-encre">Biographie</h1>
+        <Trait class="mt-5 text-or" width="7rem" />
+        <p class="mt-7 max-w-prose font-serif text-h3 italic leading-snug text-encre/90">
+          {bio.lead}
+        </p>
+      </div>
+
+      <figure class="reveal is-visible">
+        <div class="aspect-[4/5] w-full overflow-hidden rounded-sm shadow-[var(--shadow-soft)]">
+          {bio.portrait ? (
+            <img src={bio.portrait} alt={bio.portraitAlt} class="h-full w-full object-cover" loading="eager" />
+          ) : (
+            <ArtworkPlaceholder title="Portrait" dimensions="Photographie à venir" />
+          )}
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- RÉCIT -->
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <div class="mx-auto max-w-prose">
+        {bio.sections.map((s, i) => (
+          <div class="reveal mb-12 last:mb-0">
+            <h2 class="text-h3 font-serif text-encre">{s.heading}</h2>
+            <Trait class="mt-3 text-cendre/60" width="3.5rem" />
+            {s.paragraphs.map((p) => (
+              <p class="mt-4 leading-relaxed text-noir/85">{p}</p>
+            ))}
+            {i === 3 && bio.quotes[0] && (
+              <blockquote class="mt-7 border-l-2 border-or pl-5 font-serif text-xl italic text-encre">
+                «&nbsp;{bio.quotes[0]}&nbsp;»
+              </blockquote>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CITATION + LIENS -->
+  <section class="shell py-section text-center">
+    <Trait class="mx-auto text-or" width="6rem" />
+    {bio.quotes[1] && (
+      <p class="mx-auto mt-6 max-w-2xl font-serif text-h2 italic leading-snug text-encre">
+        «&nbsp;{bio.quotes[1]}&nbsp;»
+      </p>
+    )}
+    <div class="mt-10 flex flex-wrap justify-center gap-3">
+      <a href="/oeuvres" class="btn-primary">Découvrir les œuvres</a>
+      <a href="/demarche" class="btn-ghost">Lire la démarche</a>
+      <a href="/contact" class="btn-ghost">Contacter l’artiste</a>
+    </div>
+  </section>
+</Base>

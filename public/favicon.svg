@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Armelle Mourier">
+  <rect width="64" height="64" rx="12" fill="#173039"/>
+  <text x="32" y="34" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="26" font-weight="400" fill="#F5F2EB" letter-spacing="-0.5">AM</text>
+  <path d="M16 46 C26 41, 38 41, 48 46" stroke="#A9791F" stroke-width="3"
+        stroke-linecap="round" fill="none"/>
+</svg>

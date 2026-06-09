@@ -1,0 +1,50 @@
+---
+import { site, nav } from '../data/site';
+---
+<header class="sticky top-0 z-50 border-b border-cendre/20 bg-paper/90 backdrop-blur-md">
+  <nav class="shell flex min-h-20 items-center justify-between gap-6" aria-label="Navigation principale">
+    <a href="/" class="group inline-flex flex-col leading-none" aria-label={`${site.artistName} — accueil`}>
+      <span class="font-serif text-2xl text-encre">{site.artistName}</span>
+      <span class="mt-1 text-xs uppercase tracking-[0.2em] text-cendre">{site.role}</span>
+    </a>
+
+    <button
+      class="nav-toggle inline-flex items-center rounded-full border border-cendre/30 px-4 py-2 text-sm font-semibold text-encre lg:hidden"
+      type="button"
+      aria-expanded="false"
+      aria-controls="menu-principal"
+      data-nav-toggle
+    >
+      Menu
+    </button>
+
+    <div id="menu-principal" class="nav-menu hidden items-center gap-5 lg:flex">
+      {nav.map((item) => (
+        <a href={item.href} class="nav-link">{item.label}</a>
+      ))}
+    </div>
+  </nav>
+</header>
+
+<script>
+  const toggle = document.querySelector('[data-nav-toggle]');
+  const menu = document.querySelector('#menu-principal');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu?.classList.toggle('hidden', open);
+    menu?.classList.toggle('flex', !open);
+    menu?.classList.toggle('absolute', !open);
+    menu?.classList.toggle('left-4', !open);
+    menu?.classList.toggle('right-4', !open);
+    menu?.classList.toggle('top-20', !open);
+    menu?.classList.toggle('flex-col', !open);
+    menu?.classList.toggle('items-start', !open);
+    menu?.classList.toggle('rounded-sm', !open);
+    menu?.classList.toggle('border', !open);
+    menu?.classList.toggle('border-cendre/20', !open);
+    menu?.classList.toggle('bg-paper', !open);
+    menu?.classList.toggle('p-5', !open);
+    menu?.classList.toggle('shadow-xl', !open);
+  });
+</script>

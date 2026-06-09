@@ -1,0 +1,95 @@
+---
+import ArtworkCard from './ArtworkCard.astro';
+import { type Artwork, statusLabel } from '../data/artworks';
+
+interface Props {
+  artworks: Artwork[];
+  filterable?: boolean;
+}
+const { artworks, filterable = false } = Astro.props;
+
+// Séries et statuts réellement présents dans la sélection affichée
+const series = Array.from(new Set(artworks.map((a) => a.series).filter(Boolean))) as string[];
+const statuses = Array.from(new Set(artworks.map((a) => a.status)));
+---
+{filterable && (
+  <div class="reveal mb-10 flex flex-col gap-5" data-filterbar>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="mr-1 text-eyebrow uppercase tracking-[0.18em] text-cendre">Série</span>
+      <button type="button" class="filter-chip is-active" data-filter="series" data-value="all" aria-pressed="true">Toutes</button>
+      {series.map((s) => (
+        <button type="button" class="filter-chip" data-filter="series" data-value={s} aria-pressed="false">{s}</button>
+      ))}
+    </div>
+    {statuses.length > 1 && (
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="mr-1 text-eyebrow uppercase tracking-[0.18em] text-cendre">Statut</span>
+        <button type="button" class="filter-chip is-active" data-filter="status" data-value="all" aria-pressed="true">Tous</button>
+        {statuses.map((st) => (
+          <button type="button" class="filter-chip" data-filter="status" data-value={st} aria-pressed="false">{statusLabel[st]}</button>
+        ))}
+      </div>
+    )}
+    <p class="text-sm text-cendre" data-empty hidden>Aucune œuvre ne correspond à ce filtre pour le moment.</p>
+  </div>
+)}
+
+<div class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3" data-grid>
+  {artworks.map((a) => (
+    <div data-item data-series={a.series ?? ''} data-status={a.status}>
+      <ArtworkCard artwork={a} />
+    </div>
+  ))}
+</div>
+
+{filterable && (
+  <style>
+    .filter-chip {
+      border-radius: 9999px;
+      border: 1px solid rgba(111, 124, 130, 0.35);
+      padding: 0.4rem 0.95rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #173039;
+      background: transparent;
+      transition: all 0.25s ease;
+    }
+    .filter-chip:hover { border-color: #173039; }
+    .filter-chip.is-active { background: #173039; color: #F5F2EB; border-color: #173039; }
+  </style>
+  <script>
+    const bar = document.querySelector('[data-filterbar]');
+    if (bar) {
+      const state: Record<string, string> = { series: 'all', status: 'all' };
+      const items = Array.from(document.querySelectorAll<HTMLElement>('[data-item]'));
+      const empty = bar.querySelector<HTMLElement>('[data-empty]');
+
+      const apply = () => {
+        let visible = 0;
+        items.forEach((el) => {
+          const okSeries = state.series === 'all' || el.dataset.series === state.series;
+          const okStatus = state.status === 'all' || el.dataset.status === state.status;
+          const show = okSeries && okStatus;
+          el.hidden = !show;
+          if (show) visible++;
+        });
+        if (empty) empty.hidden = visible !== 0;
+      };
+
+      bar.querySelectorAll<HTMLButtonElement>('.filter-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const group = chip.dataset.filter!;
+          state[group] = chip.dataset.value!;
+          bar
+            .querySelectorAll<HTMLButtonElement>(`.filter-chip[data-filter="${group}"]`)
+            .forEach((c) => {
+              const active = c === chip;
+              c.classList.toggle('is-active', active);
+              c.setAttribute('aria-pressed', String(active));
+            });
+          apply();
+        });
+      });
+    }
+  </script>
+)}

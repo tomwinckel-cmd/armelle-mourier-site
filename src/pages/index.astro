@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import ArtworkGrid from '../components/ArtworkGrid.astro';
+import ArtworkPlaceholder from '../components/ArtworkPlaceholder.astro';
+import Trait from '../components/Trait.astro';
+import { site } from '../data/site';
+import { featuredArtworks, availableArtworks } from '../data/artworks';
+import { splitExhibitions } from '../data/exhibitions';
+
+const { upcoming, past } = splitExhibitions();
+const featured = featuredArtworks.length ? featuredArtworks.slice(0, 3) : availableArtworks.slice(0, 3);
+const recent = [...upcoming, ...past].slice(0, 3);
+
+const visualArtistLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VisualArtist',
+  name: site.artistName,
+  jobTitle: site.role,
+  url: site.url,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: site.city,
+    addressRegion: site.region,
+    addressCountry: site.country,
+  },
+  knowsAbout: ['peinture abstraite', 'peinture acrylique', 'art contemporain', 'Bleu Cendres'],
+};
+---
+<Base
+  title={`${site.artistName} — ${site.role}`}
+  description={`${site.manifesto} ${site.baseline}`}
+  keywords={['Armelle Mourier', 'artiste peintre Dijon', 'tableaux disponibles', 'peinture contemporaine']}
+  jsonld={visualArtistLd}
+>
+  <section class="shell grid min-h-[72vh] items-center gap-12 pb-section pt-12 lg:grid-cols-[1.05fr_0.95fr]">
+    <div class="reveal is-visible">
+      <p class="eyebrow mb-4">Artiste peintre & plasticienne</p>
+      <h1 class="text-display font-serif text-encre">{site.artistName}</h1>
+      <Trait class="mt-6 text-or" width="8rem" />
+      <p class="mt-7 max-w-prose text-xl leading-relaxed text-noir/82">{site.baseline}</p>
+      <p class="mt-4 max-w-prose font-serif text-2xl leading-snug text-encre">{site.manifesto}</p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a href="/oeuvres" class="rounded-full bg-encre px-6 py-3 font-semibold text-paper transition hover:-translate-y-0.5 hover:shadow-lg">Découvrir les œuvres</a>
+        <a href="/disponibles" class="rounded-full border border-encre/25 px-6 py-3 font-semibold text-encre transition hover:border-encre">Voir les tableaux disponibles</a>
+        <a href="/contact" class="rounded-full border border-or/50 px-6 py-3 font-semibold text-encre transition hover:border-or">Contacter l’artiste</a>
+      </div>
+    </div>
+
+    <div class="reveal is-visible">
+      <div class="aspect-[4/5] overflow-hidden rounded-sm bg-brume shadow-[var(--shadow-soft)]">
+        {featured[0]?.image ? (
+          <img src={featured[0].image} alt={featured[0].alt} class="h-full w-full object-cover" loading="eager" decoding="async" />
+        ) : (
+          <ArtworkPlaceholder title={featured[0]?.title ?? 'Armelle Mourier'} dimensions={featured[0]?.dimensions} />
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <SectionTitle
+        eyebrow="Galerie"
+        title="Œuvres mises en lumière"
+        lead="Une première traversée de l’univers pictural : couleur, matière, mémoire des lieux et souffle intérieur."
+      />
+      <div class="mt-12">
+        <ArtworkGrid artworks={featured} />
+      </div>
+      <div class="mt-10">
+        <a href="/oeuvres" class="link-quiet font-semibold">Voir toute la galerie →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell grid gap-12 py-section lg:grid-cols-2">
+    <div class="reveal">
+      <p class="eyebrow mb-3">Acquisition</p>
+      <h2 class="text-h1 font-serif text-encre">Tableaux disponibles</h2>
+      <p class="mt-6 leading-relaxed text-noir/80">
+        Certaines œuvres originales peuvent être acquises ou réservées en lien direct avec l’artiste.
+        La vente reste volontairement sobre : une conversation, une demande de catalogue, le temps de choisir.
+      </p>
+      <a href="/disponibles" class="mt-7 inline-flex rounded-full bg-encre px-6 py-3 font-semibold text-paper">Découvrir les œuvres disponibles</a>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow mb-3">Livre & poésie</p>
+      <h2 class="text-h1 font-serif text-encre">Bleu Cendres</h2>
+      <p class="mt-6 leading-relaxed text-noir/80">
+        Un recueil de poésie illustré où les toiles dorées et bleues d’Armelle Mourier dialoguent
+        avec les mots de Louise Dupré.
+      </p>
+      <a href="/bleu-cendres" class="mt-7 inline-flex rounded-full border border-encre/25 px-6 py-3 font-semibold text-encre">Entrer dans Bleu Cendres</a>
+    </div>
+  </section>
+
+  <section class="bg-encre py-section text-paper">
+    <div class="shell">
+      <SectionTitle
+        eyebrow="Présence"
+        title="Expositions récentes & à venir"
+        lead="Une chronologie vivante entre expositions, performances, résidences et rencontres."
+      />
+      <div class="mt-12 grid gap-5 md:grid-cols-3">
+        {recent.map((e) => (
+          <article class="reveal rounded-sm border border-paper/15 bg-paper/5 p-6">
+            <p class="text-sm uppercase tracking-[0.18em] text-paper/50">{e.dateLabel}</p>
+            <h3 class="mt-3 font-serif text-2xl text-paper">{e.title}</h3>
+            <p class="mt-2 text-paper/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
+          </article>
+        ))}
+      </div>
+      <a href="/expositions" class="mt-10 inline-flex text-paper underline decoration-or underline-offset-4">Voir la chronologie →</a>
+    </div>
+  </section>
+</Base>
