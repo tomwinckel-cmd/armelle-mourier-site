@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import { site, defaultKeywords } from '../data/site';
+import { theme, themeColorVars } from '../data/theme';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
@@ -22,6 +23,16 @@ const {
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const mergedKeywords = Array.from(new Set([...defaultKeywords, ...keywords])).join(', ');
 const jsonLdArray = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
+
+// Thème pilotable (cockpit) : on traduit src/data/theme.ts en variables CSS.
+// Modifier les couleurs/arrondis/texture se fait dans theme.ts, pas ici.
+const colorVars = themeColorVars(theme.colors);
+const themeStyle = [
+  ...Object.entries(colorVars).map(([k, v]) => `${k}: ${v};`),
+  `--radius-card: ${theme.ui.radiusCard};`,
+  `--border-hair: ${theme.ui.borderHair};`,
+].join(' ');
+const themeColor = `rgb(${colorVars['--c-encre'].split(' ').join(', ')})`;
 ---
 <!doctype html>
 <html lang={site.lang}>
@@ -45,7 +56,7 @@ const jsonLdArray = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="theme-color" content="#173039" />
+    <meta name="theme-color" content={themeColor} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -57,8 +68,14 @@ const jsonLdArray = Array.isArray(jsonld) ? jsonld : jsonld ? [jsonld] : [];
     {jsonLdArray.map((item) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
     ))}
+
+    <!-- Thème injecté depuis src/data/theme.ts (surcharge les défauts de global.css). -->
+    <style is:inline set:html={`:root { ${themeStyle} }`}></style>
   </head>
-  <body class="min-h-screen bg-paper font-sans text-noir antialiased">
+  <body
+    class="min-h-screen bg-paper font-sans text-noir antialiased"
+    data-texture={theme.ui.showTexture ? 'on' : 'off'}
+  >
     <a href="#contenu" class="skip-link">Aller au contenu</a>
 
     <Header />

@@ -4,14 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Palette « Bleu Cendres » — issue de l'univers réel de l'artiste
-        // (le bleu profond et l'or de la série/recueil Bleu Cendres).
-        paper: '#F5F2EB',  // fond ivoire, chaud
-        brume: '#E9E5DA',  // section alternée, ivoire plus profond
-        encre: '#173039',  // bleu profond (cendre/mer) — couleur principale sombre
-        cendre: '#6F7C82', // gris-bleu cendré — texte secondaire, filets
-        or: '#A9791F',     // or cendré — accent (jamais terracotta)
-        noir: '#211F1B',   // noir doux — texte courant
+        // Palette pilotable : chaque couleur pointe vers une variable CSS
+        // (canaux RGB) définie dans src/styles/global.css et surchargée par
+        // src/data/theme.ts via Base.astro. Le format « rgb(var(--x) /
+        // <alpha-value>) » préserve les opacités Tailwind (ex. bg-encre/10).
+        // Pour CHANGER les couleurs : éditer src/data/theme.ts (le cockpit).
+        paper: 'rgb(var(--c-paper) / <alpha-value>)',        // fond ivoire chaud
+        brume: 'rgb(var(--c-brume) / <alpha-value>)',        // fond secondaire
+        white: 'rgb(var(--c-white) / <alpha-value>)',        // blanc pur
+        encre: 'rgb(var(--c-encre) / <alpha-value>)',        // bleu profond
+        blueSoft: 'rgb(var(--c-blue-soft) / <alpha-value>)', // bleu clair (carte)
+        cendre: 'rgb(var(--c-cendre) / <alpha-value>)',      // gris-bleu cendré
+        or: 'rgb(var(--c-or) / <alpha-value>)',              // or doux — accent
+        noir: 'rgb(var(--c-noir) / <alpha-value>)',          // noir doux — texte
+      },
+      borderRadius: {
+        // Rayon des cartes piloté par le thème (src/data/theme.ts).
+        card: 'var(--radius-card)',
+      },
+      boxShadow: {
+        soft: 'var(--shadow-soft)',
       },
       fontFamily: {
         // Fraunces : serif caractérielle et douce pour les titres.

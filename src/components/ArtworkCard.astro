@@ -4,9 +4,12 @@ import { type Artwork, statusLabel, priceLabel } from '../data/artworks';
 
 interface Props {
   artwork: Artwork;
+  /** 'feature' = mise en avant (cadre filet or, visuel plus présent). */
+  variant?: 'default' | 'feature';
 }
-const { artwork } = Astro.props;
+const { artwork, variant = 'default' } = Astro.props;
 const a = artwork;
+const isFeature = variant === 'feature';
 
 const badgeClass: Record<string, string> = {
   available: 'bg-encre/10 text-encre',
@@ -19,7 +22,7 @@ const askHref = `/contact?oeuvre=${encodeURIComponent(a.title)}`;
 const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
 ---
 <article class="reveal group flex flex-col">
-  <div class="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-brume shadow-[var(--shadow-soft)]">
+  <div class={`relative aspect-[4/5] w-full overflow-hidden rounded-card bg-brume shadow-soft ${isFeature ? 'ring-1 ring-or/40 ring-offset-2 ring-offset-paper' : ''}`}>
     {a.image ? (
       <img
         src={a.image}
@@ -38,7 +41,7 @@ const metaParts = [a.dimensions, a.technique, a.year].filter(Boolean);
 
   <div class="mt-4 flex flex-1 flex-col">
     <div class="flex items-baseline justify-between gap-3">
-      <h3 class="text-h3 font-serif text-encre">{a.title}</h3>
+      <h3 class={`font-serif text-encre ${isFeature ? 'text-h2' : 'text-h3'}`}>{a.title}</h3>
       {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{a.series}</span>}
     </div>
 
