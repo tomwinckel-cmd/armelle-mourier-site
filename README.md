@@ -53,6 +53,13 @@ Le site étant statique, l’hébergement est **gratuit** chez Vercel ou Netlify
 **Vercel** — le plus simple : connectez le dépôt, Vercel détecte Astro automatiquement.
 **Netlify** : commande de build `npm run build`, dossier de publication `dist`.
 
+> 🔧 **CI, auto-merge des PR Claude et étapes Vercel détaillées** : voir
+> [`GITHUB_SETUP.md`](./GITHUB_SETUP.md). En résumé : le workflow `validation`
+> (`npm ci` → `npm run check` → `npm run build`) garde `main` vert, le ruleset
+> `.github/repository-ruleset-main.json` protège `main`, et
+> `claude-auto-merge.yml` fusionne en squash les PR `[claude]` **uniquement**
+> quand tous les checks requis sont au vert.
+
 > ⚠️ **Avant la mise en ligne**, remplacez l’URL provisoire par le **domaine définitif** à
 > **deux endroits** :
 > 1. `astro.config.mjs` → constante `SITE_URL`
