@@ -91,6 +91,16 @@ const themeColor = `rgb(${cssVars['--c-encre'].split(' ').join(', ')})`;
 
     <Footer />
 
+    <!-- Navigation : chaque page s'ouvre EN HAUT (pas de scroll restauré).
+         Ne bloque jamais la navigation des liens (<a href> standards). -->
+    <script is:inline>
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      // pageshow couvre le chargement normal ET le retour via bfcache.
+      window.addEventListener('pageshow', function () {
+        if (!location.hash) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      });
+    </script>
+
     <script>
       const revealEls = document.querySelectorAll('.reveal');
       if ('IntersectionObserver' in window) {

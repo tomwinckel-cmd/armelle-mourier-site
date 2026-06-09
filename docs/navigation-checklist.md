@@ -69,3 +69,23 @@ tableau `nav` (`label` + `href`). Chaque entrée ferme le Carnet au clic
 - Aucune route dynamique `/oeuvres/[slug]` n'existe encore : ne pas lier vers une
   page détail tant qu'elle n'est pas créée (les demandes passent par `/contact`).
 - Pas de `tel:` (aucun téléphone), pas de lien de paiement.
+
+## Test du Carnet (ouverture en haut de page)
+
+Chaque entrée du Carnet est un `<a href>` standard (pas de JS de navigation,
+pas de `preventDefault`). Au clic : le panneau se ferme et le navigateur ouvre
+la route attendue **en haut de page**.
+
+> Garde-fou (`Base.astro`) : `history.scrollRestoration = 'manual'` + remise en
+> haut sur `pageshow` (couvre aussi le retour bfcache). Aucune position de
+> scroll ancienne n'est conservée ; la navigation des liens n'est pas bloquée.
+
+| Carnet → | Doit ouvrir | En haut ? |
+|---|---|---|
+| Œuvres | `/oeuvres` | ✅ |
+| Disponibles | `/disponibles` | ✅ |
+| Biographie | `/biographie` | ✅ |
+| Démarche | `/demarche` | ✅ |
+| Bleu Cendres | `/bleu-cendres` | ✅ |
+| Expositions | `/expositions` | ✅ |
+| Contact | `/contact` | ✅ |
