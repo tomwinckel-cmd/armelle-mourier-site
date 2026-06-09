@@ -2,15 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================================
+   DESIGN TOKENS — valeurs par défaut
+   ---------------------------------------------------------------------
+   Source de vérité : src/data/theme.ts (le « cockpit »). Base.astro
+   injecte les valeurs du thème dans :root et surcharge celles-ci.
+   Les couleurs sont en CANAUX RGB « r g b » pour que Tailwind puisse
+   appliquer les opacités (ex. bg-encre/10, border-cendre/25).
+   ===================================================================== */
 :root {
-  --shadow-soft: 0 22px 60px rgba(23, 48, 57, 0.10);
+  --c-paper: 245 242 235;     /* ivoire chaud */
+  --c-brume: 233 229 218;     /* ivoire plus profond */
+  --c-white: 255 255 255;     /* blanc pur */
+  --c-encre: 23 48 57;        /* bleu profond */
+  --c-blue-soft: 127 174 198; /* bleu clair (carte de visite) */
+  --c-or: 169 121 31;         /* or doux */
+  --c-cendre: 111 124 130;    /* gris-bleu cendré */
+  --c-noir: 33 31 27;         /* noir doux */
+
+  --radius-card: 0.5rem;      /* arrondi des cartes/visuels */
+  --border-hair: 1px;         /* filets fins type galerie */
+  --shadow-soft: 0 22px 60px rgb(var(--c-encre) / 0.10);
+
+  /* Intensité du voile de matière (peut être mise à 0 pour le couper). */
+  --texture-strength: 0.05;
 }
 
 * { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
-  background: #F5F2EB;
+  background: rgb(var(--c-paper));
 }
 
 body { margin: 0; }
@@ -19,39 +41,72 @@ img, svg { display: block; }
 
 button, input, textarea, select { font: inherit; }
 
+/* ---------------------------------------------------------------------
+   Voile de matière très subtil (effet toile / peinture).
+   Activé via [data-texture="on"] sur <body> (piloté par theme.ui.showTexture).
+   Reste discret : un lavis d'or et de bleu clair quasi imperceptible.
+   --------------------------------------------------------------------- */
+body[data-texture="on"]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 12% 8%, rgb(var(--c-blue-soft) / var(--texture-strength)), transparent 70%),
+    radial-gradient(50% 45% at 92% 18%, rgb(var(--c-or) / var(--texture-strength)), transparent 70%),
+    radial-gradient(70% 60% at 80% 100%, rgb(var(--c-encre) / calc(var(--texture-strength) * 0.7)), transparent 70%);
+}
+body > * { position: relative; z-index: 1; }
+
+/* ---------------------------------------------------------------------
+   SHELL — conteneur centré
+   --------------------------------------------------------------------- */
 .shell {
   width: min(100% - 2rem, 78rem);
   margin-inline: auto;
 }
 
+/* ---------------------------------------------------------------------
+   TYPOGRAPHIE & filets
+   --------------------------------------------------------------------- */
 .eyebrow {
   font-size: 0.78rem;
   line-height: 1;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #6F7C82;
+  color: rgb(var(--c-cendre));
   font-weight: 700;
 }
 
-.link-quiet {
-  color: #173039;
-  text-decoration: underline;
-  text-decoration-color: rgba(169, 121, 31, 0.65);
-  text-underline-offset: 0.22em;
+/* Effet « signature » pour le nom de l'artiste — sans police externe
+   fragile : on s'appuie sur Fraunces (déjà chargée) en italique, avec
+   une légère emphase, soulignée par le trait au pinceau (composant Trait). */
+.signature {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 0.98;
 }
 
-.link-quiet:hover { text-decoration-color: #A9791F; }
+.link-quiet {
+  color: rgb(var(--c-encre));
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--c-or) / 0.65);
+  text-underline-offset: 0.22em;
+}
+.link-quiet:hover { text-decoration-color: rgb(var(--c-or)); }
 
 .nav-link {
-  color: rgba(23, 48, 57, 0.78);
+  color: rgb(var(--c-encre) / 0.78);
   font-weight: 700;
   font-size: 0.94rem;
   text-decoration: none;
   transition: color .2s ease;
 }
-
 .nav-link:hover,
-.nav-link:focus-visible { color: #173039; }
+.nav-link:focus-visible { color: rgb(var(--c-encre)); }
 
 .badge {
   border-radius: 999px;
@@ -60,6 +115,69 @@ button, input, textarea, select { font: inherit; }
   font-weight: 700;
 }
 
+/* ---------------------------------------------------------------------
+   SYSTÈME DE BOUTONS — centralisé (corrige .btn-primary / .btn-ghost
+   qui étaient utilisés dans 6 pages sans jamais être définis).
+   Cibles tactiles confortables (>= 44px) pour le mobile.
+   --------------------------------------------------------------------- */
+/* La base s'applique à .btn ET à chaque variante, pour que .btn-primary /
+   .btn-ghost / .btn-gold fonctionnent SEULES (comme dans les pages existantes)
+   ou combinées avec .btn. */
+.btn,
+.btn-primary,
+.btn-ghost,
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.85rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  border: var(--border-hair) solid transparent;
+  font-weight: 600;
+  font-size: 0.98rem;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .25s ease, box-shadow .25s ease,
+              background-color .25s ease, border-color .25s ease, color .25s ease;
+}
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.btn-gold:focus-visible {
+  outline: 2px solid rgb(var(--c-or));
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: rgb(var(--c-encre));
+  color: rgb(var(--c-paper));
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: rgb(var(--c-encre));
+  border-color: rgb(var(--c-encre) / 0.25);
+}
+.btn-ghost:hover { border-color: rgb(var(--c-encre)); }
+
+/* Variante accent or, discrète — pour appels secondaires « artistiques ». */
+.btn-gold {
+  background: transparent;
+  color: rgb(var(--c-encre));
+  border-color: rgb(var(--c-or) / 0.5);
+}
+.btn-gold:hover { border-color: rgb(var(--c-or)); }
+
+/* ---------------------------------------------------------------------
+   ACCESSIBILITÉ — lien d'évitement
+   --------------------------------------------------------------------- */
 .skip-link {
   position: fixed;
   left: 1rem;
@@ -67,20 +185,21 @@ button, input, textarea, select { font: inherit; }
   z-index: 100;
   transform: translateY(-160%);
   border-radius: 999px;
-  background: #173039;
-  color: #F5F2EB;
+  background: rgb(var(--c-encre));
+  color: rgb(var(--c-paper));
   padding: .75rem 1rem;
   font-weight: 700;
 }
-
 .skip-link:focus { transform: translateY(0); }
 
+/* ---------------------------------------------------------------------
+   RÉVÉLATION AU SCROLL
+   --------------------------------------------------------------------- */
 .reveal {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity .7s cubic-bezier(0.22, 0.61, 0.36, 1), transform .7s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-
 .reveal.is-visible {
   opacity: 1;
   transform: none;
@@ -93,4 +212,5 @@ button, input, textarea, select { font: inherit; }
     transform: none;
     transition: none;
   }
+  .btn:hover { transform: none; }
 }

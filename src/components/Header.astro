@@ -1,50 +1,142 @@
 ---
 import { site, nav } from '../data/site';
 ---
-<header class="sticky top-0 z-50 border-b border-cendre/20 bg-paper/90 backdrop-blur-md">
+<header class="sticky top-0 z-50 border-b border-cendre/20 bg-paper/85 backdrop-blur-md">
   <nav class="shell flex min-h-20 items-center justify-between gap-6" aria-label="Navigation principale">
     <a href="/" class="group inline-flex flex-col leading-none" aria-label={`${site.artistName} — accueil`}>
-      <span class="font-serif text-2xl text-encre">{site.artistName}</span>
-      <span class="mt-1 text-xs uppercase tracking-[0.2em] text-cendre">{site.role}</span>
+      <span class="signature text-2xl text-encre transition-colors group-hover:text-encre/80">{site.artistName}</span>
+      <span class="mt-1.5 text-[0.62rem] uppercase tracking-[0.22em] text-cendre">{site.role}</span>
     </a>
 
     <button
-      class="nav-toggle inline-flex items-center rounded-full border border-cendre/30 px-4 py-2 text-sm font-semibold text-encre lg:hidden"
+      class="nav-toggle lg:hidden"
       type="button"
       aria-expanded="false"
       aria-controls="menu-principal"
+      aria-label="Ouvrir le menu"
       data-nav-toggle
     >
-      Menu
+      <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="text-sm font-semibold">Menu</span>
     </button>
 
-    <div id="menu-principal" class="nav-menu hidden items-center gap-5 lg:flex">
+    <div id="menu-principal" class="nav-menu" data-nav-menu>
       {nav.map((item) => (
-        <a href={item.href} class="nav-link">{item.label}</a>
+        <a href={item.href} class="nav-link" data-nav-close>{item.label}</a>
       ))}
     </div>
   </nav>
+  <button class="nav-scrim" type="button" aria-hidden="true" tabindex="-1" data-nav-scrim></button>
 </header>
 
+<style>
+  /* Bouton burger (mobile) */
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    border: var(--border-hair) solid rgb(var(--c-encre) / 0.25);
+    color: rgb(var(--c-encre));
+    background: rgb(var(--c-paper) / 0.6);
+  }
+  .nav-toggle__bars {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 18px;
+  }
+  .nav-toggle__bars span {
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform .3s ease, opacity .3s ease;
+  }
+  [aria-expanded="true"] .nav-toggle__bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  [aria-expanded="true"] .nav-toggle__bars span:nth-child(2) { opacity: 0; }
+  [aria-expanded="true"] .nav-toggle__bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* Menu — desktop : rangée horizontale */
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+  }
+
+  /* Scrim (voile) — caché par défaut */
+  .nav-scrim { display: none; }
+
+  /* Mobile / tablette : menu en panneau déroulant */
+  @media (max-width: 1023px) {
+    .nav-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      background: rgb(var(--c-paper));
+      border-bottom: var(--border-hair) solid rgb(var(--c-cendre) / 0.2);
+      box-shadow: var(--shadow-soft);
+      padding: 0.5rem 1rem 1.25rem;
+      transform: translateY(-12px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, transform .25s ease, visibility .25s;
+    }
+    .nav-menu .nav-link {
+      padding: 0.95rem 0.25rem;
+      font-size: 1.05rem;
+      border-bottom: var(--border-hair) solid rgb(var(--c-cendre) / 0.14);
+    }
+    .nav-menu .nav-link:last-child { border-bottom: none; }
+
+    header[data-open="true"] .nav-menu {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+    header[data-open="true"] .nav-scrim {
+      display: block;
+      position: fixed;
+      inset: 5rem 0 0;
+      background: rgb(var(--c-noir) / 0.18);
+      border: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu, .nav-toggle__bars span { transition: none; }
+  }
+</style>
+
 <script>
+  const header = document.querySelector('header');
   const toggle = document.querySelector('[data-nav-toggle]');
-  const menu = document.querySelector('#menu-principal');
+  const scrim = document.querySelector('[data-nav-scrim]');
+
+  const setOpen = (open: boolean) => {
+    if (!header || !toggle) return;
+    header.setAttribute('data-open', String(open));
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+  };
+
   toggle?.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!open));
-    menu?.classList.toggle('hidden', open);
-    menu?.classList.toggle('flex', !open);
-    menu?.classList.toggle('absolute', !open);
-    menu?.classList.toggle('left-4', !open);
-    menu?.classList.toggle('right-4', !open);
-    menu?.classList.toggle('top-20', !open);
-    menu?.classList.toggle('flex-col', !open);
-    menu?.classList.toggle('items-start', !open);
-    menu?.classList.toggle('rounded-sm', !open);
-    menu?.classList.toggle('border', !open);
-    menu?.classList.toggle('border-cendre/20', !open);
-    menu?.classList.toggle('bg-paper', !open);
-    menu?.classList.toggle('p-5', !open);
-    menu?.classList.toggle('shadow-xl', !open);
+    setOpen(header?.getAttribute('data-open') !== 'true');
   });
+  scrim?.addEventListener('click', () => setOpen(false));
+  document.querySelectorAll('[data-nav-close]').forEach((link) =>
+    link.addEventListener('click', () => setOpen(false)),
+  );
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+  // Réinitialise l'état si on repasse en vue desktop.
+  const mq = window.matchMedia('(min-width: 1024px)');
+  mq.addEventListener('change', (e) => { if (e.matches) setOpen(false); });
 </script>
