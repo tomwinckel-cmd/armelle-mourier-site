@@ -94,6 +94,16 @@ labels humains, descriptions courtes, actions évidentes, zéro jargon.
 6. **Authentification** *(éventuelle)* — accès privé à l'édition.
 7. **CMS / headless ou base de données** *(éventuel)* — si le besoin grandit.
 
+## Versions du cockpit
+
+| Version | Contenu |
+|---|---|
+| **V1** *(actuel)* | **Prototype** — lecture & préparation. Page interne `/cockpit-roadmap` (noindex, hors nav) : visualiser œuvres/disponibilités/pages/expositions, préparer des légendes Instagram (copier-coller) et un bloc d'œuvre à coller. **Ne sauvegarde rien.** |
+| **V2** | **Édition réelle** des œuvres et des textes (écriture dans les fichiers de données). |
+| **V3** | **Upload** et association des images. |
+| **V4** | **Assistant réseaux sociaux avancé**. |
+| **V5** | **Authentification**, si nécessaire. |
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
