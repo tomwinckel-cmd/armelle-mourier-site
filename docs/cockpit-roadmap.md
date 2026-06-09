@@ -134,6 +134,22 @@ d'Armelle et de Tom, avant d'ajouter des services. Modèle : `src/data/operation
 > Garde-fou : **aucune action sensible automatisée sans validation humaine**
 > (Armelle décide · Tom valide · Claude Code exécute).
 
+## Assistant « Ajouter une œuvre » (prototype)
+
+Parcours guidé dans `/cockpit-roadmap` (modèle : `src/data/artworkWorkflow.ts`) :
+**identifier → décrire → images → vente douce → protection → réseaux → récapitulatif**.
+
+- **Garde-fou récapitulatif** : checklist « Avant de publier cette œuvre, vérifier »
+  + bloc copiable **« Fiche œuvre prête à transmettre »** + bloc `artworks.ts`.
+- **Gamification douce** (encourage, n'infantilise pas) : niveau de préparation
+  (*brouillon / presque prêt / prêt à valider*), score de complétude indicatif,
+  badges (Fiche complète · Image prête · Protection pensée · Publication préparée
+  · Vente douce prête). Calcul **côté client**, rien n'est enregistré.
+- **Designs activables plus tard** : `theme.designModes` (Atelier pigment · Galerie
+  claire · Bleu Cendres) — **préparation**, pas de switch global actif.
+- **Validation humaine obligatoire** : aucun bouton « Publier », aucune sauvegarde,
+  aucun envoi. Armelle décide · Tom valide · Claude Code exécute.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
