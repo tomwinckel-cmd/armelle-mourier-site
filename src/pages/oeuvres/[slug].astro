@@ -1,0 +1,135 @@
+---
+import Base from '../../layouts/Base.astro';
+import ArtworkPlaceholder from '../../components/ArtworkPlaceholder.astro';
+import Trait from '../../components/Trait.astro';
+import {
+  artworks,
+  statusLabel,
+  priceLabel,
+  isForSale,
+  getArtworkRequestUrl,
+  type Artwork,
+} from '../../data/artworks';
+import { shop } from '../../data/shop';
+import { site } from '../../data/site';
+
+// Une fiche par œuvre (slug stable défini dans artworks.ts).
+export function getStaticPaths() {
+  return artworks.map((artwork) => ({ params: { slug: artwork.slug }, props: { artwork } }));
+}
+
+interface Props { artwork: Artwork }
+const { artwork: a } = Astro.props;
+
+const forSale = isForSale(a);
+const sold = a.status === 'sold';
+const priceText = sold ? 'Vendue' : shop.showPrices ? priceLabel(a) : shop.defaultPriceLabel;
+
+// Champs affichés seulement s'ils existent (ne rien inventer).
+const facts = [
+  { label: 'Série', value: a.series },
+  { label: 'Technique', value: a.technique },
+  { label: 'Dimensions', value: a.dimensions },
+  { label: 'Année', value: a.year },
+].filter((f) => f.value);
+
+const statusColor: Record<string, string> = {
+  available: 'text-encre',
+  reserved: 'text-or',
+  'on-request': 'text-cendre',
+  sold: 'text-cendre',
+};
+
+const acquireUrl = getArtworkRequestUrl(a, 'acquisition');
+const reserveUrl = getArtworkRequestUrl(a, 'reservation');
+
+const description =
+  a.description ??
+  `${a.title}${a.series ? ` — série ${a.series}` : ''}, œuvre originale d’Armelle Mourier. Prix sur demande, acquisition en lien direct avec l’artiste.`;
+
+const artworkLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VisualArtwork',
+  name: a.title,
+  artform: 'Peinture',
+  artMedium: a.technique ?? 'Acrylique sur toile',
+  creator: { '@type': 'VisualArtist', name: site.artistName },
+  ...(a.dimensions ? { width: a.dimensions } : {}),
+  ...(a.image ? { image: new URL(a.image, site.url).href } : {}),
+};
+---
+<Base
+  title={`${a.title} — ${site.artistName}`}
+  description={description}
+  keywords={[a.title, a.series, 'Armelle Mourier', 'œuvre originale', 'peinture'].filter(Boolean) as string[]}
+  jsonld={artworkLd}
+>
+  <section class="shell pb-section pt-10 sm:pt-14">
+    <a href="/oeuvres" class="link-quiet text-sm font-semibold">← Retour aux œuvres</a>
+
+    <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:gap-16">
+      <!-- VISUEL -->
+      <figure class="reveal is-visible">
+        <div class="frame-gallery overflow-hidden p-[7px]">
+          <div class="aspect-[4/5] overflow-hidden">
+            {a.image ? (
+              <img src={a.image} alt={a.alt} class="h-full w-full object-cover" loading="eager" decoding="async" />
+            ) : (
+              <ArtworkPlaceholder />
+            )}
+          </div>
+        </div>
+        {!a.image && (
+          <figcaption class="mt-3 text-sm italic text-cendre">
+            Visuel haute définition à venir — fragment d’atelier en attendant.
+          </figcaption>
+        )}
+      </figure>
+
+      <!-- CARTEL / DÉTAILS -->
+      <div class="reveal is-visible">
+        {a.series && <p class="eyebrow mb-3">{a.series}</p>}
+        <h1 class="font-serif text-h1 italic text-encre">{a.title}</h1>
+        <Trait class="mt-4 text-or" width="7rem" />
+
+        <p class={`mt-6 inline-flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.18em] ${statusColor[a.status]}`}>
+          <span class="status-dot" aria-hidden="true"></span>{statusLabel[a.status]}
+        </p>
+
+        {facts.length > 0 && (
+          <dl class="mt-6 divide-y divide-cendre/20 border-y border-cendre/20">
+            {facts.map((f) => (
+              <div class="flex justify-between gap-6 py-2.5">
+                <dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{f.label}</dt>
+                <dd class="text-right font-serif text-encre">{f.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+
+        <p class="mt-6 font-serif text-xl italic text-encre">{priceText}</p>
+
+        {a.description && (
+          <p class="mt-5 max-w-prose leading-relaxed text-noir/80">{a.description}</p>
+        )}
+
+        <!-- ACQUISITION DOUCE -->
+        <div class="mt-9 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          {!sold && <a href={acquireUrl} class="btn btn-primary">{shop.cta.artwork}</a>}
+          {forSale && shop.enableReservation && (
+            <a href={reserveUrl} class="btn btn-ghost">{shop.cta.reserve}</a>
+          )}
+          {sold && <span class="font-serif italic text-cendre">Œuvre vendue — merci.</span>}
+        </div>
+
+        <div class="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <a href="/oeuvres" class="link-quiet font-semibold">Retour aux œuvres</a>
+          {forSale && (
+            <a href="/disponibles" class="link-quiet font-semibold">Voir les œuvres disponibles</a>
+          )}
+          <a href="/contact?objet=catalogue" class="link-quiet font-semibold">Demander le catalogue</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

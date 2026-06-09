@@ -65,10 +65,11 @@ tableau `nav` (`label` + `href`). Chaque entrée ferme le Carnet au clic
 
 ## Règles
 
-- Tous les `href` internes commencent par `/` et correspondent à une route ci-dessus.
-- Aucune route dynamique `/oeuvres/[slug]` n'existe encore : ne pas lier vers une
-  page détail tant qu'elle n'est pas créée (les demandes passent par `/contact`).
-- Pas de `tel:` (aucun téléphone), pas de lien de paiement.
+- Tous les `href` internes commencent par `/` et correspondent à une route existante.
+- **Fiches œuvre** : `/oeuvres/<slug>` (une par œuvre, générées depuis `artworks.ts`).
+  Les cartes et la galerie y mènent ; chaque fiche renvoie vers `/oeuvres`,
+  `/disponibles` (si disponible) et `/contact` (demande/réservation/catalogue).
+- Pas de `tel:` (aucun téléphone), pas de lien de paiement, pas de panier.
 
 ## Test du Carnet (ouverture en haut de page)
 

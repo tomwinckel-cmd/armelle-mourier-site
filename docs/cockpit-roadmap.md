@@ -32,11 +32,15 @@ page sert de carte.
 - **Vente douce** : `showPrices`, libellés CTA, activation réservation/catalogue (jamais de paiement tant que `enableCheckout = false`).
 - **Images** : association fichier ↔ œuvre/portrait/projet.
 
-### Architecture déjà prête pour les fiches œuvre
+### Fiches œuvre
 `artworks.ts` expose : `getArtworkBySlug`, `getAvailableArtworks`,
-`getFeaturedArtworks`, `getArtworkRequestUrl(a, objet)`. Le `slug` est stable et
-`images[]` est prévu pour des vues secondaires — une future route
-`/oeuvres/[slug]` pourra être branchée sans refonte des données.
+`getFeaturedArtworks`, `getArtworkRequestUrl(a, objet)`. La route
+**`src/pages/oeuvres/[slug].astro`** génère **une fiche par œuvre** (slug stable)
+: visuel/placeholder, série, technique, dimensions, année, statut, « Prix sur
+demande », description, et **acquisition douce** (Demander / Réserver / Catalogue
+→ `/contact` prérempli). `images[]` reste prévu pour des vues secondaires.
+Un futur cockpit édite les œuvres dans `artworks.ts` ; les fiches se régénèrent
+au build, sans toucher au composant.
 
 ## Ce qui ne doit JAMAIS entrer dans le cockpit (ni dans le repo)
 

@@ -31,12 +31,17 @@ const statusColor: Record<string, string> = {
 };
 
 const askHref = getArtworkRequestUrl(a);
+const detailHref = `/oeuvres/${a.slug}`;
 const metaParts = [a.technique, a.dimensions, a.year].filter(Boolean);
 ---
 {/* Carte traitée comme un CARTEL d'exposition : cadre de galerie, nom en
     italique, filet or, statut discret — volontairement pas une « card » SaaS. */}
 <article class="reveal group flex flex-col">
-  <div class={`frame-gallery relative aspect-[4/5] w-full overflow-hidden p-[6px] ${isFeature ? 'border-or/45' : ''}`}>
+  <a
+    href={detailHref}
+    class={`frame-gallery relative block aspect-[4/5] w-full overflow-hidden p-[6px] ${isFeature ? 'border-or/45' : ''}`}
+    aria-label={`Voir la fiche : ${a.title}`}
+  >
     <div class="h-full w-full overflow-hidden">
       {a.image ? (
         <img
@@ -53,11 +58,13 @@ const metaParts = [a.technique, a.dimensions, a.year].filter(Boolean);
         <ArtworkPlaceholder />
       )}
     </div>
-  </div>
+  </a>
 
   <figcaption class="mt-4 flex flex-1 flex-col">
     <div class="flex items-baseline justify-between gap-3">
-      <h3 class={`font-serif italic leading-tight text-encre ${isFeature ? 'text-h2' : 'text-h3'}`}>{a.title}</h3>
+      <h3 class={`font-serif italic leading-tight ${isFeature ? 'text-h2' : 'text-h3'}`}>
+        <a href={detailHref} class="text-encre transition-colors hover:text-noir">{a.title}</a>
+      </h3>
       {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{a.series}</span>}
     </div>
 
@@ -80,13 +87,21 @@ const metaParts = [a.technique, a.dimensions, a.year].filter(Boolean);
       <span class={`font-serif text-base italic ${a.status === 'sold' ? 'text-cendre' : 'text-encre'}`}>{priceText}</span>
     </div>
 
-    {a.status !== 'sold' && (
+    <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.92rem]">
       <a
-        href={askHref}
-        class="mt-3 inline-block self-start text-[0.92rem] font-medium text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or"
+        href={detailHref}
+        class="font-medium text-encre underline decoration-cendre/40 decoration-1 underline-offset-4 transition-colors hover:decoration-encre"
       >
-        {cta} →
+        Voir la fiche →
       </a>
-    )}
+      {a.status !== 'sold' && (
+        <a
+          href={askHref}
+          class="font-medium text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors hover:decoration-or"
+        >
+          {cta} →
+        </a>
+      )}
+    </div>
   </figcaption>
 </article>
