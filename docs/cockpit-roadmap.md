@@ -104,6 +104,12 @@ labels humains, descriptions courtes, actions évidentes, zéro jargon.
 | **V4** | **Assistant réseaux sociaux avancé**. |
 | **V5** | **Authentification**, si nécessaire. |
 
+> 🧭 **Choix de l'outil pour la V2** : voir l'étude comparative
+> **[`docs/cockpit-architecture-decision.md`](./cockpit-architecture-decision.md)**.
+> Recommandation : un **CMS git-backed (Decap) + Cloudinary** pour les images —
+> garder Astro/Vercel, coût quasi nul, données dans le dépôt ; alternative
+> **Sanity** si l'on privilégie le confort d'édition.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
