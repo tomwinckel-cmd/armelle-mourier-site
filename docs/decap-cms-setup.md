@@ -51,6 +51,20 @@ docs/cloudinary-setup.md   → images
   correspondante, valider le cycle édition → commit → déploiement.
 - **2C+** : migrer les autres collections une à une (chacune dans sa PR).
 
+## Création de l'accès artiste (invitation, sans mot de passe dans le repo)
+
+> ⚠️ Aucun e-mail/mot de passe n'est stocké dans le dépôt ni transmis à Claude Code.
+> L'artiste définit son propre mot de passe via le lien d'invitation.
+
+1. **Choisir l'e-mail artiste** (celui qu'Armelle utilisera pour se connecter).
+2. **Inviter l'artiste** depuis le fournisseur d'auth (ex. Netlify Identity →
+   *Invite users*, ou l'app OAuth GitHub) : un e-mail d'invitation lui est envoyé.
+3. **L'artiste crée son mot de passe elle-même** via le lien reçu (jamais partagé,
+   jamais committé).
+4. **Vérifier l'accès** : elle ouvre `/admin/`, se connecte, voit ses collections.
+5. **Ne jamais stocker le mot de passe** (ni l'e-mail) dans le repo ni dans un fichier
+   de configuration — uniquement côté fournisseur d'auth.
+
 ## Checklist sécurité
 - [ ] Aucun secret/token/clé/cloud_name privé committé.
 - [ ] Clés (Cloudinary, OAuth) **uniquement** dans Variables Netlify/Vercel.
