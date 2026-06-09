@@ -5,3 +5,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Migration majeure reportée : Astro 6 et Tailwind 4 sont couplés
+      # (ils imposent d'abandonner @astrojs/tailwind au profit de
+      # @tailwindcss/vite + thème CSS-first). À traiter plus tard dans une
+      # PR dédiée et planifiée, avec tests visuels et audit complet.
+      # On reste sur le stack stable Astro 4 + Tailwind 3.
+      - dependency-name: astro
+        update-types: ["version-update:semver-major"]
+      - dependency-name: tailwindcss
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@astrojs/tailwind"
+        update-types: ["version-update:semver-major"]
