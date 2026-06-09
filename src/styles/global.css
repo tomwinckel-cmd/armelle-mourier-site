@@ -33,11 +33,13 @@
   /* Intensité du voile de matière (peut être mise à 0 pour le couper). */
   --texture-strength: 0.05;
 
-  /* Tokens « atelier-galerie » (surchargés par theme.identity via Base). */
-  --border-irregular: 0.6;    /* coins organiques des cadres */
-  --brush-strength: 0.7;      /* force des gestes/traits */
-  --gold-trace: 0.55;         /* l'or comme trace */
-  --soft-blue-wash: 0.5;      /* lavis bleu clair des sections */
+  /* Tokens « artist-studio » (surchargés par theme.identity via Base). */
+  --border-irregular: 0.7;    /* coins organiques des cadres */
+  --brush-strength: 0.85;     /* force des gestes/traits */
+  --gold-trace: 0.7;          /* l'or comme trace/pigment */
+  --soft-blue-wash: 0.45;     /* lavis bleu clair des sections */
+  --paper-grain: 0.8;         /* matière inégale de l'ivoire */
+  --blue-depth: 0.8;          /* profondeur des masses bleu/encre */
 }
 
 * { box-sizing: border-box; }
@@ -70,6 +72,21 @@ body[data-texture="on"]::before {
     radial-gradient(70% 60% at 80% 100%, rgb(var(--c-encre) / calc(var(--texture-strength) * 0.7)), transparent 70%);
 }
 body > * { position: relative; z-index: 1; }
+
+/* Ivoire « vivant » (theme.identity.paperMood = 'raw-ivory') : matière
+   inégale, taches de lumière chaude et ombres cendrées — pas un aplat. */
+body[data-paper="raw-ivory"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 8% 0%, rgb(var(--c-white) / calc(0.5 * var(--paper-grain))), transparent 60%),
+    radial-gradient(70% 55% at 100% 12%, rgb(var(--c-brume) / calc(0.7 * var(--paper-grain))), transparent 60%),
+    radial-gradient(60% 50% at 88% 100%, rgb(var(--c-cendre) / calc(0.06 * var(--paper-grain))), transparent 70%),
+    radial-gradient(55% 45% at 0% 92%, rgb(var(--c-encre) / calc(0.05 * var(--paper-grain))), transparent 70%);
+}
 
 /* ---------------------------------------------------------------------
    SHELL — conteneur centré
@@ -246,16 +263,56 @@ body[data-buttons="artist-line"] .btn-gold:hover {
 }
 
 /* ---------------------------------------------------------------------
-   CADRE DE GALERIE — filet fin, coins légèrement organiques (pas une card)
+   IDENTITÉ « handline » (theme.identity.buttonMode = 'handline')
+   Les boutons deviennent des LIENS D'ATELIER : pas de capsule, un filet
+   d'or peint (SVG irrégulier) sous le texte, qui s'épaissit au survol.
+   On garde la clarté UX (cibles tactiles, focus visibles).
+   --------------------------------------------------------------------- */
+body[data-buttons="handline"] .btn,
+body[data-buttons="handline"] .btn-primary,
+body[data-buttons="handline"] .btn-ghost,
+body[data-buttons="handline"] .btn-gold {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: rgb(var(--c-encre));
+  min-height: 2.6rem;
+  padding: 0.4rem 0.15rem 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 38 2 66 9 104 5 S 168 3 198 6' fill='none' stroke='%23A9791F' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 100% 7px;
+  transition: color .2s ease, background-size .2s ease, opacity .2s ease;
+}
+body[data-buttons="handline"] .btn-primary {
+  font-weight: 700;
+  color: rgb(var(--c-noir));
+}
+body[data-buttons="handline"] .btn-ghost { color: rgb(var(--c-encre) / 0.92); }
+body[data-buttons="handline"] .btn:hover,
+body[data-buttons="handline"] .btn-primary:hover,
+body[data-buttons="handline"] .btn-ghost:hover,
+body[data-buttons="handline"] .btn-gold:hover {
+  transform: none;
+  box-shadow: none;
+  color: rgb(var(--c-noir));
+  background-size: 100% 10px;
+}
+
+/* ---------------------------------------------------------------------
+   CADRE D'ATELIER — papier monté, filet fin, coins organiques (pas une card)
    --------------------------------------------------------------------- */
 .frame-gallery {
-  border: var(--border-hair) solid rgb(var(--c-cendre) / 0.35);
+  border: var(--border-hair) solid rgb(var(--c-encre) / 0.18);
   border-radius:
-    calc(2px + var(--border-irregular) * 8px)
-    calc(2px + var(--border-irregular) * 3px)
-    calc(2px + var(--border-irregular) * 7px)
-    calc(2px + var(--border-irregular) * 4px);
-  background: rgb(var(--c-white));
+    calc(1px + var(--border-irregular) * 9px)
+    calc(1px + var(--border-irregular) * 3px)
+    calc(1px + var(--border-irregular) * 7px)
+    calc(1px + var(--border-irregular) * 4px);
+  background: rgb(var(--c-paper));
 }
 
 /* Filet de cartel (sous le nom de l'œuvre) — or discret comme une trace. */

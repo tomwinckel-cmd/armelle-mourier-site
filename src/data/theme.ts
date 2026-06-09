@@ -111,20 +111,34 @@ export type ThemeFragment = {
 // Identité visuelle « atelier-galerie » — modes futurs + tokens picturaux.
 // Pensé pour piloter une DA d'artiste (carnet/cartel/galerie), pas un template.
 export type ThemeIdentity = {
-  visualIdentity: 'atelier-gallery' | 'clean';
+  visualIdentity: 'artist-studio' | 'atelier-gallery' | 'clean';
   textureMode: 'pictorial' | 'flat';
-  cardMode: 'cartel' | 'card';
-  buttonMode: 'artist-line' | 'pill';
+  /** Composition du hero. 'business-card-fragment' = carte de visite agrandie. */
+  heroComposition: 'business-card-fragment' | 'plain';
+  /** Menu mobile. 'atelier-notebook' = carnet d'atelier (papier, lignes, n°). */
+  menuMode: 'atelier-notebook' | 'bar';
+  /** Boutons. 'handline' = liens d'atelier soulignés à la main (filet or). */
+  buttonMode: 'handline' | 'artist-line' | 'pill';
+  /** Cartes. 'exhibition-label' = cartel/fiche d'atelier sur papier. */
+  cardMode: 'exhibition-label' | 'cartel' | 'card';
   heroMode: 'living-atelier' | 'living-card';
   accentMode: 'blue-gold-trace' | 'plain';
+  /** Fragment pictural. 'blue-gold-rectangles' = blocs verticaux bleu/noir + or. */
+  fragmentStyle: 'blue-gold-rectangles' | 'wash';
+  /** Ambiance du fond. 'raw-ivory' = ivoire vivant, matière inégale. */
+  paperMood: 'raw-ivory' | 'flat';
+  /** Usage de l'or. 'pigment-trace' = trace/pigment, pas accent luxe. */
+  goldUse: 'pigment-trace' | 'accent';
+  /** Usage du bleu. 'paint-matter' = matière picturale, pas couleur de marque. */
+  blueUse: 'paint-matter' | 'brand';
 
   // Tokens picturaux (0 → 1, sauf indication). Injectés en variables CSS.
   borderIrregularity: number;       // 0 = filets nets ; 1 = coins organiques
-  paperTexture: number;             // grain papier (voile très subtil)
+  paperTexture: number;             // grain/matière du papier ivoire
   brushStrokeIntensity: number;     // force des gestes/traits
   artworkFragmentIntensity: number; // densité picturale des fragments
   goldTraceOpacity: number;         // l'or comme trace, pas comme luxe
-  blueDepth: number;                // profondeur du bleu (réservé/futur)
+  blueDepth: number;                // profondeur du bleu (masses sombres)
   softBlueWash: number;             // lavis bleu clair des sections
 };
 
@@ -166,19 +180,25 @@ export const theme: Theme = {
     borderHair: '1px',
   },
   identity: {
-    visualIdentity: 'atelier-gallery',
+    visualIdentity: 'artist-studio',
     textureMode: 'pictorial',
-    cardMode: 'cartel',
-    buttonMode: 'artist-line',
+    heroComposition: 'business-card-fragment',
+    menuMode: 'atelier-notebook',
+    buttonMode: 'handline',
+    cardMode: 'exhibition-label',
     heroMode: 'living-atelier',
     accentMode: 'blue-gold-trace',
-    borderIrregularity: 0.6,
-    paperTexture: 0.5,
-    brushStrokeIntensity: 0.7,
-    artworkFragmentIntensity: 0.85,
-    goldTraceOpacity: 0.55,
-    blueDepth: 0.5,
-    softBlueWash: 0.5,
+    fragmentStyle: 'blue-gold-rectangles',
+    paperMood: 'raw-ivory',
+    goldUse: 'pigment-trace',
+    blueUse: 'paint-matter',
+    borderIrregularity: 0.7,
+    paperTexture: 0.8,
+    brushStrokeIntensity: 0.85,
+    artworkFragmentIntensity: 1,
+    goldTraceOpacity: 0.7,
+    blueDepth: 0.8,
+    softBlueWash: 0.45,
   },
   hero: {
     mode: 'living-card',
@@ -195,7 +215,7 @@ export const theme: Theme = {
   },
   buttons: {
     radius: 'full',
-    style: 'line-gold',
+    style: 'solid',
   },
   texture: {
     enabled: true,
@@ -278,6 +298,8 @@ export function themeCssVars(t: Theme): Record<string, string> {
     '--brush-strength': String(t.identity.brushStrokeIntensity),
     '--gold-trace': String(t.identity.goldTraceOpacity),
     '--soft-blue-wash': String(t.identity.softBlueWash),
+    '--paper-grain': String(t.identity.paperTexture),
+    '--blue-depth': String(t.identity.blueDepth),
     '--font-serif': `'${t.typography.serif}', Georgia, serif`,
     '--font-sans': `'${t.typography.sans}', system-ui, sans-serif`,
   };
