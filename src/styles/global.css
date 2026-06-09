@@ -11,19 +11,23 @@
    appliquer les opacités (ex. bg-encre/10, border-cendre/25).
    ===================================================================== */
 :root {
-  --c-paper: 245 242 235;     /* ivoire chaud */
-  --c-brume: 233 229 218;     /* ivoire plus profond */
-  --c-white: 255 255 255;     /* blanc pur */
-  --c-encre: 23 48 57;        /* bleu profond */
-  --c-blue-soft: 127 174 198; /* bleu clair (carte de visite) */
-  --c-or: 169 121 31;         /* or doux */
-  --c-cendre: 111 124 130;    /* gris-bleu cendré */
-  --c-noir: 33 31 27;         /* noir doux */
+  --c-paper: 244 239 227;       /* papier chaud / carnet */
+  --c-paper-raw: 231 222 203;   /* papier brut */
+  --c-brume: 231 222 203;       /* fond secondaire (= papier brut) */
+  --c-white: 251 249 243;       /* blanc cassé papier */
+  --c-encre: 21 34 59;          /* bleu nuit pictural (masses sombres) */
+  --c-blue-pigment: 43 76 146;  /* outremer / Collioure */
+  --c-blue-soft: 143 183 199;   /* bleu clair aquatique */
+  --c-or: 162 118 46;           /* ocre-pigment */
+  --c-cendre: 115 128 139;      /* bleu-gris cendre */
+  --c-noir: 26 22 19;           /* noir encre */
+  --c-charcoal: 44 42 43;       /* charbon / masse sombre */
 
   --radius-card: 0.5rem;      /* arrondi des cartes/visuels */
   --border-hair: 1px;         /* filets fins type galerie */
   --btn-radius: 999px;        /* arrondi des boutons */
-  --shadow-soft: 0 22px 60px rgb(var(--c-encre) / 0.10);
+  /* Ombre volontairement légère : on privilégie les filets de galerie. */
+  --shadow-soft: 0 14px 40px rgb(var(--c-encre) / 0.07);
 
   /* Typographie (pilotable depuis theme.ts ; police chargée dans Base.astro). */
   --font-serif: 'Fraunces', Georgia, serif;
@@ -31,6 +35,14 @@
 
   /* Intensité du voile de matière (peut être mise à 0 pour le couper). */
   --texture-strength: 0.05;
+
+  /* Tokens « artist-studio » (surchargés par theme.identity via Base). */
+  --border-irregular: 0.7;    /* coins organiques des cadres */
+  --brush-strength: 0.85;     /* force des gestes/traits */
+  --gold-trace: 0.7;          /* l'or comme trace/pigment */
+  --soft-blue-wash: 0.45;     /* lavis bleu clair des sections */
+  --paper-grain: 0.8;         /* matière inégale de l'ivoire */
+  --blue-depth: 0.8;          /* profondeur des masses bleu/encre */
 }
 
 * { box-sizing: border-box; }
@@ -63,6 +75,21 @@ body[data-texture="on"]::before {
     radial-gradient(70% 60% at 80% 100%, rgb(var(--c-encre) / calc(var(--texture-strength) * 0.7)), transparent 70%);
 }
 body > * { position: relative; z-index: 1; }
+
+/* Ivoire « vivant » (theme.identity.paperMood = 'raw-ivory') : matière
+   inégale, taches de lumière chaude et ombres cendrées — pas un aplat. */
+body[data-paper="raw-ivory"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 8% 0%, rgb(var(--c-white) / calc(0.5 * var(--paper-grain))), transparent 60%),
+    radial-gradient(70% 55% at 100% 12%, rgb(var(--c-brume) / calc(0.7 * var(--paper-grain))), transparent 60%),
+    radial-gradient(60% 50% at 88% 100%, rgb(var(--c-cendre) / calc(0.06 * var(--paper-grain))), transparent 70%),
+    radial-gradient(55% 45% at 0% 92%, rgb(var(--c-encre) / calc(0.05 * var(--paper-grain))), transparent 70%);
+}
 
 /* ---------------------------------------------------------------------
    SHELL — conteneur centré
@@ -197,6 +224,122 @@ body[data-btn-style="line-gold"] .btn-primary {
 }
 body[data-btn-style="line-gold"] .btn-primary:hover {
   box-shadow: inset 0 0 0 1px rgb(var(--c-or) / 0.6), var(--shadow-soft);
+}
+
+/* ---------------------------------------------------------------------
+   IDENTITÉ « artist-line » (theme.identity.buttonMode = 'artist-line')
+   Sort du look « pilule startup » : appel principal = bloc encre sobre à
+   filet or ; appels secondaires = liens soulignés façon cartel de galerie.
+   --------------------------------------------------------------------- */
+body[data-buttons="artist-line"] .btn,
+body[data-buttons="artist-line"] .btn-primary,
+body[data-buttons="artist-line"] .btn-ghost,
+body[data-buttons="artist-line"] .btn-gold {
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+  font-weight: 600;
+}
+body[data-buttons="artist-line"] .btn-primary {
+  border-bottom: 2px solid rgb(var(--c-or) / 0.85);
+  box-shadow: none;
+}
+body[data-buttons="artist-line"] .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: none;
+  background: rgb(var(--c-encre) / 0.92);
+}
+/* Secondaires : pas de cadre fermé, un simple filet (lien d'atelier). */
+body[data-buttons="artist-line"] .btn-ghost,
+body[data-buttons="artist-line"] .btn-gold {
+  border-radius: 0;
+  border-color: transparent;
+  border-bottom: 1px solid rgb(var(--c-encre) / 0.35);
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+}
+body[data-buttons="artist-line"] .btn-gold {
+  border-bottom-color: rgb(var(--c-or) / 0.6);
+}
+body[data-buttons="artist-line"] .btn-ghost:hover,
+body[data-buttons="artist-line"] .btn-gold:hover {
+  border-bottom-color: rgb(var(--c-or));
+}
+
+/* ---------------------------------------------------------------------
+   IDENTITÉ « handline » (theme.identity.buttonMode = 'handline')
+   Les boutons deviennent des LIENS D'ATELIER : pas de capsule, un filet
+   d'or peint (SVG irrégulier) sous le texte, qui s'épaissit au survol.
+   On garde la clarté UX (cibles tactiles, focus visibles).
+   --------------------------------------------------------------------- */
+body[data-buttons="handline"] .btn,
+body[data-buttons="handline"] .btn-primary,
+body[data-buttons="handline"] .btn-ghost,
+body[data-buttons="handline"] .btn-gold {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: rgb(var(--c-encre));
+  min-height: 2.6rem;
+  padding: 0.4rem 0.15rem 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C 38 2 66 9 104 5 S 168 3 198 6' fill='none' stroke='%23A2762E' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  background-size: 100% 7px;
+  transition: color .2s ease, background-size .2s ease, opacity .2s ease;
+}
+body[data-buttons="handline"] .btn-primary {
+  font-weight: 700;
+  color: rgb(var(--c-noir));
+}
+body[data-buttons="handline"] .btn-ghost { color: rgb(var(--c-encre) / 0.92); }
+body[data-buttons="handline"] .btn:hover,
+body[data-buttons="handline"] .btn-primary:hover,
+body[data-buttons="handline"] .btn-ghost:hover,
+body[data-buttons="handline"] .btn-gold:hover {
+  transform: none;
+  box-shadow: none;
+  color: rgb(var(--c-noir));
+  background-size: 100% 10px;
+}
+
+/* ---------------------------------------------------------------------
+   CADRE D'ATELIER — papier monté, filet fin, coins organiques (pas une card)
+   --------------------------------------------------------------------- */
+.frame-gallery {
+  border: var(--border-hair) solid rgb(var(--c-encre) / 0.18);
+  border-radius:
+    calc(1px + var(--border-irregular) * 9px)
+    calc(1px + var(--border-irregular) * 3px)
+    calc(1px + var(--border-irregular) * 7px)
+    calc(1px + var(--border-irregular) * 4px);
+  background: rgb(var(--c-paper));
+}
+
+/* Filet de cartel (sous le nom de l'œuvre) — or discret comme une trace. */
+.cartel-rule {
+  height: 1px;
+  width: 100%;
+  border: 0;
+  background: linear-gradient(to right, rgb(var(--c-or) / calc(0.7 * var(--gold-trace))), transparent 75%);
+}
+
+/* Point de statut discret (disponible / réservée / vendue). */
+.status-dot {
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* Lavis bleu clair très doux pour différencier des sections (atelier). */
+.wash-blue {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(var(--c-blue-soft) / calc(0.10 * var(--soft-blue-wash) * 2)), transparent 60%),
+    rgb(var(--c-brume));
 }
 
 /* ---------------------------------------------------------------------

@@ -18,12 +18,15 @@ const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1
 >
   <!-- INTRO « galerie privée » -->
   <section class="shell pb-section pt-12 sm:pt-16">
-    <p class="eyebrow reveal is-visible mb-3">Galerie privée</p>
+    <p class="eyebrow reveal is-visible mb-3">Sélection d’atelier</p>
     <h1 class="reveal is-visible text-h1 font-serif text-encre">Tableaux disponibles</h1>
     <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
-    <p class="reveal mt-7 max-w-prose text-lg leading-relaxed text-noir/85">
-      Certaines œuvres sont disponibles à l’acquisition. Pour connaître les conditions,
-      réserver une œuvre ou recevoir le catalogue, vous pouvez contacter directement l’artiste.
+    <p class="reveal mt-7 max-w-prose font-serif text-xl italic leading-snug text-encre">
+      Acquisition en lien direct avec l’artiste — prix sur demande.
+    </p>
+    <p class="reveal mt-5 max-w-prose text-lg leading-relaxed text-noir/85">
+      Quelques œuvres quittent l’atelier. Pour connaître les conditions, réserver une toile ou
+      recevoir les informations, écrivez simplement à l’artiste.
     </p>
     <p class="reveal mt-4 max-w-prose text-noir/70">
       Chaque toile est une pièce unique. L’acquisition se fait dans l’échange&nbsp;: pas de paiement
@@ -81,7 +84,7 @@ const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1
 
     <div class="mt-12 flex flex-wrap gap-3">
       <a href="/contact?objet=acquisition" class="btn-primary">Demander une œuvre</a>
-      <a href="/contact?objet=catalogue" class="btn-ghost">Recevoir le catalogue</a>
+      <a href="/contact?objet=catalogue" class="btn-ghost">Recevoir les informations</a>
     </div>
   </section>
 </Base>

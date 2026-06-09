@@ -20,15 +20,20 @@
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
+// Palette d'ARTISTE (pigment/papier/encre), pas une palette de marque.
+// Inspirée de l'œuvre imprimée sur la carte de visite : bleus picturaux,
+// ocre pigment, noir encre, papier chaud.
 export type ThemeColors = {
-  paper: string;     // fond principal (ivoire chaud)
-  brume: string;     // fond secondaire (ivoire plus profond)
-  white: string;     // blanc pur (cartes, contrastes)
-  blueDeep: string;  // bleu profond — sombre principal (« encre »)
-  blueSoft: string;  // bleu clair — accent lumineux de la carte
-  gold: string;      // or doux — accent discret (jamais criard)
-  ash: string;       // gris-bleu cendré — texte secondaire, filets
-  ink: string;       // noir doux — texte courant
+  paper: string;        // papier chaud / carnet (fond principal)
+  paperRaw: string;     // papier brut (fond secondaire, plus profond)
+  white: string;        // blanc cassé papier (pas un blanc pur premium)
+  bluePigment: string;  // bleu outremer / Collioure — bleu vivant pictural
+  blueDeep: string;     // bleu nuit pictural — masses sombres
+  blueWash: string;     // bleu clair aquatique — lavis
+  ochreGold: string;    // ocre-pigment — trace, pas accent luxe
+  inkBlack: string;     // noir encre — signature, texte
+  charcoal: string;     // noir doux / charbon — masses sombres
+  ashBlue: string;      // bleu-gris cendre — texte secondaire, filets
 };
 
 export type ThemeTypography = {
@@ -108,10 +113,45 @@ export type ThemeFragment = {
   accentStroke: boolean;
 };
 
+// Identité visuelle « atelier-galerie » — modes futurs + tokens picturaux.
+// Pensé pour piloter une DA d'artiste (carnet/cartel/galerie), pas un template.
+export type ThemeIdentity = {
+  visualIdentity: 'artist-studio' | 'atelier-gallery' | 'clean';
+  textureMode: 'pictorial' | 'flat';
+  /** Composition du hero. 'business-card-fragment' = carte de visite agrandie. */
+  heroComposition: 'business-card-fragment' | 'plain';
+  /** Menu mobile. 'atelier-notebook' = carnet d'atelier (papier, lignes, n°). */
+  menuMode: 'atelier-notebook' | 'bar';
+  /** Boutons. 'handline' = liens d'atelier soulignés à la main (filet or). */
+  buttonMode: 'handline' | 'artist-line' | 'pill';
+  /** Cartes. 'exhibition-label' = cartel/fiche d'atelier sur papier. */
+  cardMode: 'exhibition-label' | 'cartel' | 'card';
+  heroMode: 'living-atelier' | 'living-card';
+  accentMode: 'blue-gold-trace' | 'plain';
+  /** Fragment pictural. 'blue-gold-rectangles' = blocs verticaux bleu/noir + or. */
+  fragmentStyle: 'blue-gold-rectangles' | 'wash';
+  /** Ambiance du fond. 'raw-ivory' = ivoire vivant, matière inégale. */
+  paperMood: 'raw-ivory' | 'flat';
+  /** Usage de l'or. 'pigment-trace' = trace/pigment, pas accent luxe. */
+  goldUse: 'pigment-trace' | 'accent';
+  /** Usage du bleu. 'paint-matter' = matière picturale, pas couleur de marque. */
+  blueUse: 'paint-matter' | 'brand';
+
+  // Tokens picturaux (0 → 1, sauf indication). Injectés en variables CSS.
+  borderIrregularity: number;       // 0 = filets nets ; 1 = coins organiques
+  paperTexture: number;             // grain/matière du papier ivoire
+  brushStrokeIntensity: number;     // force des gestes/traits
+  artworkFragmentIntensity: number; // densité picturale des fragments
+  goldTraceOpacity: number;         // l'or comme trace, pas comme luxe
+  blueDepth: number;                // profondeur du bleu (masses sombres)
+  softBlueWash: number;             // lavis bleu clair des sections
+};
+
 export type Theme = {
   colors: ThemeColors;
   typography: ThemeTypography;
   layout: ThemeLayout;
+  identity: ThemeIdentity;
   hero: ThemeHero;
   artworkCards: ThemeArtworkCards;
   buttons: ThemeButtons;
@@ -126,14 +166,16 @@ export type Theme = {
 /* ------------------------------------------------------------------ */
 export const theme: Theme = {
   colors: {
-    paper: '#F5F2EB',
-    brume: '#E9E5DA',
-    white: '#FFFFFF',
-    blueDeep: '#173039',
-    blueSoft: '#7FAEC6',
-    gold: '#A9791F',
-    ash: '#6F7C82',
-    ink: '#211F1B',
+    paper: '#F4EFE3',       // papier chaud / carnet
+    paperRaw: '#E7DECB',    // papier brut
+    white: '#FBF9F3',       // blanc cassé papier
+    bluePigment: '#2B4C92', // outremer / Collioure
+    blueDeep: '#15223B',    // bleu nuit pictural
+    blueWash: '#8FB7C7',    // bleu clair aquatique
+    ochreGold: '#A2762E',   // ocre-pigment
+    inkBlack: '#1A1613',    // noir encre
+    charcoal: '#2C2A2B',    // charbon / masse sombre
+    ashBlue: '#73808B',     // bleu-gris cendre
   },
   typography: {
     serif: 'Fraunces',
@@ -143,6 +185,27 @@ export const theme: Theme = {
   layout: {
     radiusCard: '0.5rem',
     borderHair: '1px',
+  },
+  identity: {
+    visualIdentity: 'artist-studio',
+    textureMode: 'pictorial',
+    heroComposition: 'business-card-fragment',
+    menuMode: 'atelier-notebook',
+    buttonMode: 'handline',
+    cardMode: 'exhibition-label',
+    heroMode: 'living-atelier',
+    accentMode: 'blue-gold-trace',
+    fragmentStyle: 'blue-gold-rectangles',
+    paperMood: 'raw-ivory',
+    goldUse: 'pigment-trace',
+    blueUse: 'paint-matter',
+    borderIrregularity: 0.7,
+    paperTexture: 0.8,
+    brushStrokeIntensity: 0.85,
+    artworkFragmentIntensity: 1,
+    goldTraceOpacity: 0.7,
+    blueDepth: 0.8,
+    softBlueWash: 0.45,
   },
   hero: {
     mode: 'living-card',
@@ -159,7 +222,7 @@ export const theme: Theme = {
   },
   buttons: {
     radius: 'full',
-    style: 'line-gold',
+    style: 'solid',
   },
   texture: {
     enabled: true,
@@ -196,17 +259,23 @@ export function hexToRgbChannels(hex: string): string {
   return `${r} ${g} ${b}`;
 }
 
-/** Mappe les couleurs du thème vers les variables CSS attendues. */
+/** Mappe la palette d'artiste vers les variables CSS consommées par Tailwind.
+ *  Les noms historiques (--c-encre, --c-or, --c-cendre, --c-noir, --c-brume)
+ *  sont conservés pour ne rien casser, mais pointent vers les nouveaux pigments.
+ *  De nouveaux tokens (--c-blue-pigment, --c-charcoal, --c-paper-raw) s'ajoutent. */
 export function themeColorVars(colors: ThemeColors): Record<string, string> {
   return {
     '--c-paper': hexToRgbChannels(colors.paper),
-    '--c-brume': hexToRgbChannels(colors.brume),
+    '--c-brume': hexToRgbChannels(colors.paperRaw),       // fond secondaire
+    '--c-paper-raw': hexToRgbChannels(colors.paperRaw),
     '--c-white': hexToRgbChannels(colors.white),
-    '--c-encre': hexToRgbChannels(colors.blueDeep),
-    '--c-blue-soft': hexToRgbChannels(colors.blueSoft),
-    '--c-or': hexToRgbChannels(colors.gold),
-    '--c-cendre': hexToRgbChannels(colors.ash),
-    '--c-noir': hexToRgbChannels(colors.ink),
+    '--c-encre': hexToRgbChannels(colors.blueDeep),       // masses sombres / dark
+    '--c-blue-pigment': hexToRgbChannels(colors.bluePigment),
+    '--c-blue-soft': hexToRgbChannels(colors.blueWash),   // lavis aquatique
+    '--c-or': hexToRgbChannels(colors.ochreGold),         // ocre-pigment
+    '--c-cendre': hexToRgbChannels(colors.ashBlue),
+    '--c-noir': hexToRgbChannels(colors.inkBlack),
+    '--c-charcoal': hexToRgbChannels(colors.charcoal),
   };
 }
 
@@ -225,13 +294,25 @@ const FRAGMENT_STRENGTH: Record<ThemeFragment['intensity'], string> = {
 
 /** Construit l'ensemble des variables CSS injectées dans :root par Base. */
 export function themeCssVars(t: Theme): Record<string, string> {
+  // Voile de matière : combine l'ancien réglage texture et le grain papier.
+  const textureBase = t.texture.enabled ? Number(TEXTURE_STRENGTH[t.texture.intensity]) : 0;
+  const textureStrength = Math.max(textureBase, t.identity.paperTexture * 0.06);
+  // Densité picturale des fragments : piloté par l'identité (fallback enum).
+  const fragmentStrength = t.identity.artworkFragmentIntensity || Number(FRAGMENT_STRENGTH[t.fragment.intensity]);
   return {
     ...themeColorVars(t.colors),
     '--radius-card': t.layout.radiusCard,
     '--border-hair': t.layout.borderHair,
     '--btn-radius': t.buttons.radius === 'full' ? '999px' : 'var(--radius-card)',
-    '--texture-strength': t.texture.enabled ? TEXTURE_STRENGTH[t.texture.intensity] : '0',
-    '--fragment-strength': FRAGMENT_STRENGTH[t.fragment.intensity],
+    '--texture-strength': String(textureStrength),
+    '--fragment-strength': String(fragmentStrength),
+    // Tokens identité « atelier-galerie ».
+    '--border-irregular': String(t.identity.borderIrregularity),
+    '--brush-strength': String(t.identity.brushStrokeIntensity),
+    '--gold-trace': String(t.identity.goldTraceOpacity),
+    '--soft-blue-wash': String(t.identity.softBlueWash),
+    '--paper-grain': String(t.identity.paperTexture),
+    '--blue-depth': String(t.identity.blueDepth),
     '--font-serif': `'${t.typography.serif}', Georgia, serif`,
     '--font-sans': `'${t.typography.sans}', system-ui, sans-serif`,
   };

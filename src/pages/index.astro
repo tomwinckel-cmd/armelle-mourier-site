@@ -34,49 +34,46 @@ const visualArtistLd = {
   keywords={['Armelle Mourier', 'artiste peintre Dijon', 'tableaux disponibles', 'peinture contemporaine']}
   jsonld={visualArtistLd}
 >
-  <section class="shell grid items-center gap-10 pb-section pt-10 sm:pt-14 lg:min-h-[78vh] lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+  <section class="shell grid items-center gap-12 pb-section pt-10 sm:pt-16 lg:min-h-[84vh] lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
     <div class="reveal is-visible">
-      <p class="eyebrow mb-4">{theme.hero.eyebrow}</p>
+      <p class="eyebrow mb-5">{theme.hero.eyebrow}</p>
       <h1 class="signature text-display text-encre">{site.artistName}</h1>
-      {theme.hero.showSignatureLine && <Trait class="mt-5 text-or" width="9rem" />}
-      <p class="mt-7 max-w-prose text-lg leading-relaxed text-noir/80 sm:text-xl">{theme.hero.lead}</p>
-      <p class="mt-4 max-w-prose font-serif text-xl italic leading-snug text-encre sm:text-2xl">{site.manifesto}</p>
-      <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <a href="/oeuvres" class="btn btn-primary">Découvrir les œuvres</a>
-        <a href="/disponibles" class="btn btn-ghost">Tableaux disponibles</a>
-        <a href="/contact" class="btn btn-gold">Contacter l’artiste</a>
-      </div>
+      {theme.hero.showSignatureLine && <Trait class="mt-4 text-or" width="12rem" />}
+      <p class="mt-3 text-sm uppercase tracking-[0.18em] text-cendre">Atelier · {site.city}, {site.region}</p>
+      <p class="mt-8 max-w-prose font-serif text-2xl italic leading-snug text-encre sm:text-3xl">{site.manifesto}</p>
+      <p class="mt-5 max-w-prose leading-relaxed text-noir/75">{theme.hero.lead}</p>
+      {/* Entrées comme un index de carnet, pas une rangée de boutons marketing. */}
+      <ul class="mt-10 flex flex-col items-start gap-4">
+        <li><a href="/oeuvres" class="btn btn-primary">Découvrir les œuvres</a></li>
+        <li><a href="/disponibles" class="btn btn-ghost">Voir les tableaux disponibles</a></li>
+        <li><a href="/contact" class="btn btn-gold">Écrire à l’artiste</a></li>
+      </ul>
     </div>
 
     <div class="reveal is-visible">
-      <!-- Fragment d'œuvre encadré — clin d'œil à la carte de visite :
-           filet or discret, lueur bleu clair, signature en surimpression. -->
-      <figure class="relative mx-auto max-w-md lg:max-w-none">
+      {/* Carte de visite agrandie : fragment pictural monté sur papier,
+          légèrement incliné, posé en asymétrie. */}
+      <figure class="relative mx-auto max-w-xs sm:max-w-sm lg:ml-auto lg:mr-0 lg:max-w-none lg:translate-y-4">
         {theme.hero.showArtworkFragment && (
           <div
-            class="absolute -inset-5 -z-10 rounded-[1.5rem]"
+            class="absolute -inset-6 -z-10"
             aria-hidden="true"
-            style="background: radial-gradient(70% 70% at 70% 20%, rgb(var(--c-blue-soft) / calc(0.3 * var(--fragment-strength))), transparent 70%);"
+            style="background: radial-gradient(60% 60% at 72% 18%, rgb(var(--c-blue-soft) / calc(0.22 * var(--fragment-strength))), transparent 72%);"
           ></div>
         )}
-        <div class={`overflow-hidden rounded-card bg-brume shadow-soft ${theme.hero.showArtworkFragment ? 'ring-1 ring-or/30 ring-offset-4 ring-offset-paper' : ''}`}>
-          <div class="aspect-[4/5]">
+        <div class="frame-gallery overflow-hidden p-[7px] lg:rotate-[1.6deg]">
+          <div class="aspect-[4/5] overflow-hidden">
             {featured[0]?.image ? (
               <img src={featured[0].image} alt={featured[0].alt} class="h-full w-full object-cover" loading="eager" decoding="async" />
             ) : (
-              <ArtworkPlaceholder title={featured[0]?.title ?? site.artistName} dimensions={featured[0]?.dimensions} />
+              <ArtworkPlaceholder />
             )}
           </div>
         </div>
-        {theme.hero.showArtworkFragment && featured[0]?.title && (
-          <figcaption class="mt-3 flex items-center justify-between gap-3 text-sm text-cendre">
-            <span class="font-serif italic text-encre">{featured[0].title}</span>
-            {featured[0].series && <span class="text-eyebrow uppercase tracking-[0.16em]">{featured[0].series}</span>}
-          </figcaption>
-        )}
-        {theme.hero.showArtworkFragment && !featured[0]?.image && (
-          <p class="mt-1 text-sm italic text-cendre">Fragment d’univers — bleu, matière et lumière.</p>
-        )}
+        <figcaption class="mt-4 flex items-baseline justify-between gap-3 lg:rotate-[1.6deg]">
+          <span class="font-serif italic text-encre">{featured[0]?.title ?? 'Fragment d’atelier'}</span>
+          <span class="text-eyebrow uppercase tracking-[0.18em] text-cendre">{featured[0]?.series ?? 'Bleu · matière'}</span>
+        </figcaption>
       </figure>
     </div>
   </section>
@@ -97,17 +94,17 @@ const visualArtistLd = {
     </div>
   </section>
 
-  <section class="shell grid gap-6 py-section lg:grid-cols-2 lg:gap-10">
-    <div class={`reveal rounded-card p-7 sm:p-9 ${theme.saleMode.highlightOnHome ? 'bg-brume ring-1 ring-or/25' : ''}`}>
+  <section class="shell grid gap-10 py-section lg:grid-cols-2 lg:gap-14">
+    <div class={`reveal border-l-2 pl-6 sm:pl-8 ${theme.saleMode.highlightOnHome ? 'border-or/60' : 'border-cendre/30'}`}>
       <p class="eyebrow mb-3">Acquisition</p>
       <h2 class="text-h1 font-serif text-encre">Tableaux disponibles</h2>
       <p class="mt-6 leading-relaxed text-noir/80">
-        Certaines œuvres originales peuvent être acquises ou réservées en lien direct avec l’artiste.
-        La vente reste volontairement sobre : une conversation, une demande de catalogue, le temps de choisir.
+        Certaines œuvres originales peuvent être acquises ou réservées, en lien direct avec l’artiste.
+        L’acquisition reste une conversation : une demande, le temps de choisir, jamais un panier.
       </p>
-      <a href="/disponibles" class="btn btn-primary mt-7">Découvrir les œuvres disponibles</a>
+      <a href="/disponibles" class="btn btn-primary mt-7">Voir les tableaux disponibles</a>
     </div>
-    <div class="reveal rounded-card p-7 sm:p-9">
+    <div class="reveal border-l-2 border-cendre/30 pl-6 sm:pl-8">
       <p class="eyebrow mb-3">Livre & poésie</p>
       <h2 class="text-h1 font-serif text-encre">Bleu Cendres</h2>
       <p class="mt-6 leading-relaxed text-noir/80">
@@ -127,7 +124,7 @@ const visualArtistLd = {
       />
       <div class="mt-12 grid gap-5 md:grid-cols-3">
         {recent.map((e) => (
-          <article class="reveal rounded-card border border-paper/15 bg-paper/5 p-6 transition-colors hover:border-or/40">
+          <article class="reveal border-t border-paper/25 pt-5 transition-colors hover:border-or/60">
             <p class="text-sm uppercase tracking-[0.18em] text-paper/50">{e.dateLabel}</p>
             <h3 class="mt-3 font-serif text-2xl text-paper">{e.title}</h3>
             <p class="mt-2 text-paper/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>

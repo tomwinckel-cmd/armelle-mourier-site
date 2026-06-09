@@ -9,14 +9,17 @@ export default {
         // src/data/theme.ts via Base.astro. Le format « rgb(var(--x) /
         // <alpha-value>) » préserve les opacités Tailwind (ex. bg-encre/10).
         // Pour CHANGER les couleurs : éditer src/data/theme.ts (le cockpit).
-        paper: 'rgb(var(--c-paper) / <alpha-value>)',        // fond ivoire chaud
-        brume: 'rgb(var(--c-brume) / <alpha-value>)',        // fond secondaire
-        white: 'rgb(var(--c-white) / <alpha-value>)',        // blanc pur
-        encre: 'rgb(var(--c-encre) / <alpha-value>)',        // bleu profond
-        blueSoft: 'rgb(var(--c-blue-soft) / <alpha-value>)', // bleu clair (carte)
-        cendre: 'rgb(var(--c-cendre) / <alpha-value>)',      // gris-bleu cendré
-        or: 'rgb(var(--c-or) / <alpha-value>)',              // or doux — accent
-        noir: 'rgb(var(--c-noir) / <alpha-value>)',          // noir doux — texte
+        paper: 'rgb(var(--c-paper) / <alpha-value>)',        // papier chaud / carnet
+        paperRaw: 'rgb(var(--c-paper-raw) / <alpha-value>)', // papier brut
+        brume: 'rgb(var(--c-brume) / <alpha-value>)',        // fond secondaire (= papier brut)
+        white: 'rgb(var(--c-white) / <alpha-value>)',        // blanc cassé papier
+        encre: 'rgb(var(--c-encre) / <alpha-value>)',        // bleu nuit pictural
+        bluePigment: 'rgb(var(--c-blue-pigment) / <alpha-value>)', // outremer / Collioure
+        blueSoft: 'rgb(var(--c-blue-soft) / <alpha-value>)', // bleu clair aquatique
+        cendre: 'rgb(var(--c-cendre) / <alpha-value>)',      // bleu-gris cendre
+        or: 'rgb(var(--c-or) / <alpha-value>)',              // ocre-pigment
+        noir: 'rgb(var(--c-noir) / <alpha-value>)',          // noir encre
+        charcoal: 'rgb(var(--c-charcoal) / <alpha-value>)',  // charbon / masse
       },
       borderRadius: {
         // Rayon des cartes piloté par le thème (src/data/theme.ts).

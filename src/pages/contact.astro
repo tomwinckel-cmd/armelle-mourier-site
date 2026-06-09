@@ -28,12 +28,15 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
       <!-- COLONNE GAUCHE : invitation + e-mail direct -->
       <div class="reveal is-visible">
         <p class="eyebrow mb-3">Échanger</p>
-        <h1 class="text-h1 font-serif text-encre">Contact</h1>
+        <h1 class="text-h1 font-serif text-encre">Écrire à l’artiste</h1>
         <Trait class="mt-5 text-or" width="7rem" />
-        <p class="mt-7 max-w-prose leading-relaxed text-noir/85">
-          Une œuvre vous touche, vous souhaitez recevoir le catalogue, proposer une exposition
-          ou simplement échanger&nbsp;? Écrivez en quelques mots&nbsp;: Armelle vous répondra
-          personnellement.
+        <p class="mt-7 max-w-prose font-serif text-xl italic leading-snug text-encre">
+          Quelques mots suffisent. Armelle vous répond personnellement.
+        </p>
+        <p class="mt-5 max-w-prose leading-relaxed text-noir/85">
+          Une œuvre vous touche, vous aimeriez recevoir les informations, proposer une exposition,
+          une résidence, une commande spéciale ou parler presse&nbsp;? Cette adresse arrive
+          directement dans l’atelier.
         </p>
 
         <div class="mt-8">
@@ -66,7 +69,7 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
       <div class="reveal">
         <form
           id="contact-form"
-          class="rounded-card border border-cendre/25 bg-brume p-6 sm:p-8"
+          class="frame-gallery bg-brume p-6 sm:p-8"
           method="POST"
           novalidate
         >
@@ -79,19 +82,19 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
             <div class="sm:col-span-1">
               <label for="name" class="block text-sm font-semibold text-encre">Nom <span class="text-or">*</span></label>
               <input id="name" name="name" type="text" required autocomplete="name"
-                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none" />
+                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-or focus:outline-none" />
             </div>
             <div class="sm:col-span-1">
               <label for="email" class="block text-sm font-semibold text-encre">E-mail <span class="text-or">*</span></label>
               <input id="email" name="email" type="email" required autocomplete="email"
-                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none" />
+                class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-or focus:outline-none" />
             </div>
           </div>
 
           <div class="mt-5">
             <label for="subject" class="block text-sm font-semibold text-encre">Objet</label>
             <select id="subject" name="subject"
-              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none">
+              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-or focus:outline-none">
               {contact.subjects.map((s) => <option value={s}>{s}</option>)}
             </select>
           </div>
@@ -99,7 +102,7 @@ void FORM_ENDPOINT; // conservé comme repère éditable ; la valeur active est 
           <div class="mt-5">
             <label for="message" class="block text-sm font-semibold text-encre">Message <span class="text-or">*</span></label>
             <textarea id="message" name="message" rows="6" required
-              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-encre focus:outline-none"></textarea>
+              class="mt-2 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2.5 text-noir focus:border-or focus:outline-none"></textarea>
           </div>
 
           <p id="form-error" class="mt-4 text-sm text-or" hidden></p>
