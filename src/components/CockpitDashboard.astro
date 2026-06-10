@@ -846,66 +846,70 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
       <p class="mt-4 max-w-prose text-noir/80">
-        Composer une <strong>sélection d’œuvres</strong> à transmettre (collectionneur, galerie,
-        exposition, presse) sous forme de <strong>dossier clair, copiable, réutilisable</strong>.
-        <strong>Rien n’est sauvegardé, téléversé ni envoyé ici</strong>, et <strong>aucun PDF</strong>
-        n’est généré pour l’instant.
+        Trois étapes pour préparer un <strong>dossier clair et digne</strong> à envoyer
+        (collectionneur, galerie, exposition, presse), puis le <strong>copier</strong>.
+        <strong>Aucun PDF, aucun envoi, aucune sauvegarde</strong> : on prépare, un humain valide.
       </p>
 
-      <!-- Garde-fous images / prix / statuts -->
-      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
-        ⚠️ Garde-fous : <strong>images web compressées uniquement</strong> (jamais de HD complète),
-        <strong>statuts vérifiés</strong>, <strong>aucun prix inventé</strong> (« Prix sur demande »
-        si rien n’est validé), orthographe des titres relue, <strong>validation humaine avant envoi</strong>.
-      </p>
-
-      <!-- Types de catalogues -->
-      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {catalogTypes.map((t) => (
-          <article class="frame-gallery p-4">
-            <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
-            <p class="mt-1 text-sm text-noir/75">{t.description}</p>
-            <p class="mt-2 text-xs text-cendre">{t.fields.join(' · ')}</p>
-          </article>
-        ))}
+      <!-- Progression -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation</p>
+          <p class="text-sm text-cendre"><span id="c-count">0</span> œuvre(s) · <span id="c-level" class="text-encre">Brouillon</span></p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="c-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <ul id="c-badges" class="mt-4 flex flex-wrap gap-2">
+          {catalogBadges.map((b) => (
+            <li data-cbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
       </div>
 
-      <!-- Préparer le dossier -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Composer le dossier</h3>
-      <form id="c-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
-        <label class="text-sm">Type de dossier
-          <select id="c-type" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
-            {catalogTypes.map((t) => <option value={t.label}>{t.label}</option>)}
-          </select>
-        </label>
-        <label class="text-sm">Destinataire
-          <input id="c-dest" type="text" placeholder="Nom du collectionneur / de la galerie" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
-        <label class="text-sm">Contexte
-          <input id="c-context" type="text" placeholder="rencontre, salon, demande…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
-        <label class="text-sm">Date
-          <input id="c-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
-        <label class="text-sm sm:col-span-2">Message d’introduction
-          <textarea id="c-intro" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
-        </label>
-        <label class="text-sm sm:col-span-2">Conditions
-          <textarea id="c-conditions" rows="4" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">- Acquisition en lien direct avec l’artiste.
+      <form id="c-form" class="mt-6 grid max-w-3xl gap-6" onsubmit="return false">
+        <!-- ÉTAPE 1 — Choisir le type de dossier -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">1 · Choisir le type de dossier</legend>
+          <p class="mt-1 text-sm text-cendre">Collectionneur · Galerie · Exposition · Presse · Œuvres disponibles.</p>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="text-sm">Type de dossier
+              <select id="c-type" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                {catalogTypes.map((t) => <option value={t.label}>{t.label}</option>)}
+              </select>
+            </label>
+            <label class="text-sm">Destinataire
+              <input id="c-dest" type="text" placeholder="Nom du collectionneur / de la galerie" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Contexte
+              <input id="c-context" type="text" placeholder="rencontre, salon, demande…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Date
+              <input id="c-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm sm:col-span-2">Message d’introduction
+              <textarea id="c-intro" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+            </label>
+            <label class="text-sm sm:col-span-2">Conditions
+              <textarea id="c-conditions" rows="4" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">- Acquisition en lien direct avec l’artiste.
 - Prix sur demande sauf information validée.
 - Images web compressées uniquement.
 - Validation humaine avant envoi.</textarea>
-        </label>
-        <label class="text-sm">Contact (e-mail)
-          <input id="c-email" type="text" placeholder="e-mail public de l’artiste" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
-        <label class="text-sm sm:col-span-2">Notes <span class="text-cendre">(optionnel)</span>
-          <input id="c-notes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
-        </label>
+            </label>
+            <label class="text-sm">Contact (e-mail)
+              <input id="c-email" type="text" placeholder="e-mail public de l’artiste" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Notes <span class="text-cendre">(optionnel)</span>
+              <input id="c-notes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+          </div>
+        </fieldset>
 
-        <fieldset class="sm:col-span-2 mt-1">
-          <legend class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Œuvres sélectionnées</legend>
-          <div class="mt-3 grid gap-2 sm:grid-cols-2">
+        <!-- ÉTAPE 2 — Sélectionner les œuvres -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">2 · Sélectionner les œuvres</legend>
+          <p class="mt-1 text-sm text-cendre">Cocher les œuvres. Vérifier : statut · image web · dimensions · technique.</p>
+          <div class="mt-4 grid gap-2 sm:grid-cols-2">
             {artworks.map((a) => (
               <label class="flex items-start gap-2 text-sm">
                 <input
@@ -924,35 +928,27 @@ const statusChipClass: Record<ArtworkStatus, string> = {
             ))}
           </div>
         </fieldset>
+
+        <!-- ÉTAPE 3 — Copier le dossier -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">3 · Copier le dossier</legend>
+          <p class="mt-1 text-sm text-cendre">On relit, on coche, on copie. L’envoi se fait <strong>à la main</strong>.</p>
+          <p class="mt-4 text-eyebrow uppercase tracking-[0.16em] text-cendre">Avant d’envoyer</p>
+          <ul class="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+            {catalogChecklist.map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+          <div class="mt-3 space-y-2 text-sm">
+            <label class="flex items-center gap-2"><input id="c-statusok" type="checkbox" /> Statuts vérifiés (vendue ≠ disponible)</label>
+            <label class="flex items-center gap-2"><input id="c-imgok" type="checkbox" /> Images web prêtes (pas de HD complète)</label>
+            <label class="flex items-center gap-2 font-semibold text-encre"><input id="c-human" type="checkbox" /> Validation humaine faite — à valider avant envoi</label>
+          </div>
+        </fieldset>
       </form>
 
-      <!-- Gamification douce -->
-      <div class="mt-6 frame-gallery p-5">
-        <div class="flex flex-wrap items-baseline justify-between gap-3">
-          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation du catalogue</p>
-          <p id="c-level" class="font-serif italic text-encre">Brouillon</p>
-        </div>
-        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
-          <div id="c-bar" class="h-full bg-or transition-all" style="width:0%"></div>
-        </div>
-        <p class="mt-2 text-sm text-cendre"><span id="c-count">0</span> œuvre(s) sélectionnée(s) — indicatif.</p>
-        <ul id="c-badges" class="mt-4 flex flex-wrap gap-2">
-          {catalogBadges.map((b) => (
-            <li data-cbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
-          ))}
-        </ul>
-      </div>
-
-      <!-- Checklist de préparation -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Checklist de préparation</h3>
-      <ul class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
-        {catalogChecklist.map((item) => (
-          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
-        ))}
-      </ul>
-
-      <!-- Message d'envoi -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Message d’envoi</h3>
+      <!-- Message d'accompagnement -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Message d’accompagnement</h3>
       <label class="mt-3 block max-w-md text-sm">Modèle de message
         <select id="c-msg" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
           {catalogMessages.map((m) => <option value={m.id} data-body={m.body}>{m.label}</option>)}
@@ -962,18 +958,18 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       <button type="button" class="btn btn-ghost mt-3" data-cmsg-copy>Copier le message</button>
 
       <!-- Liste d'œuvres sélectionnées -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Liste d’œuvres sélectionnées</h3>
+      <h3 class="mt-8 text-h3 font-serif text-encre">Liste d’œuvres sélectionnées</h3>
       <pre id="c-list" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
-      <button type="button" class="btn btn-ghost mt-3" data-list-copy>Copier la liste d’œuvres</button>
+      <button type="button" class="btn btn-ghost mt-3" data-list-copy>Copier la liste</button>
 
-      <!-- Dossier collectionneur -->
-      <h3 class="mt-10 text-h3 font-serif text-encre">Dossier collectionneur</h3>
+      <!-- Dossier à envoyer (brouillon) -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Dossier à envoyer</h3>
       <pre id="c-dossier" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
       <button type="button" class="btn btn-primary mt-3" data-dossier-copy>Copier le dossier</button>
 
       <p class="mt-6 max-w-prose text-sm italic text-or">
-        Brouillon à <strong>vérifier humainement</strong> avant envoi. Pas de PDF, pas d’envoi,
-        pas de sauvegarde. <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+        Brouillon à <strong>valider avant envoi</strong>. Pas de PDF, pas d’envoi, pas de sauvegarde.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
       </p>
       </details>
     </section>
@@ -1604,9 +1600,9 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       }
       function buildDossier() {
         return [
-          'DOSSIER COLLECTIONNEUR — BROUILLON',
+          'DOSSIER À ENVOYER — BROUILLON',
           '',
-          'Type : ' + v('c-type'),
+          'Type de dossier : ' + v('c-type'),
           'Destinataire : ' + v('c-dest'),
           'Contexte : ' + v('c-context'),
           'Date : ' + v('c-date'),
@@ -1617,13 +1613,12 @@ const statusChipClass: Record<ArtworkStatus, string> = {
           '',
           'Conditions :',
           (v('c-conditions') || '- Acquisition en lien direct avec l’artiste.'),
+          'Images : versions web uniquement',
+          (v('c-notes') ? 'Notes : ' + v('c-notes') : ''),
           '',
-          'Notes : ' + v('c-notes'),
-          'Contact :',
-          'Email : ' + v('c-email'),
-          '',
+          'Contact : ' + v('c-email'),
           'Validation humaine : à vérifier avant envoi',
-        ].join('\n');
+        ].filter(function (l) { return l !== null; }).join('\n');
       }
       function buildMessage() {
         var sel = document.getElementById('c-msg');
@@ -1632,19 +1627,21 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         var dest = v('c-dest') || '…';
         return body.split('{destinataire}').join(dest);
       }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
       function update() {
         var count = selected().length;
         var cc = document.getElementById('c-count'); if (cc) cc.textContent = String(count);
+        var ready = !!(count >= 1 && v('c-dest') && c('c-human'));
         var pct = Math.min(100, count * 20);
         var bar = document.getElementById('c-bar'); if (bar) bar.style.width = pct + '%';
         var lvl = document.getElementById('c-level');
-        if (lvl) lvl.textContent = (count >= 3 ? 'Prêt à valider' : (count >= 1 ? 'En cours' : 'Brouillon'));
+        if (lvl) lvl.textContent = (ready ? 'Prêt à valider' : (count >= 1 ? 'En cours' : 'Brouillon'));
         var got = {
           selection: count >= 1,
-          status: count >= 1,
-          images: !!v('c-conditions'),
+          status: c('c-statusok'),
+          images: c('c-imgok'),
           message: !!v('c-intro'),
-          ready: !!(count >= 1 && v('c-dest') && v('c-email') && v('c-intro')),
+          ready: ready,
         };
         document.querySelectorAll('[data-cbadge]').forEach(function (el) {
           var on = got[el.getAttribute('data-cbadge')];

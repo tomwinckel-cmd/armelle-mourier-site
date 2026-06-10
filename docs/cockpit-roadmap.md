@@ -221,27 +221,30 @@ remise/livraison → preuve de remise → archivage**.
   côté navigateur, rien n’est enregistré.
 - **Validation humaine obligatoire** : Armelle décide · Tom valide · Claude Code exécute.
 
-## Module « Catalogue / dossier collectionneur » (prototype)
+## Module « Préparer un catalogue » (prototype, mini-assistant 3 étapes)
 
-Section « **Préparer un catalogue** » dans `/cockpit-roadmap` (modèle :
-`src/data/catalogWorkflow.ts`) pour composer une **sélection d’œuvres à transmettre**.
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/catalogWorkflow.ts`)
+pour préparer un **dossier clair et digne** à envoyer.
 
-- **Types de dossier** : sélection collectionneur · dossier galerie · dossier
-  exposition · dossier presse · catalogue des œuvres disponibles.
-- **Fonctionnement** : choisir un type, renseigner destinataire / contexte / date /
-  message d’introduction / conditions / contact, **cocher les œuvres** → blocs
-  copiables **« DOSSIER COLLECTIONNEUR — BROUILLON »** et **« Liste d’œuvres
-  sélectionnées »** (titre, série, dimensions, technique, statut, **prix**, lien
-  fiche, notes) + **modèles de message d’envoi** (collectionneur, galerie,
-  exposition, réponse à une demande, relance douce). Calcul **côté client**.
-- **Garde-fous** : **images web compressées uniquement** (jamais de HD complète),
-  **statuts vérifiés**, **aucun prix inventé** (« Prix sur demande » si non validé),
-  orthographe des titres relue, **validation humaine avant envoi**.
-- **Gamification douce** (sobre) : badges Sélection claire · Statuts vérifiés ·
-  Images prêtes · Message préparé · Catalogue prêt à valider.
-- **Limites volontaires** : **aucun PDF généré** pour l’instant (le **PDF reste une
-  étape future**), aucun bouton « Envoyer », **aucune sauvegarde, aucun upload,
-  aucun service externe**. Le dossier est un **brouillon à vérifier humainement**.
+- **Étape 1 — Choisir le type de dossier** : Collectionneur · Galerie · Exposition ·
+  Presse · Œuvres disponibles ; + destinataire / contexte / date / message
+  d’introduction / conditions / contact.
+- **Étape 2 — Sélectionner les œuvres** : **cocher** les œuvres existantes ; rappel
+  de vérifier **statut · image web · dimensions · technique**.
+- **Étape 3 — Copier le dossier** : checklist « Avant d’envoyer » + blocs copiables
+  **« DOSSIER À ENVOYER — BROUILLON »**, **« Liste d’œuvres sélectionnées »**
+  (titre, série, dimensions, technique, statut, **prix**, lien fiche) et **message
+  d’accompagnement** (collectionneur, galerie, exposition, réponse, relance douce).
+- **Garde-fous** : **images web uniquement** (jamais la HD complète), **statuts
+  vérifiés** (une œuvre **vendue** n’est pas présentée comme disponible), **aucun
+  prix inventé** (« Prix sur demande »), titres relus, **validation humaine avant
+  envoi**. Badges : Sélection claire · Statuts vérifiés · Images prêtes · Message
+  prêt · Catalogue prêt à valider.
+- **Limites volontaires** : **aucun PDF réel** pour l’instant, **aucun bouton
+  « Envoyer »**, **aucune sauvegarde, aucun upload, aucun service externe**. Boutons
+  **Copier le dossier / Copier la liste / Copier le message** uniquement.
+- 🔮 **Futur possible** (hors scope) : **export PDF** du dossier — seulement si
+  bénéfice net, jamais d’API ni de secret.
 
 ## Tableau de bord interne (`/cockpit-roadmap`)
 
