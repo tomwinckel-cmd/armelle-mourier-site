@@ -290,6 +290,35 @@ Hashtags prêts · Image web prête · Statut vérifié · Publication prête à
 - 🔮 **Futur possible** (hors scope) : **export d'image sociale** « prête à poster »
   et **calendrier éditorial** — seulement si bénéfice net, jamais d'API ni de secret.
 
+## Module « Répondre à une demande » (prototype, mini-assistant 3 étapes)
+
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/transactionWorkflow.ts`)
+pour préparer une réponse **claire, humaine et vérifiée** à une demande entrante,
+puis l'**envoyer à la main**.
+
+- **Étape 1 — Identifier la demande** : type (information œuvre · réservation ·
+  catalogue · exposition/résidence · presse · commande spéciale · autre) + contact,
+  e-mail (à copier à la main), œuvre concernée, contexte, priorité.
+- **Étape 2 — Préparer la réponse** : **réponse proposée** (modèle pré-rempli,
+  ajustable), informations à vérifier, **pièces à joindre** (fiche œuvre · catalogue ·
+  photos web · conditions · disponibilité).
+- **Étape 3 — Copier & suivre** : checklist « Avant de répondre » + **statut manuel**
+  (à répondre · répondu · en attente · à relancer · réservé · clôturé) + prochaine
+  action + bloc copiable **« RÉPONSE À UNE DEMANDE — BROUILLON »**.
+
+- **Modèles de réponse** (ton humain, professionnel, sans pression, sobre, chaleureux) :
+  information œuvre · réservation · envoi catalogue · proposition exposition/résidence ·
+  presse · commande spéciale · relance douce.
+- **Garde-fous** : nom du contact correct · œuvre **bien disponible** si réservation ·
+  **aucun prix inventé** · images **web** uniquement · message relu · pièces vérifiées ·
+  statut noté · **validation humaine avant envoi**. Badges : Demande identifiée ·
+  Réponse prête · Pièces vérifiées · Statut noté · Suivi prévu.
+- **Limites volontaires** : **aucun envoi e-mail automatique**, **aucun CRM réel**,
+  aucun bouton « Envoyer », **aucune sauvegarde, aucun service externe**. Boutons
+  **Copier la réponse / Copier le brouillon** uniquement ; **suivi manuel**.
+- 🔮 **Futur possible** (hors scope) : **boîte de demandes / CRM léger** — seulement
+  si bénéfice net, jamais d'API ni de secret.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.

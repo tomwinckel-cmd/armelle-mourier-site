@@ -190,3 +190,110 @@ export const transactionBadges = [
   { id: 'delivery', label: 'Remise sécurisée' },
   { id: 'archive', label: 'Archive prévue' },
 ];
+
+// =====================================================================
+//  RÉPONDRE À UNE DEMANDE — mini-assistant (prototype, copier-coller)
+//  ---------------------------------------------------------------------
+//  Préparer une réponse claire, humaine et vérifiée à une demande entrante,
+//  puis l'envoyer À LA MAIN. Aucun envoi automatique, aucune sauvegarde,
+//  aucun CRM réel. Ton : humain, professionnel, sans pression, sobre,
+//  chaleureux. Placeholders {contact}/{oeuvre} remplacés côté client.
+// =====================================================================
+export type RequestType = { id: string; label: string };
+
+export const requestTypes: RequestType[] = [
+  { id: 'info', label: 'Information sur une œuvre' },
+  { id: 'reservation', label: 'Réservation' },
+  { id: 'catalogue', label: 'Catalogue' },
+  { id: 'exhibition', label: 'Exposition / résidence' },
+  { id: 'press', label: 'Presse' },
+  { id: 'commission', label: 'Commande spéciale' },
+  { id: 'other', label: 'Autre' },
+];
+
+export type RequestResponse = { id: string; label: string; body: string };
+
+export const requestResponses: RequestResponse[] = [
+  {
+    id: 'info',
+    label: 'Information sur une œuvre',
+    body:
+      'Bonjour {contact},\n\n' +
+      'Merci pour votre message et pour l’intérêt porté à « {oeuvre} ». Je vous transmets ' +
+      'volontiers ses informations (dimensions, technique, disponibilité). L’acquisition se ' +
+      'fait en lien direct avec moi — prix sur demande.\n\n' +
+      'Dites-moi ce qui vous guiderait le mieux.\n\nBien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'reservation',
+    label: 'Réservation',
+    body:
+      'Bonjour {contact},\n\n' +
+      'Avec plaisir : je peux réserver « {oeuvre} » pour vous, le temps que nous précisions ' +
+      'ensemble les détails (remise ou livraison, modalités). Je vous confirme la réservation ' +
+      'dès votre accord.\n\nBien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'catalogue',
+    label: 'Envoi catalogue',
+    body:
+      'Bonjour {contact},\n\n' +
+      'Merci pour votre intérêt. Je vous adresse une sélection d’œuvres et leurs informations. ' +
+      'Dites-moi ce qui retient votre regard : je vous donnerai volontiers tous les détails.\n\n' +
+      'Bien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'exhibition',
+    label: 'Proposition exposition / résidence',
+    body:
+      'Bonjour,\n\n' +
+      'Merci pour votre proposition. Je serais ravie d’échanger autour d’une exposition ou d’une ' +
+      'résidence — mon travail mêle la peinture, et parfois la poésie et la danse. Précisons ' +
+      'ensemble le lieu, les dates et le cadre.\n\nBien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'press',
+    label: 'Presse',
+    body:
+      'Bonjour,\n\n' +
+      'Merci pour votre intérêt. Je vous transmets volontiers des visuels web, une biographie ' +
+      'courte et quelques éléments de démarche. Dites-moi l’angle et vos délais.\n\n' +
+      'Bien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'commission',
+    label: 'Commande spéciale',
+    body:
+      'Bonjour {contact},\n\n' +
+      'Merci pour votre confiance. Une commande se construit dans l’échange : format, couleurs, ' +
+      'intention, délai. Parlons-en pour voir ensemble ce qui est possible, sans engagement.\n\n' +
+      'Bien à vous,\nArmelle Mourier',
+  },
+  {
+    id: 'follow-up',
+    label: 'Relance douce',
+    body:
+      'Bonjour {contact},\n\n' +
+      'Un petit mot, sans aucune pression, pour savoir si ma précédente réponse vous convient ou ' +
+      'si vous avez des questions. Je reste à votre disposition.\n\nBien à vous,\nArmelle Mourier',
+  },
+];
+
+/** Statuts de suivi MANUEL (aucun CRM, aucune sauvegarde). */
+export const requestStatuses = [
+  'à répondre',
+  'répondu',
+  'en attente',
+  'à relancer',
+  'réservé',
+  'clôturé',
+];
+
+/** Badges (gamification douce). */
+export const requestBadges = [
+  { id: 'identified', label: 'Demande identifiée' },
+  { id: 'response', label: 'Réponse prête' },
+  { id: 'pieces', label: 'Pièces vérifiées' },
+  { id: 'status', label: 'Statut noté' },
+  { id: 'followup', label: 'Suivi prévu' },
+];

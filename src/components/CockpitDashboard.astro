@@ -9,7 +9,7 @@ import { operations, operationsPrinciple, operationActivation, type OperationSta
 import { addArtworkSteps } from '../data/artworkWorkflow';
 import { designModes } from '../data/theme';
 import { artworkProof, webPublicationTips, protectionChecklist, proofBadges } from '../data/proof';
-import { transactionWorkflow, invoiceChecklist, deliveryChecklist, messageTemplates, transactionBadges } from '../data/transactionWorkflow';
+import { transactionWorkflow, invoiceChecklist, deliveryChecklist, messageTemplates, transactionBadges, requestTypes, requestResponses, requestStatuses, requestBadges } from '../data/transactionWorkflow';
 import { catalogTypes, catalogChecklist, catalogMessages, catalogBadges } from '../data/catalogWorkflow';
 
 // ---- Données (lecture seule) ----
@@ -53,6 +53,7 @@ const dashboardNav = [
   { id: 'social', label: 'Réseaux' },
   { id: 'catalog', label: 'Catalogue' },
   { id: 'disponibilites', label: 'Vente douce' },
+  { id: 'respond', label: 'Répondre' },
   { id: 'transaction', label: 'Facture · remise' },
   { id: 'ambiance', label: 'Ambiance' },
   { id: 'etapes', label: 'Roadmap' },
@@ -65,7 +66,7 @@ const quickActions: { href: string; label: string; hint: string; state: ActionSt
   { href: '#intake', label: 'Vérifier une œuvre avant publication', hint: 'Garde-fou récapitulatif', state: 'active' },
   { href: '#social', label: 'Préparer une publication Instagram', hint: 'Légende à copier-coller', state: 'active' },
   { href: '#catalog', label: 'Préparer un catalogue', hint: 'Dossier collectionneur', state: 'active' },
-  { href: '#transaction', label: 'Répondre à une demande', hint: 'Message client + réservation', state: 'active' },
+  { href: '#respond', label: 'Répondre à une demande', hint: 'Réponse claire à copier', state: 'active' },
   { href: '#transaction', label: 'Préparer facture & remise', hint: 'Brouillon + logistique', state: 'active' },
   { href: '#proof', label: 'Protéger une œuvre', hint: 'Fiche + preuve de création', state: 'active' },
   { href: '#ambiance', label: 'Ajuster l’ambiance visuelle', hint: 'Couleurs & ambiances', state: 'prepared' },
@@ -633,6 +634,136 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         Organiser ne protège pas à soi seul. Pour une œuvre importante : envisager une preuve
         datée (e-Soleau / autre) et, en cas d’enjeu réel, consulter un professionnel.
         <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+      </details>
+    </section>
+
+    <!-- RÉPONDRE À UNE DEMANDE (prototype, copier-coller, AUCUN envoi auto) -->
+    <section id="respond" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Répondre à une demande</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Trois étapes pour préparer une réponse <strong>claire, humaine et vérifiée</strong>, puis
+        l’envoyer <strong>à la main</strong>. <strong>Aucun envoi automatique, aucune sauvegarde,
+        aucun CRM</strong> : on prépare, un humain valide.
+      </p>
+
+      <!-- Progression -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation</p>
+          <p id="r-level" class="font-serif italic text-encre">À préparer</p>
+        </div>
+        <ul id="r-badges" class="mt-3 flex flex-wrap gap-2">
+          {requestBadges.map((b) => (
+            <li data-rbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <form id="r-form" class="mt-6 grid max-w-3xl gap-6" onsubmit="return false">
+        <!-- ÉTAPE 1 — Identifier la demande -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">1 · Identifier la demande</legend>
+          <p class="mt-1 text-sm text-cendre">Le type pré-remplit une réponse adaptée.</p>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="text-sm">Type de demande
+              <select id="r-type" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                {requestTypes.map((t) => {
+                  const tpl = requestResponses.find((r) => r.id === t.id);
+                  return <option value={t.id} data-body={tpl ? tpl.body : ''}>{t.label}</option>;
+                })}
+              </select>
+            </label>
+            <label class="text-sm">Priorité
+              <select id="r-priority" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="normale">Normale</option>
+                <option value="haute">Haute</option>
+                <option value="basse">Basse</option>
+              </select>
+            </label>
+            <label class="text-sm">Prénom / nom du contact
+              <input id="r-contact" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">E-mail du contact <span class="text-cendre">(à copier à la main)</span>
+              <input id="r-email" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Œuvre concernée <span class="text-cendre">(si applicable)</span>
+              <input id="r-oeuvre" type="text" placeholder="Renaissance…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Contexte
+              <input id="r-context" type="text" placeholder="salon, recommandation, message Instagram…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- ÉTAPE 2 — Préparer la réponse -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">2 · Préparer la réponse</legend>
+          <label class="mt-4 block text-sm">Réponse proposée <span class="text-cendre">(à ajuster · ton humain et sobre)</span>
+            <textarea id="r-response" rows="6" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+          </label>
+          <label class="mt-3 block text-sm">Informations à vérifier <span class="text-cendre">(disponibilité, dimensions…)</span>
+            <input id="r-verify" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+          </label>
+          <p class="mt-4 text-eyebrow uppercase tracking-[0.16em] text-cendre">Pièces à joindre (éventuelles)</p>
+          <div class="mt-2 grid gap-2 text-sm sm:grid-cols-2">
+            <label class="flex items-center gap-2"><input id="r-pc-fiche" type="checkbox" /> Fiche œuvre</label>
+            <label class="flex items-center gap-2"><input id="r-pc-catalogue" type="checkbox" /> Catalogue</label>
+            <label class="flex items-center gap-2"><input id="r-pc-photos" type="checkbox" /> Photos web</label>
+            <label class="flex items-center gap-2"><input id="r-pc-conditions" type="checkbox" /> Conditions</label>
+            <label class="flex items-center gap-2"><input id="r-pc-dispo" type="checkbox" /> Disponibilité</label>
+          </div>
+          <button type="button" class="btn btn-ghost mt-4" data-r-response-copy>Copier la réponse</button>
+        </fieldset>
+
+        <!-- ÉTAPE 3 — Copier & suivre -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">3 · Copier &amp; suivre</legend>
+          <p class="mt-1 text-sm text-cendre">On relit, on coche, on copie. L’envoi se fait <strong>à la main</strong>.</p>
+          <p class="mt-4 text-eyebrow uppercase tracking-[0.16em] text-cendre">Avant de répondre</p>
+          <ul class="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+            {[
+              'Le nom du contact est correct.',
+              'L’œuvre est bien disponible (si réservation).',
+              'Aucun prix inventé.',
+              'Les images envoyées sont des versions web.',
+              'Le message est relu.',
+              'Les pièces jointes sont vérifiées.',
+            ].map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="text-sm">Statut manuel
+              <select id="r-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                {requestStatuses.map((s) => <option value={s}>{s}</option>)}
+              </select>
+            </label>
+            <label class="text-sm">Prochaine action <span class="text-cendre">(à suivre à la main)</span>
+              <input id="r-next" type="text" placeholder="relancer dans 7 jours…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+          </div>
+          <label class="mt-3 flex items-center gap-2 text-sm font-semibold text-encre">
+            <input id="r-human" type="checkbox" /> Validation humaine faite — à envoyer manuellement
+          </label>
+        </fieldset>
+      </form>
+
+      <!-- Réponse à une demande (brouillon) -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Réponse à une demande</h3>
+      <pre id="r-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-r-recap-copy>Copier le brouillon</button>
+        <button type="button" class="btn btn-ghost" data-r-response-copy>Copier la réponse</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        À envoyer manuellement · à suivre humainement. Aucun envoi automatique, aucune sauvegarde :
+        Armelle décide · Tom valide.
       </p>
       </details>
     </section>
@@ -1723,5 +1854,78 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       document.querySelectorAll('[data-sp-caption-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(caption(), b); }); });
       document.querySelectorAll('[data-sp-hashtags-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(hashtags(), b); }); });
       var rc = document.querySelector('[data-sp-recap-copy]'); if (rc) rc.addEventListener('click', function () { copyText(buildRecap(), rc); });
+    })();
+
+    // --- Répondre à une demande (copier-coller, AUCUN envoi auto, AUCUN CRM) ---
+    (function () {
+      var form = document.getElementById('r-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      var typeSel = document.getElementById('r-type');
+      var typeLabel = {};
+      if (typeSel) { Array.prototype.forEach.call(typeSel.options, function (o) { typeLabel[o.value] = o.textContent; }); }
+
+      // Pré-remplir la réponse depuis le type (placeholders {contact}/{oeuvre}).
+      function fill(body) {
+        return body
+          .split('{contact}').join(v('r-contact') || '…')
+          .split('{oeuvre}').join(v('r-oeuvre') || '…');
+      }
+      function applyType() {
+        if (!typeSel) return;
+        var opt = typeSel.options[typeSel.selectedIndex];
+        var resp = document.getElementById('r-response');
+        if (opt && resp && !resp.value.trim()) resp.value = fill(opt.getAttribute('data-body') || '');
+        update();
+      }
+      function response() { return v('r-response'); }
+      function pieces() {
+        var out = [];
+        if (c('r-pc-fiche')) out.push('fiche œuvre');
+        if (c('r-pc-catalogue')) out.push('catalogue');
+        if (c('r-pc-photos')) out.push('photos web');
+        if (c('r-pc-conditions')) out.push('conditions');
+        if (c('r-pc-dispo')) out.push('disponibilité');
+        return out.join(', ') || 'aucune';
+      }
+      function buildRecap() {
+        return [
+          'RÉPONSE À UNE DEMANDE — BROUILLON',
+          '',
+          'Type de demande : ' + (typeSel ? (typeLabel[typeSel.value] || typeSel.value) : ''),
+          'Contact : ' + v('r-contact') + (v('r-email') ? ' · ' + v('r-email') : ''),
+          'Œuvre concernée : ' + v('r-oeuvre'),
+          'Contexte : ' + v('r-context'),
+          'Réponse proposée : ' + response(),
+          'Informations à vérifier : ' + v('r-verify'),
+          'Pièces à joindre : ' + pieces(),
+          'Statut manuel : ' + (v('r-status') || 'à répondre'),
+          'Prochaine action : ' + v('r-next'),
+          'Validation humaine : à vérifier avant envoi',
+        ].join('\n');
+      }
+      function update() {
+        var got = {
+          identified: !!(v('r-contact') && typeSel && typeSel.value),
+          response: !!response(),
+          pieces: !!(c('r-pc-fiche') || c('r-pc-catalogue') || c('r-pc-photos') || c('r-pc-conditions') || c('r-pc-dispo')),
+          status: !!v('r-status'),
+          followup: !!v('r-next'),
+        };
+        document.querySelectorAll('[data-rbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-rbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var lvl = document.getElementById('r-level');
+        var ready = !!(got.identified && got.response && c('r-human'));
+        if (lvl) lvl.textContent = ready ? 'Prête à envoyer' : (got.response ? 'Presque prête' : 'À préparer');
+        var rec = document.getElementById('r-recap'); if (rec) rec.textContent = buildRecap();
+      }
+      if (typeSel) typeSel.addEventListener('change', applyType);
+      form.addEventListener('input', update);
+      applyType();
+      document.querySelectorAll('[data-r-response-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(response(), b); }); });
+      var rrc = document.querySelector('[data-r-recap-copy]'); if (rrc) rrc.addEventListener('click', function () { copyText(buildRecap(), rrc); });
     })();
   </script>
