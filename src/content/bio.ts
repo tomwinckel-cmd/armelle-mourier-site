@@ -62,10 +62,30 @@ export const bio = {
     'Les couleurs emportent tout et ne laissent que le plaisir de peindre.',
     'Rien ne se perd, tout devient une boucle d’oreille, un collier, une histoire.',
   ],
+  // Repères factuels — strictement issus du récit ci-dessus, sans rien ajouter.
+  repere: {
+    title: 'Repères',
+    items: [
+      { label: 'Lieux', value: 'Collioure · Bourgogne · Dijon' },
+      { label: 'Études', value: 'Deux Masters (anglais, FLE) · histoire de l’art' },
+      { label: 'Tournant', value: 'Découverte des pigments, été 2021' },
+      { label: 'Association', value: 'ArtDi — fondée et présidée (2024)' },
+      { label: 'Livre', value: 'Bleu Cendres — recueil illustré (2024)' },
+    ],
+  },
 };
 
 export const demarche = {
   lead: 'Une peinture née d’une nécessité : poser la couleur et la matière comme on pose le souffle. Voici les fils qui traversent son travail.',
+  // Matières & gestes — issus de la bio (« La matière »), sans rien inventer.
+  materials: {
+    title: 'Matières & gestes',
+    note: 'À l’acrylique le plus souvent, sur toile recyclée — achetée ou créée.',
+    tools: ['Pinceaux', 'Couteaux', 'Rouleau', 'Bombe', 'Pastels', 'Pigments', 'Teintures'],
+  },
+  // Clôture : les fils se rejoignent dans Bleu Cendres (déjà présent dans les axes).
+  closing:
+    'Ces fils se rejoignent dans les toiles — et dans le recueil Bleu Cendres, où la peinture dialogue avec les mots.',
   axes: [
     {
       title: 'La couleur d’abord',

@@ -45,6 +45,21 @@ const personLd = {
     </div>
   </section>
 
+  <!-- REPÈRES (faits, pour ancrer le récit) -->
+  <section class="shell pb-section">
+    <div class="reveal frame-gallery p-6 sm:p-8">
+      <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{bio.repere.title}</p>
+      <dl class="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+        {bio.repere.items.map((r) => (
+          <div class="border-l-2 border-or/40 pl-4">
+            <dt class="text-eyebrow uppercase tracking-[0.14em] text-cendre">{r.label}</dt>
+            <dd class="mt-1 font-serif text-lg italic text-encre">{r.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
   <!-- RÉCIT -->
   <section class="bg-brume py-section">
     <div class="shell">
@@ -54,7 +69,7 @@ const personLd = {
             <h2 class="text-h3 font-serif text-encre">{s.heading}</h2>
             <Trait class="mt-3 text-cendre/60" width="3.5rem" />
             {s.paragraphs.map((p) => (
-              <p class="mt-4 leading-relaxed text-noir/85">{p}</p>
+              <p class="mt-4 text-lg leading-relaxed text-noir/85">{p}</p>
             ))}
             {i === 3 && bio.quotes[0] && (
               <blockquote class="mt-7 border-l-2 border-or pl-5 font-serif text-xl italic text-encre">
@@ -78,6 +93,7 @@ const personLd = {
     <div class="mt-10 flex flex-wrap justify-center gap-3">
       <a href="/oeuvres" class="btn-primary">Découvrir les œuvres</a>
       <a href="/demarche" class="btn-ghost">Lire la démarche</a>
+      <a href="/expositions" class="btn-ghost">Voir les expositions</a>
       <a href="/contact" class="btn-ghost">Contacter l’artiste</a>
     </div>
   </section>
