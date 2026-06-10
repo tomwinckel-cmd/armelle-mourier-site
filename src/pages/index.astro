@@ -1,18 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import SectionTitle from '../components/SectionTitle.astro';
-import ArtworkGrid from '../components/ArtworkGrid.astro';
 import ArtworkPlaceholder from '../components/ArtworkPlaceholder.astro';
 import Trait from '../components/Trait.astro';
 import { site } from '../data/site';
 import { theme } from '../data/theme';
 import { pages } from '../content/pages';
+import { bleuCendres } from '../content/bio';
 import { featuredArtworks, availableArtworks } from '../data/artworks';
 import { splitExhibitions } from '../data/exhibitions';
 
 const { upcoming, past } = splitExhibitions();
 const featured = featuredArtworks.length ? featuredArtworks.slice(0, 3) : availableArtworks.slice(0, 3);
 const recent = [...upcoming, ...past].slice(0, 3);
+
+// Faits factuels de Bleu Cendres (sans prix sur la home).
+const bleuFacts = bleuCendres.facts.filter((f) =>
+  ['Parution', 'Éditions', 'Poèmes'].includes(f.label),
+);
 
 const visualArtistLd = {
   '@context': 'https://schema.org',
@@ -31,10 +35,20 @@ const visualArtistLd = {
 ---
 <Base
   title={`${site.artistName} — ${site.role}`}
-  description={`${site.manifesto} ${site.baseline}`}
-  keywords={['Armelle Mourier', 'artiste peintre Dijon', 'tableaux disponibles', 'peinture contemporaine']}
+  description={`${site.artistName}, ${site.role.toLowerCase()} à ${site.city} (${site.region}). ${site.manifesto} Œuvres originales, séries Bleu Cendres, tableaux disponibles — entre la lumière de Collioure et la terre de Bourgogne.`}
+  keywords={[
+    'Armelle Mourier',
+    'artiste peintre',
+    'artiste plasticienne',
+    'peinture Bourgogne',
+    'artiste Collioure',
+    'œuvres originales',
+    'tableaux disponibles',
+    'Bleu Cendres',
+  ]}
   jsonld={visualArtistLd}
 >
+  <!-- A — HERO -->
   <section class="shell grid items-center gap-12 pb-section pt-10 sm:pt-16 lg:min-h-[84vh] lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
     <div class="reveal is-visible">
       <p class="eyebrow mb-5">{theme.hero.eyebrow}</p>
@@ -43,17 +57,15 @@ const visualArtistLd = {
       <p class="mt-3 text-sm uppercase tracking-[0.18em] text-cendre">Atelier · {site.city}, {site.region}</p>
       <p class="mt-8 max-w-prose font-serif text-2xl italic leading-snug text-encre sm:text-3xl">{site.manifesto}</p>
       <p class="mt-5 max-w-prose leading-relaxed text-noir/75">{theme.hero.lead}</p>
-      {/* Entrées comme un index de carnet, pas une rangée de boutons marketing. */}
-      <ul class="mt-10 flex flex-col items-start gap-4">
+      <ul class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <li><a href="/oeuvres" class="btn btn-primary">Découvrir les œuvres</a></li>
-        <li><a href="/disponibles" class="btn btn-ghost">Voir les tableaux disponibles</a></li>
+        <li><a href="/disponibles" class="btn btn-ghost">Œuvres disponibles</a></li>
         <li><a href="/contact" class="btn btn-gold">Écrire à l’artiste</a></li>
       </ul>
     </div>
 
     <div class="reveal is-visible">
-      {/* Carte de visite agrandie : fragment pictural monté sur papier,
-          légèrement incliné, posé en asymétrie. */}
+      {/* Carte de visite agrandie : fragment pictural monté sur papier, posé en asymétrie. */}
       <figure class="relative mx-auto max-w-xs sm:max-w-sm lg:ml-auto lg:mr-0 lg:max-w-none lg:translate-y-4">
         {theme.hero.showArtworkFragment && (
           <div
@@ -79,64 +91,129 @@ const visualArtistLd = {
     </div>
   </section>
 
+  <!-- B — SIGNATURE D'UNIVERS -->
   <section class="bg-brume py-section">
-    <div class="shell">
-      <SectionTitle
-        eyebrow={pages.home.gallery.eyebrow}
-        title={pages.home.gallery.title}
-        lead={pages.home.gallery.lead}
-      />
-      <div class="mt-12">
-        <ArtworkGrid artworks={featured} />
+    <div class="shell grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-16">
+      <div class="reveal">
+        <p class="eyebrow mb-3">{pages.home.universe.eyebrow}</p>
+        <h2 class="text-h1 font-serif text-encre">{pages.home.universe.title}</h2>
+        <Trait class="mt-5 text-or" width="7rem" />
       </div>
-      <div class="mt-10">
-        <a href="/oeuvres" class="link-quiet font-semibold">{pages.home.gallery.more} →</a>
+      <div class="reveal">
+        <p class="max-w-prose font-serif text-xl leading-relaxed text-encre sm:text-2xl">{pages.home.universe.text}</p>
+        <ul class="mt-8 flex flex-wrap gap-2.5">
+          {pages.home.universe.signs.map((s) => (
+            <li class="rounded-full border border-cendre/35 bg-paper/60 px-4 py-1.5 text-sm text-encre">{s}</li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>
 
-  <section class="shell grid gap-10 py-section lg:grid-cols-2 lg:gap-14">
-    <div class={`reveal border-l-2 pl-6 sm:pl-8 ${theme.saleMode.highlightOnHome ? 'border-or/60' : 'border-cendre/30'}`}>
-      <p class="eyebrow mb-3">{pages.home.sale.eyebrow}</p>
-      <h2 class="text-h1 font-serif text-encre">{pages.home.sale.title}</h2>
-      <p class="mt-6 leading-relaxed text-noir/80">{pages.home.sale.text}</p>
-      <a href="/disponibles" class="btn btn-primary mt-7">{pages.home.sale.cta}</a>
-    </div>
-    <div class="reveal border-l-2 border-cendre/30 pl-6 sm:pl-8">
-      <p class="eyebrow mb-3">{pages.home.bleu.eyebrow}</p>
-      <h2 class="text-h1 font-serif text-encre">{pages.home.bleu.title}</h2>
-      <p class="mt-6 leading-relaxed text-noir/80">{pages.home.bleu.text}</p>
-      <a href="/bleu-cendres" class="btn btn-ghost mt-7">{pages.home.bleu.cta}</a>
+  <!-- C — ENTRÉES PRINCIPALES (trois portes) -->
+  <section class="shell py-section">
+    <p class="eyebrow mb-3">{pages.home.doors.eyebrow}</p>
+    <h2 class="text-h1 font-serif text-encre">{pages.home.doors.title}</h2>
+    <Trait class="mt-5 text-or" width="7rem" />
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+      {pages.home.doors.items.map((d) => (
+        <a href={d.href} class="reveal group frame-gallery flex flex-col p-6 transition-colors hover:border-or/60">
+          <span class="font-serif text-3xl italic text-or/80">{d.index}</span>
+          <h3 class="mt-3 font-serif text-2xl text-encre">{d.label}</h3>
+          <hr class="cartel-rule mt-4" />
+          <p class="mt-4 flex-1 leading-relaxed text-noir/75">{d.note}</p>
+          <span class="mt-5 font-medium text-encre underline decoration-or/60 decoration-1 underline-offset-4 transition-colors group-hover:decoration-or">{d.cta} →</span>
+        </a>
+      ))}
     </div>
   </section>
 
+  <!-- D — ŒUVRES MISES EN LUMIÈRE (fragments de galerie) -->
   <section class="bg-encre py-section text-paper">
     <div class="shell">
-      <SectionTitle
-        eyebrow={pages.home.exhib.eyebrow}
-        title={pages.home.exhib.title}
-        lead={pages.home.exhib.lead}
-      />
-      <div class="mt-12 grid gap-5 md:grid-cols-3">
-        {recent.map((e) => (
-          <article class="reveal border-t border-paper/25 pt-5 transition-colors hover:border-or/60">
-            <p class="text-sm uppercase tracking-[0.18em] text-paper/50">{e.dateLabel}</p>
-            <h3 class="mt-3 font-serif text-2xl text-paper">{e.title}</h3>
-            <p class="mt-2 text-paper/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
-          </article>
+      <p class="eyebrow mb-3 text-or">{pages.home.gallery.eyebrow}</p>
+      <h2 class="text-h1 font-serif text-paper">{pages.home.gallery.title}</h2>
+      <p class="mt-6 max-w-prose leading-relaxed text-paper/75">{pages.home.gallery.lead}</p>
+      <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {featured.map((a, i) => (
+          <a href={`/oeuvres/${a.slug}`} class="reveal group block" aria-label={`Voir la fiche : ${a.title}`}>
+            <figure class={`frame-gallery overflow-hidden p-[6px] ${i === 0 ? 'border-or/45' : 'border-paper/20'}`}>
+              <div class="aspect-[4/5] overflow-hidden">
+                {a.image ? (
+                  <img src={a.image} alt={a.alt} loading="lazy" decoding="async" width="800" height="1000" class="h-full w-full object-cover transition-transform duration-700 ease-soft group-hover:scale-[1.02]" />
+                ) : (
+                  <ArtworkPlaceholder />
+                )}
+              </div>
+            </figure>
+            <figcaption class="mt-4 flex items-baseline justify-between gap-3">
+              <span class="font-serif text-xl italic text-paper transition-colors group-hover:text-or">{a.title}</span>
+              {a.series && <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-paper/55">{a.series}</span>}
+            </figcaption>
+          </a>
         ))}
       </div>
-      <a href="/expositions" class="mt-10 inline-flex text-paper underline decoration-or underline-offset-4">{pages.home.exhib.cta} →</a>
+      <a href="/oeuvres" class="mt-10 inline-flex text-paper underline decoration-or underline-offset-4">{pages.home.gallery.more} →</a>
     </div>
   </section>
 
-  <!-- TRANSITION DE FIN — entrer dans le récit de l'artiste -->
+  <!-- E — BLEU CENDRES (appel poétique) -->
+  <section class="shell py-section">
+    <div class="reveal grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+      <div>
+        <p class="eyebrow mb-3">{pages.home.bleu.eyebrow}</p>
+        <h2 class="text-h1 font-serif text-encre">{pages.home.bleu.title}</h2>
+        <Trait class="mt-5 text-or" width="7rem" />
+        <p class="mt-7 max-w-prose font-serif text-xl italic leading-relaxed text-encre">{bleuCendres.lead}</p>
+        <p class="mt-5 max-w-prose leading-relaxed text-noir/80">{pages.home.bleu.text}</p>
+        <a href="/bleu-cendres" class="btn btn-primary mt-8">{pages.home.bleu.cta}</a>
+      </div>
+      <dl class="grid grid-cols-1 gap-px overflow-hidden rounded-card border border-cendre/25 bg-cendre/20 sm:grid-cols-3 lg:grid-cols-1">
+        {bleuFacts.map((f) => (
+          <div class="bg-paper px-5 py-4">
+            <dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{f.label}</dt>
+            <dd class="mt-1 font-serif text-lg italic text-encre">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- PRÉSENCE — expositions & rencontres (concis) -->
+  {recent.length > 0 && (
+    <section class="bg-brume py-section">
+      <div class="shell">
+        <p class="eyebrow mb-3">{pages.home.exhib.eyebrow}</p>
+        <h2 class="text-h1 font-serif text-encre">{pages.home.exhib.title}</h2>
+        <Trait class="mt-5 text-or" width="7rem" />
+        <p class="mt-6 max-w-prose leading-relaxed text-noir/80">{pages.home.exhib.lead}</p>
+        <div class="mt-12 grid gap-5 md:grid-cols-3">
+          {recent.map((e) => (
+            <article class="reveal border-t border-cendre/30 pt-5 transition-colors hover:border-or/60">
+              <p class="text-sm uppercase tracking-[0.18em] text-cendre">{e.dateLabel}</p>
+              <h3 class="mt-3 font-serif text-2xl text-encre">{e.title}</h3>
+              <p class="mt-2 text-noir/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
+            </article>
+          ))}
+        </div>
+        <a href="/expositions" class="mt-10 inline-flex font-semibold text-encre underline decoration-or underline-offset-4">{pages.home.exhib.cta} →</a>
+      </div>
+    </section>
+  )}
+
+  <!-- F — CONTACT DOUX -->
   <section class="shell py-section">
     <div class="reveal max-w-prose">
       <p class="eyebrow mb-3">{pages.home.closing.eyebrow}</p>
       <h2 class="text-h2 font-serif text-encre">{pages.home.closing.title}</h2>
-      <p class="mt-5 leading-relaxed text-noir/80">{pages.home.closing.text}</p>
-      <div class="mt-7 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+      <Trait class="mt-5 text-or" width="7rem" />
+      <p class="mt-6 leading-relaxed text-noir/80">{pages.home.closing.text}</p>
+      <ul class="mt-7 flex flex-wrap gap-2.5">
+        {pages.home.closing.intents.map((it) => (
+          <li class="rounded-full border border-cendre/35 px-4 py-1.5 text-sm text-encre">{it}</li>
+        ))}
+      </ul>
+      <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
         {pages.home.closing.links.map((l) => (
           <a href={l.href} class="btn btn-gold">{l.label}</a>
         ))}
