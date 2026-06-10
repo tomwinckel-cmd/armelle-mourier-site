@@ -232,6 +232,25 @@ Section « **Préparer un catalogue** » dans `/cockpit-roadmap` (modèle :
   étape future**), aucun bouton « Envoyer », **aucune sauvegarde, aucun upload,
   aucun service externe**. Le dossier est un **brouillon à vérifier humainement**.
 
+## Tableau de bord interne (`/cockpit-roadmap`)
+
+La page est organisée en **tableau de bord** lisible en quelques secondes :
+
+- **« Que veux-tu faire aujourd’hui ? »** : 6 actions rapides (ajouter une œuvre,
+  préparer une fiche, une publication, un catalogue, une demande client, une
+  remise) qui ouvrent directement le module visé.
+- **Navigation interne** (ancres, libellés courts, **sticky**, responsive).
+- **Vue d’ensemble** avec le statut des modules : **Actifs (prototype) · En
+  préparation · Prochaines activations** (ton adulte, sans infantilisation).
+- **Modules lourds repliables** (`<details>/<summary>` natif, accessible clavier) :
+  *Ajouter une œuvre*, *Fiche œuvre + preuve*, *Facture & remise*, *Catalogue* —
+  fermés par défaut, ouverts à la demande via les actions rapides ou la
+  navigation. Les sections de référence (disponibilités, pages, expositions,
+  réseaux, ambiance, roadmap) restent ouvertes.
+
+Objectif : **réduire la charge mentale**, pas la déplacer dans une page trop
+longue. Aucune sauvegarde, aucun service externe — comportement inchangé.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.

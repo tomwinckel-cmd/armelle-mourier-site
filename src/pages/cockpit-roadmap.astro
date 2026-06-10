@@ -47,21 +47,53 @@ const palette = [
   { key: 'ashBlue', label: 'Cendre', hex: theme.colors.ashBlue },
 ];
 
-const sections = [
+// Navigation interne du tableau de bord (libellés courts, scannables).
+const dashboardNav = [
   { id: 'apercu', label: 'Vue d’ensemble' },
-  { id: 'operations', label: 'Centre opérationnel' },
-  { id: 'oeuvres', label: 'Œuvres' },
   { id: 'intake', label: 'Ajouter une œuvre' },
-  { id: 'proof', label: 'Fiche œuvre + preuve' },
-  { id: 'transaction', label: 'Après une demande' },
+  { id: 'proof', label: 'Protéger' },
+  { id: 'social', label: 'Publier' },
   { id: 'catalog', label: 'Catalogue' },
-  { id: 'disponibilites', label: 'Disponibilités' },
-  { id: 'pages', label: 'Pages' },
-  { id: 'expositions', label: 'Expositions' },
-  { id: 'social', label: 'Réseaux sociaux' },
-  { id: 'ambiance', label: 'Ambiance visuelle' },
-  { id: 'etapes', label: 'Prochaines étapes' },
+  { id: 'disponibilites', label: 'Vente douce' },
+  { id: 'transaction', label: 'Facture · remise' },
+  { id: 'ambiance', label: 'Ambiance' },
+  { id: 'etapes', label: 'Roadmap' },
 ];
+
+// Actions rapides : « Que veux-tu faire aujourd’hui ? » → ancres internes.
+const quickActions = [
+  { href: '#intake', label: 'Ajouter une œuvre', hint: 'Saisir une œuvre sans erreur' },
+  { href: '#proof', label: 'Préparer une fiche œuvre', hint: 'Fiche + preuve de création' },
+  { href: '#social', label: 'Préparer une publication', hint: 'Légende Instagram à copier' },
+  { href: '#catalog', label: 'Préparer un catalogue', hint: 'Dossier collectionneur' },
+  { href: '#transaction', label: 'Préparer une demande client', hint: 'Brouillon de facture' },
+  { href: '#transaction', label: 'Préparer une remise d’œuvre', hint: 'Logistique de remise' },
+];
+
+// Statut des modules du cockpit (vue d’ensemble, ton adulte, pas d’infantilisation).
+type ModuleState = 'prototype' | 'preparation' | 'future';
+const cockpitModuleStatus: { label: string; state: ModuleState; href: string }[] = [
+  { label: 'Ajouter une œuvre', state: 'prototype', href: '#intake' },
+  { label: 'Fiche œuvre + preuve', state: 'prototype', href: '#proof' },
+  { label: 'Vente douce', state: 'prototype', href: '#disponibilites' },
+  { label: 'Réseaux sociaux', state: 'prototype', href: '#social' },
+  { label: 'Catalogue', state: 'prototype', href: '#catalog' },
+  { label: 'Facture brouillon', state: 'prototype', href: '#transaction' },
+  { label: 'Remise / livraison', state: 'prototype', href: '#transaction' },
+  { label: 'Ambiance visuelle', state: 'preparation', href: '#ambiance' },
+  { label: 'Édition réelle (CMS)', state: 'future', href: '#etapes' },
+  { label: 'Dépôt d’images', state: 'future', href: '#etapes' },
+  { label: 'Authentification', state: 'future', href: '#etapes' },
+];
+const moduleStateLabel: Record<ModuleState, string> = {
+  prototype: 'Actifs (prototype)',
+  preparation: 'En préparation',
+  future: 'Prochaines activations',
+};
+const moduleStateOrder: ModuleState[] = ['prototype', 'preparation', 'future'];
+const modulesByState = Object.fromEntries(
+  moduleStateOrder.map((s) => [s, cockpitModuleStatus.filter((m) => m.state === s)]),
+) as Record<ModuleState, typeof cockpitModuleStatus>;
 
 // Titres orientés action pour les cartes du centre opérationnel.
 const opCardTitle: Record<string, string> = {
@@ -106,10 +138,24 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       contenus. Aucune connexion, aucun mot de passe, aucun paiement.
     </p>
 
-    <!-- Sommaire -->
-    <nav aria-label="Sections du cockpit" class="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-      {sections.map((s) => (
-        <a href={`#${s.id}`} class="link-quiet font-semibold">{s.label}</a>
+    <!-- ACTIONS RAPIDES : « Que veux-tu faire aujourd’hui ? » -->
+    <section aria-labelledby="quick-actions-title" class="mt-8">
+      <h2 id="quick-actions-title" class="text-h3 font-serif text-encre">Que veux-tu faire aujourd’hui ?</h2>
+      <p class="mt-1 text-sm text-cendre">Choisis une action — chaque carte ouvre le module correspondant.</p>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {quickActions.map((a) => (
+          <a href={a.href} class="quick-action frame-gallery flex flex-col gap-1 p-4 transition-colors hover:border-or/60">
+            <span class="font-serif text-lg italic text-encre">{a.label}</span>
+            <span class="text-sm text-cendre">{a.hint}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- NAVIGATION INTERNE (sticky, libellés courts) -->
+    <nav aria-label="Navigation du cockpit" class="cockpit-nav mt-8 flex flex-wrap gap-2 border-y border-cendre/20 py-3 text-sm">
+      {dashboardNav.map((s) => (
+        <a href={`#${s.id}`} class="rounded-full border border-cendre/30 px-3 py-1 font-semibold text-encre transition-colors hover:border-or/60 hover:text-or">{s.label}</a>
       ))}
     </nav>
 
@@ -132,6 +178,25 @@ const statusChipClass: Record<ArtworkStatus, string> = {
           </li>
         ))}
       </ul>
+
+      <!-- Statut des modules : centre opérationnel — niveau prototype -->
+      <div class="mt-8 rounded-card border border-or/30 bg-or/5 px-5 py-4">
+        <p class="text-eyebrow uppercase tracking-[0.16em] text-or">Centre opérationnel — niveau prototype</p>
+        <div class="mt-4 grid gap-5 sm:grid-cols-3">
+          {moduleStateOrder.map((state) => (
+            <div>
+              <p class="text-sm font-semibold text-encre">{moduleStateLabel[state]} <span class="text-cendre">({modulesByState[state].length})</span></p>
+              <ul class="mt-2 space-y-1 text-sm">
+                {modulesByState[state].map((m) => (
+                  <li>
+                    <a href={m.href} class="link-quiet text-noir/80">{m.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
 
     <!-- CENTRE OPÉRATIONNEL -->
@@ -200,7 +265,11 @@ const statusChipClass: Record<ArtworkStatus, string> = {
 
     <!-- ASSISTANT « AJOUTER UNE ŒUVRE » (prototype, ne sauvegarde pas) -->
     <section id="intake" class="scroll-mt-28">
-      <h2 class="mt-16 text-h2 font-serif text-encre">Ajouter une œuvre — assistant prototype</h2>
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Ajouter une œuvre — assistant prototype</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
       <p class="mt-4 max-w-prose text-noir/80">
         On prépare la fiche pas à pas, on vérifie, on copie le récapitulatif.
@@ -333,11 +402,16 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       <p class="mt-3 max-w-prose text-sm italic text-or">
         À valider humainement. Rien n’est publié automatiquement : Armelle décide, Tom valide.
       </p>
+      </details>
     </section>
 
     <!-- FICHE ŒUVRE + PREUVE DE CRÉATION (prototype, ne sauvegarde pas) -->
     <section id="proof" class="scroll-mt-28">
-      <h2 class="mt-16 text-h2 font-serif text-encre">{artworkProof.title}</h2>
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">{artworkProof.title}</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
       <p class="mt-4 max-w-prose text-noir/80">{artworkProof.intro}</p>
 
@@ -543,11 +617,16 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         datée (e-Soleau / autre) et, en cas d’enjeu réel, consulter un professionnel.
         <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
       </p>
+      </details>
     </section>
 
     <!-- APRÈS UNE DEMANDE D'ACQUISITION (prototype, ne sauvegarde pas) -->
     <section id="transaction" class="scroll-mt-28">
-      <h2 class="mt-16 text-h2 font-serif text-encre">Après une demande d’acquisition</h2>
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Après une demande d’acquisition — facture &amp; remise</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
       <p class="mt-4 max-w-prose text-noir/80">
         Une fois la demande reçue, le cockpit aide à préparer la suite : informations client,
@@ -738,11 +817,16 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         aucune facture officielle, aucune comptabilité automatisée.
         <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
       </p>
+      </details>
     </section>
 
     <!-- CATALOGUE / DOSSIER COLLECTIONNEUR (prototype, ne sauvegarde pas) -->
     <section id="catalog" class="scroll-mt-28">
-      <h2 class="mt-16 text-h2 font-serif text-encre">Préparer un catalogue</h2>
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Préparer un catalogue</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
       <p class="mt-4 max-w-prose text-noir/80">
         Composer une <strong>sélection d’œuvres</strong> à transmettre (collectionneur, galerie,
@@ -874,6 +958,7 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         Brouillon à <strong>vérifier humainement</strong> avant envoi. Pas de PDF, pas d’envoi,
         pas de sauvegarde. <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
       </p>
+      </details>
     </section>
 
     <!-- 3 — DISPONIBILITÉS -->
@@ -1022,6 +1107,61 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       <p class="mt-6 text-sm"><a href="/" class="link-quiet font-semibold">← Retour au site</a></p>
     </section>
   </section>
+
+  <style>
+    /* En-tête repliable des modules lourds (details/summary natif, accessible). */
+    .cockpit-summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+      list-style: none;
+    }
+    .cockpit-summary::-webkit-details-marker { display: none; }
+    .cockpit-summary:focus-visible {
+      outline: 2px solid rgb(var(--c-or));
+      outline-offset: 4px;
+    }
+    .cockpit-chevron {
+      flex: none;
+      color: rgb(var(--c-or));
+      transition: transform 0.2s ease;
+    }
+    .cockpit-module[open] > .cockpit-summary .cockpit-chevron { transform: rotate(90deg); }
+    /* Navigation interne accessible en permanence. */
+    .cockpit-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background-color: rgb(var(--c-paper));
+    }
+    @media (max-width: 640px) {
+      .cockpit-nav { flex-wrap: nowrap; overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cockpit-chevron { transition: none; }
+    }
+  </style>
+
+  <script is:inline>
+    // Tableau de bord : ouvrir le module replié ciblé par une ancre (clic / hash).
+    (function () {
+      function openTarget(hash) {
+        if (!hash || hash.charAt(0) !== '#') return;
+        var el;
+        try { el = document.querySelector(hash); } catch (e) { return; }
+        if (!el) return;
+        var d = el.tagName === 'DETAILS' ? el : el.querySelector('details.cockpit-module');
+        if (d) d.open = true;
+      }
+      document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function () { openTarget(a.getAttribute('href')); });
+      });
+      window.addEventListener('hashchange', function () { openTarget(location.hash); });
+      if (location.hash) openTarget(location.hash);
+    })();
+  </script>
 
   <script is:inline>
     // Copier dans le presse-papier (sans API externe). Préparation seulement.
