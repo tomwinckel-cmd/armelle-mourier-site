@@ -210,6 +210,28 @@ remise/livraison → preuve de remise → archivage**.
   côté navigateur, rien n’est enregistré.
 - **Validation humaine obligatoire** : Armelle décide · Tom valide · Claude Code exécute.
 
+## Module « Catalogue / dossier collectionneur » (prototype)
+
+Section « **Préparer un catalogue** » dans `/cockpit-roadmap` (modèle :
+`src/data/catalogWorkflow.ts`) pour composer une **sélection d’œuvres à transmettre**.
+
+- **Types de dossier** : sélection collectionneur · dossier galerie · dossier
+  exposition · dossier presse · catalogue des œuvres disponibles.
+- **Fonctionnement** : choisir un type, renseigner destinataire / contexte / date /
+  message d’introduction / conditions / contact, **cocher les œuvres** → blocs
+  copiables **« DOSSIER COLLECTIONNEUR — BROUILLON »** et **« Liste d’œuvres
+  sélectionnées »** (titre, série, dimensions, technique, statut, **prix**, lien
+  fiche, notes) + **modèles de message d’envoi** (collectionneur, galerie,
+  exposition, réponse à une demande, relance douce). Calcul **côté client**.
+- **Garde-fous** : **images web compressées uniquement** (jamais de HD complète),
+  **statuts vérifiés**, **aucun prix inventé** (« Prix sur demande » si non validé),
+  orthographe des titres relue, **validation humaine avant envoi**.
+- **Gamification douce** (sobre) : badges Sélection claire · Statuts vérifiés ·
+  Images prêtes · Message préparé · Catalogue prêt à valider.
+- **Limites volontaires** : **aucun PDF généré** pour l’instant (le **PDF reste une
+  étape future**), aucun bouton « Envoyer », **aucune sauvegarde, aucun upload,
+  aucun service externe**. Le dossier est un **brouillon à vérifier humainement**.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
