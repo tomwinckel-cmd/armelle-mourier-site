@@ -57,12 +57,26 @@ const artworkLd = {
   ...(a.dimensions ? { width: a.dimensions } : {}),
   ...(a.image ? { image: new URL(a.image, site.url).href } : {}),
 };
+
+// Fil d'Ariane : Accueil › Œuvres › <titre>
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Accueil', item: new URL('/', site.url).href },
+    { '@type': 'ListItem', position: 2, name: 'Œuvres', item: new URL('/oeuvres', site.url).href },
+    { '@type': 'ListItem', position: 3, name: a.title, item: new URL(`/oeuvres/${a.slug}`, site.url).href },
+  ],
+};
 ---
 <Base
   title={`${a.title} — ${site.artistName}`}
   description={description}
   keywords={[a.title, a.series, 'Armelle Mourier', 'œuvre originale', 'peinture'].filter(Boolean) as string[]}
-  jsonld={artworkLd}
+  image={a.image ? a.image : undefined}
+  imageAlt={a.alt}
+  ogType="article"
+  jsonld={[artworkLd, breadcrumbLd]}
 >
   <section class="shell pb-section pt-10 sm:pt-14">
     <a href="/oeuvres" class="link-quiet text-sm font-semibold">← Retour aux œuvres</a>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Armelle Mourier — Artiste peintre & plasticienne">
+  <!-- Image de partage par défaut (Open Graph / Twitter), palette « atelier ».
+       ⚠️ Master vectoriel. Pour une compatibilité maximale sur les réseaux,
+       exporter un PNG/JPG 1200×630 (voir docs/seo-checklist.md). -->
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4EFE3"/>
+      <stop offset="0.6" stop-color="#EFE8D8"/>
+      <stop offset="1" stop-color="#F4EFE3"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#paper)"/>
+
+  <!-- Fragment pictural (rappel des blocs bleu/or de l'atelier) -->
+  <g transform="translate(815 70)">
+    <rect x="0" y="0" width="300" height="490" fill="#F8F4EA" stroke="#A2762E" stroke-opacity="0.45" stroke-width="3"/>
+    <rect x="36" y="40" width="86" height="430" fill="#15223B" transform="rotate(-1.4 79 255)"/>
+    <rect x="150" y="80" width="30" height="360" fill="#1A1613" opacity="0.92"/>
+    <rect x="196" y="120" width="80" height="300" fill="#2B4C92" opacity="0.82"/>
+    <rect x="120" y="40" width="3" height="430" fill="#A2762E" opacity="0.7"/>
+    <rect x="40" y="430" width="220" height="3" fill="#A2762E" opacity="0.8"/>
+    <path d="M70 470 C 110 320, 100 230, 170 70" fill="none" stroke="#A2762E" stroke-opacity="0.6" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Texte -->
+  <g font-family="Georgia, 'Times New Roman', serif" fill="#15223B">
+    <text x="90" y="150" font-size="30" letter-spacing="6" fill="#73808B">ATELIER · DIJON, BOURGOGNE</text>
+    <text x="86" y="300" font-size="104" font-style="italic" font-weight="600">Armelle Mourier</text>
+    <rect x="92" y="330" width="150" height="5" fill="#A2762E"/>
+    <text x="90" y="392" font-size="38" fill="#2C2A2B">Artiste peintre &amp; plasticienne</text>
+    <text x="90" y="470" font-size="30" font-style="italic" fill="#1A1613">Peindre comme on respire,</text>
+    <text x="90" y="512" font-size="30" font-style="italic" fill="#1A1613">transmettre la joie d’être en vie.</text>
+  </g>
+</svg>

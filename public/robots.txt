@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
+# Back-office Decap (non destiné au référencement).
+Disallow: /admin/
+# Note : /cockpit-roadmap reste autorisé au crawl pour que sa balise
+# meta « noindex » soit lue par les moteurs (ne pas le bloquer ici).
 
 # Plan du site statique — mettez à jour le domaine si vous changez SITE_URL dans astro.config.mjs
 Sitemap: https://www.armellemourier.fr/sitemap.xml
