@@ -53,6 +53,23 @@ const bookLd = {
     </div>
   </section>
 
+  <!-- BLEU, CENDRE, OR (évocation de la gamme) -->
+  <section class="shell pb-section">
+    <p class="eyebrow reveal mb-3">La gamme</p>
+    <h2 class="reveal text-h2 font-serif text-encre">{bleuCendres.palette.title}</h2>
+    <Trait class="reveal mt-5 text-or" width="7rem" />
+    <p class="reveal mt-6 max-w-prose text-noir/75">{bleuCendres.palette.note}</p>
+    <div class="mt-10 grid gap-6 sm:grid-cols-3">
+      {bleuCendres.palette.items.map((p) => (
+        <div class="reveal frame-gallery p-6">
+          <h3 class="font-serif text-2xl italic text-encre">{p.word}</h3>
+          <hr class="cartel-rule mt-3" />
+          <p class="mt-4 leading-relaxed text-noir/80">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
   <!-- RÉCIT + FICHE -->
   <section class="bg-brume py-section">
     <div class="shell grid gap-12 lg:grid-cols-[1.4fr_0.6fr]">
@@ -122,6 +139,10 @@ const bookLd = {
           Le recueil chez L’Atelier des Noyers ↗
         </a>
       </div>
+      <p class="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+        <a href="/oeuvres" class="text-paper/85 underline decoration-or underline-offset-4 hover:text-paper">Voir les œuvres →</a>
+        <a href="/demarche" class="text-paper/85 underline decoration-or underline-offset-4 hover:text-paper">Lire la démarche →</a>
+      </p>
     </div>
   </section>
 </Base>

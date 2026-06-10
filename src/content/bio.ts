@@ -124,6 +124,16 @@ export const demarche = {
 
 export const bleuCendres = {
   lead: 'Bleu Cendres est un recueil de poésie illustré, où les tableaux dorés et bleus d’Armelle Mourier rencontrent les mots.',
+  // Évocation de la gamme (poétique et sobre, ancrée dans les bleus profonds et l'or).
+  palette: {
+    title: 'Bleu, cendre, or',
+    note: 'Trois mots pour une même gamme — la matière du recueil.',
+    items: [
+      { word: 'Bleu', text: 'Des bleus profonds, comme des paysages intérieurs.' },
+      { word: 'Cendre', text: 'Ce qui reste après le geste — la trace, la mémoire.' },
+      { word: 'Or', text: 'La lumière posée sur le bleu, l’éclat qui traverse.' },
+    ],
+  },
   cover: '', // ex. '/images/projects/bleu-cendres-couverture.webp'
   coverAlt: 'Couverture du recueil Bleu Cendres, tableaux dorés et bleus d’Armelle Mourier.',
   paragraphs: [
