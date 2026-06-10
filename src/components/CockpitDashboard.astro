@@ -7,7 +7,7 @@ import { theme } from '../data/theme';
 import { splitExhibitions } from '../data/exhibitions';
 import { operations, operationsPrinciple, operationActivation, type OperationStatus } from '../data/operations';
 import { addArtworkSteps } from '../data/artworkWorkflow';
-import { designModes } from '../data/theme';
+import { visualModes } from '../data/theme';
 import { webPublicationTips, protectionChecklist, proofBadges } from '../data/proof';
 import { messageTemplates, transactionBadges, requestTypes, requestResponses, requestStatuses, requestBadges } from '../data/transactionWorkflow';
 import { catalogTypes, catalogChecklist, catalogMessages, catalogBadges } from '../data/catalogWorkflow';
@@ -1224,41 +1224,143 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         <span class="cockpit-chevron" aria-hidden="true">▸</span>
       </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
-      <p class="mt-4 text-noir/75">
-        Identité : <strong>{theme.identity.visualIdentity}</strong> · boutons
-        <strong> {theme.identity.buttonMode}</strong> · cartes <strong>{theme.identity.cardMode}</strong>
-        · fragment <strong>{theme.identity.fragmentStyle}</strong>. Source : <code class="text-cendre">src/data/theme.ts</code>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Trois étapes pour <strong>choisir une direction visuelle</strong> et préparer une demande de
+        changement — <strong>sans rien modifier</strong>. Le design n’est pas changé ici : on prépare,
+        un humain valide, puis l’ajustement se fait dans <code class="text-cendre">src/data/theme.ts</code>.
       </p>
-      <div class="mt-6 flex flex-wrap gap-4">
+
+      <!-- PHASE 4 — Ce module ne modifie pas encore le site automatiquement -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ <strong>Ce module ne modifie pas encore le site automatiquement.</strong> Il prépare une
+        <strong>décision</strong> ; les changements doivent être <strong>validés</strong> ; les
+        couleurs réelles seront <strong>ajustées avec les vraies œuvres HD</strong>. <strong>Aucune
+        modification n’est appliquée sans intervention humaine</strong> (pas de switch, pas de
+        sauvegarde, theme.ts n’est pas touché par le cockpit).
+      </p>
+
+      <!-- Référence : ambiance active + palette -->
+      <p class="mt-5 text-sm text-cendre">
+        Ambiance active : <strong class="text-encre">{visualModes[0].label}</strong> · source :
+        <code>src/data/theme.ts</code>
+      </p>
+      <div class="mt-3 flex flex-wrap gap-3">
         {palette.map((c) => (
           <div class="text-center">
-            <span class="block h-14 w-14 rounded-sm border border-cendre/25" style={`background:${c.hex}`}></span>
-            <span class="mt-1 block text-[0.7rem] text-encre">{c.label}</span>
-            <code class="text-[0.65rem] text-cendre">{c.hex}</code>
+            <span class="block h-10 w-10 rounded-sm border border-cendre/25" style={`background:${c.hex}`}></span>
+            <span class="mt-1 block text-[0.62rem] text-cendre">{c.label}</span>
           </div>
         ))}
       </div>
-      <p class="mt-6 max-w-prose text-sm text-cendre">
-        Modifiables plus tard : couleur papier, bleu pigment, ocre, intensité de matière,
-        style des cartes, style des boutons — sans casser le design.
-      </p>
 
-      <h3 class="mt-8 text-h3 font-serif text-encre">Ambiances visuelles activables plus tard</h3>
-      <p class="mt-2 max-w-prose text-sm text-cendre">
-        Préparation : un futur cockpit pourra proposer ces ambiances. Aujourd’hui,
-        l’ambiance active reste « {designModes[0].label} ».
-      </p>
-      <div class="mt-4 grid gap-4 sm:grid-cols-3">
-        {designModes.map((d, i) => (
-          <article class={`frame-gallery p-4 ${i === 0 ? 'border-or/45' : ''}`}>
-            <div class="flex items-baseline justify-between gap-2">
-              <h4 class="font-serif italic text-encre">{d.label}</h4>
-              {i === 0 && <span class="text-eyebrow uppercase tracking-[0.14em] text-or">active</span>}
-            </div>
-            <p class="mt-1 text-sm text-noir/75">{d.description}</p>
-          </article>
-        ))}
+      <!-- Progression -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation</p>
+          <p id="vi-level" class="font-serif italic text-encre">À préparer</p>
+        </div>
+        <ul id="vi-badges" class="mt-3 flex flex-wrap gap-2">
+          {[
+            { id: 'mode', label: 'Ambiance choisie' },
+            { id: 'colors', label: 'Couleurs précisées' },
+            { id: 'texture', label: 'Texture dosée' },
+            { id: 'cards', label: 'Cartes définies' },
+            { id: 'ready', label: 'Validation prête' },
+          ].map((b) => (
+            <li data-vibadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
       </div>
+
+      <form id="vi-form" class="mt-6 grid max-w-3xl gap-6" onsubmit="return false">
+        <!-- ÉTAPE 1 — Choisir une ambiance -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">1 · Choisir une ambiance</legend>
+          <p class="mt-1 text-sm text-cendre">Une direction, pas un réglage technique.</p>
+          <div class="mt-4 grid gap-4 sm:grid-cols-3">
+            {visualModes.map((m, i) => (
+              <label class="frame-gallery flex cursor-pointer flex-col gap-1 p-4 transition-colors hover:border-or/60">
+                <span class="flex items-center justify-between gap-2">
+                  <span class="font-serif text-lg italic text-encre">{m.label}</span>
+                  <input type="radio" name="vi-mode" value={m.id} data-label={m.label} data-intention={m.intention} checked={i === 0} />
+                </span>
+                {m.active && <span class="text-eyebrow uppercase tracking-[0.14em] text-or">active</span>}
+                <span class="mt-1 text-sm text-noir/75">{m.intention}</span>
+                <span class="mt-2 text-xs text-cendre">Couleurs : {m.colors.join(' · ')}</span>
+                <span class="text-xs text-cendre">Sensation : {m.sensation}</span>
+                <span class="text-xs text-cendre">Usage : {m.usage}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- ÉTAPE 2 — Ajuster le ressenti -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">2 · Ajuster le ressenti</legend>
+          <p class="mt-1 text-sm text-cendre">Réglages <strong>préparatoires</strong> — rien n’est appliqué.</p>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="text-sm">Intensité du bleu : <span id="vi-blue-val" class="text-cendre">50</span>%
+              <input id="vi-blue" type="range" min="0" max="100" value="50" class="mt-1 w-full" />
+            </label>
+            <label class="text-sm">Intensité de l’ocre : <span id="vi-ochre-val" class="text-cendre">50</span>%
+              <input id="vi-ochre" type="range" min="0" max="100" value="50" class="mt-1 w-full" />
+            </label>
+            <label class="text-sm">Texture papier
+              <select id="vi-texture" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="">— à choisir —</option>
+                <option value="discrète">Discrète</option>
+                <option value="moyenne">Moyenne</option>
+                <option value="marquée">Marquée</option>
+              </select>
+            </label>
+            <label class="text-sm">Style des cartes
+              <select id="vi-cards" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="">— à choisir —</option>
+                <option value="cartel d’atelier">Cartel d’atelier</option>
+                <option value="galerie sobre">Galerie sobre</option>
+                <option value="carte simple">Carte simple</option>
+              </select>
+            </label>
+            <label class="text-sm">Style des boutons
+              <select id="vi-buttons" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="">— à choisir —</option>
+                <option value="filet or (handline)">Filet or (handline)</option>
+                <option value="aplat sobre">Aplat sobre</option>
+                <option value="pilule">Pilule</option>
+              </select>
+            </label>
+            <label class="text-sm">Sobriété / expressivité
+              <select id="vi-tone" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="">— à choisir —</option>
+                <option value="sobre">Sobre</option>
+                <option value="équilibré">Équilibré</option>
+                <option value="expressif">Expressif</option>
+              </select>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- ÉTAPE 3 — Copier la demande de changement -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">3 · Copier la demande de changement</legend>
+          <label class="mt-4 block text-sm">Commentaire artiste <span class="text-cendre">(ressenti, exemple, intention…)</span>
+            <textarea id="vi-comment" rows="3" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+          </label>
+          <label class="mt-3 flex items-center gap-2 text-sm font-semibold text-encre">
+            <input id="vi-human" type="checkbox" /> Validation humaine faite — à vérifier avant modification du site
+          </label>
+        </fieldset>
+      </form>
+
+      <!-- Demande copiable -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Demande de modification</h3>
+      <pre id="vi-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-primary mt-3" data-vi-copy>Copier la demande</button>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        Rien n’est appliqué : <strong>à valider avant modification du site</strong>. Le changement
+        réel se fait ensuite dans <code class="text-cendre">theme.ts</code>.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
       </details>
     </section>
 
@@ -1837,5 +1939,67 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       applyType();
       document.querySelectorAll('[data-r-response-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(response(), b); }); });
       var rrc = document.querySelector('[data-r-recap-copy]'); if (rrc) rrc.addEventListener('click', function () { copyText(buildRecap(), rrc); });
+    })();
+
+    // --- Ambiance visuelle (prépare une DEMANDE, ne change PAS le thème) ---
+    (function () {
+      var form = document.getElementById('vi-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      function mode() {
+        var r = document.querySelector('input[name="vi-mode"]:checked');
+        return r ? { label: r.getAttribute('data-label') || '', intention: r.getAttribute('data-intention') || '' } : { label: '', intention: '' };
+      }
+      function reinforce() {
+        var out = [];
+        if (parseInt(v('vi-blue') || '50', 10) >= 60) out.push('bleu');
+        if (parseInt(v('vi-ochre') || '50', 10) >= 60) out.push('ocre');
+        return out.join(', ') || '—';
+      }
+      function soften() {
+        var out = [];
+        if (parseInt(v('vi-blue') || '50', 10) <= 40) out.push('bleu');
+        if (parseInt(v('vi-ochre') || '50', 10) <= 40) out.push('ocre');
+        return out.join(', ') || '—';
+      }
+      function buildRecap() {
+        var m = mode();
+        return [
+          'AMBIANCE VISUELLE — DEMANDE DE MODIFICATION',
+          '',
+          'Mode choisi : ' + m.label,
+          'Objectif : ' + m.intention + (v('vi-tone') ? ' · ton : ' + v('vi-tone') : ''),
+          'Couleurs à renforcer : ' + reinforce(),
+          'Couleurs à adoucir : ' + soften(),
+          'Texture : ' + (v('vi-texture') || 'à préciser'),
+          'Cartes : ' + (v('vi-cards') || 'à préciser'),
+          'Boutons : ' + (v('vi-buttons') || 'à préciser'),
+          'Commentaire artiste : ' + v('vi-comment'),
+          'Validation humaine : à vérifier avant modification du site',
+        ].join('\n');
+      }
+      function update() {
+        var bv = document.getElementById('vi-blue-val'); if (bv) bv.textContent = v('vi-blue') || '50';
+        var ov = document.getElementById('vi-ochre-val'); if (ov) ov.textContent = v('vi-ochre') || '50';
+        var got = {
+          mode: !!mode().label,
+          colors: !!(reinforce() !== '—' || soften() !== '—'),
+          texture: !!v('vi-texture'),
+          cards: !!v('vi-cards'),
+          ready: !!(mode().label && c('vi-human')),
+        };
+        document.querySelectorAll('[data-vibadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-vibadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var lvl = document.getElementById('vi-level');
+        if (lvl) lvl.textContent = got.ready ? 'Prête à valider' : (got.mode ? 'En cours' : 'À préparer');
+        var rec = document.getElementById('vi-recap'); if (rec) rec.textContent = buildRecap();
+      }
+      form.addEventListener('input', update);
+      form.addEventListener('change', update);
+      update();
+      var vc = document.querySelector('[data-vi-copy]'); if (vc) vc.addEventListener('click', function () { copyText(buildRecap(), vc); });
     })();
   </script>

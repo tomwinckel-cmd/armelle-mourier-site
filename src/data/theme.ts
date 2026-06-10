@@ -341,3 +341,50 @@ export const designModes = [
     description: 'Bleus profonds, or, paysages intérieurs.',
   },
 ] as const;
+
+// =====================================================================
+//  MODES VISUELS — présentation pour le cockpit (PRÉPARATION, pas un switch)
+//  ---------------------------------------------------------------------
+//  Décrit chaque ambiance pour aider l'artiste à CHOISIR une direction.
+//  Le cockpit ne change PAS le thème : il prépare une demande à valider,
+//  puis Tom/Claude ajustent theme.ts après accord humain.
+// =====================================================================
+export type VisualMode = {
+  id: string;
+  label: string;
+  intention: string;
+  colors: string[];
+  sensation: string;
+  usage: string;
+  active: boolean;
+};
+
+export const visualModes: VisualMode[] = [
+  {
+    id: 'artist-studio',
+    label: 'Atelier pigment',
+    intention: 'L’atelier vivant : papier chaud, bleu pigment, ocre trace, cartels d’exposition.',
+    colors: ['Papier chaud', 'Bleu pigment', 'Ocre trace'],
+    sensation: 'Chaleureux, incarné, fait main.',
+    usage: 'Identité actuelle — équilibre entre matière et lisibilité.',
+    active: true,
+  },
+  {
+    id: 'gallery-minimal',
+    label: 'Galerie claire',
+    intention: 'Plus de blanc, plus de silence — priorité aux œuvres.',
+    colors: ['Blanc cassé', 'Gris cendre', 'Or discret'],
+    sensation: 'Calme, épuré, contemplatif.',
+    usage: 'Idéal quand les vraies images HD seront intégrées.',
+    active: false,
+  },
+  {
+    id: 'blue-cendres',
+    label: 'Bleu Cendres',
+    intention: 'Bleus profonds, or discret, paysages intérieurs.',
+    colors: ['Bleu nuit', 'Bleu pigment', 'Or'],
+    sensation: 'Profond, poétique, intériorisé.',
+    usage: 'Lien fort avec le recueil Bleu Cendres.',
+    active: false,
+  },
+];
