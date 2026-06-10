@@ -18,6 +18,15 @@ const bleuFacts = bleuCendres.facts.filter((f) =>
   ['Parution', 'Éditions', 'Poèmes'].includes(f.label),
 );
 
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.artistName,
+  url: site.url,
+  inLanguage: site.lang,
+  description: `${site.manifesto} ${site.baseline}`,
+};
+
 const visualArtistLd = {
   '@context': 'https://schema.org',
   '@type': 'VisualArtist',
@@ -46,7 +55,7 @@ const visualArtistLd = {
     'tableaux disponibles',
     'Bleu Cendres',
   ]}
-  jsonld={visualArtistLd}
+  jsonld={[websiteLd, visualArtistLd]}
 >
   <!-- A — HERO -->
   <section class="shell grid items-center gap-12 pb-section pt-10 sm:pt-16 lg:min-h-[84vh] lg:grid-cols-[0.92fr_1.08fr] lg:gap-16">
