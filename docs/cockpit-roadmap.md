@@ -20,6 +20,31 @@ page sert de carte.
 > Les composants (`src/components`, `src/layouts`) **consomment** ces données
 > et ne contiennent pas de texte important codé en dur.
 
+## Cockpit V1 — état
+
+L'écran d'accueil tient en une phrase : **« Choisis une action, prépare les
+informations, copie le résultat, puis valide humainement. »** Les **actions** sont
+présentées dans un **ordre naturel** (cartes + navigation), chaque module en
+`<details>` repliable.
+
+**Actions disponibles** (toutes en mode *préparer · copier · à valider*) :
+1. **Ajouter une œuvre** · 2. **Protéger une œuvre** · 3. **Préparer une publication** ·
+4. **Préparer un catalogue** · 5. **Répondre à une demande** · 6. **Facture & remise** ·
+7. **Ambiance visuelle** · puis **Roadmap / prochaines activations**.
+
+**Vocabulaire harmonisé** : *Préparer · Copier · À valider · Validation humaine ·
+Aucune sauvegarde automatique* (jamais « publier / enregistrer / payer / envoyer
+automatiquement »).
+
+**Ce que le cockpit fait** : prépare · vérifie · structure · copie.
+**Ce qu'il ne fait pas encore** : sauvegarder · publier/envoyer · encaisser ·
+remplacer un conseil professionnel.
+
+**Limites** : aucune sauvegarde réelle, aucun upload, aucune auth, aucune base de
+données, aucun paiement, aucune API (Instagram…), aucun service externe.
+**Prochaine activation possible** : édition réelle (Decap CMS) + dépôt d'images,
+avec validation humaine — voir « Versions du cockpit » plus bas.
+
 ## Où modifier quoi (aujourd'hui)
 
 | Domaine | Fichier | Contenu pilotable |
