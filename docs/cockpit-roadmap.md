@@ -188,38 +188,36 @@ Section opérationnelle dans `/cockpit-roadmap` (modèle : `src/data/proof.ts`) 
 - **Limite assumée** : le cockpit **organise**, il ne **protège pas** à lui seul.
   L'artiste garde la décision. Voir `docs/ip-protection-artist.md`.
 
-## Module « Facture brouillon + remise d’œuvre » (prototype)
+## Module « Facture & remise » (prototype, mini-assistant 3 étapes)
 
-Section opérationnelle « **Après une demande d’acquisition** » dans `/cockpit-roadmap`
-(modèle : `src/data/transactionWorkflow.ts`) pour préparer la **suite** d’une demande :
-**demande client → œuvre → réservation → brouillon de facture → paiement à définir →
-remise/livraison → preuve de remise → archivage**.
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/transactionWorkflow.ts`)
+pour préparer la **suite d’une acquisition**, sans jamais encaisser ni émettre de
+facture officielle.
 
-- **Brouillon de facture** : bloc copiable « BROUILLON DE FACTURE — À VÉRIFIER »
-  (artiste, client, œuvre, dimensions, technique, **« Prix : à valider / prix sur
-  demande »**, date, **« Numéro de facture : à compléter »**, **« Mode de paiement :
-  à définir »**, conditions, remise/livraison, notes, **« Validation humaine :
-  obligatoire avant envoi »**).
-- **Logistique** : bloc copiable « FICHE LOGISTIQUE — REMISE D’ŒUVRE » (mode de remise —
-  retrait atelier / livraison locale / transporteur à définir —, adresse, date,
-  emballage, état avant départ, photos, assurance, responsable, preuve de remise,
-  signature, notes) + checklists « **Avant d’envoyer une facture** » et « **Avant
-  remise ou livraison** ».
-- **Messages client** : modèles copiables (information, réservation, remise/livraison,
-  coordonnées, catalogue) au ton **humain, professionnel, chaleureux** — jamais agressif.
-- **Gamification douce** (sobre, adulte) : badges Demande claire · Facture préparée ·
-  Logistique prête · Remise sécurisée · Archive prévue.
+- **Étape 1 — Préparer les informations** : client & œuvre (artiste, client, e-mail,
+  statut, œuvre, dimensions, technique) · facture (prix à valider, date, numéro à
+  compléter, mode de paiement à définir, conditions, notes) · remise/livraison (mode,
+  date prévue, adresse, emballage, état, photos, assurance, responsable, signature).
+- **Étape 2 — Générer les brouillons** : blocs copiables **« BROUILLON DE FACTURE —
+  À VÉRIFIER »**, **« FICHE LOGISTIQUE — REMISE D’ŒUVRE »** et **« Message client —
+  remise / livraison »** (Copier la facture brouillon / la fiche logistique / le message).
+- **Étape 3 — Vérifier avant envoi / remise** : checklist (prix validé humainement ·
+  numéro à compléter · mode de paiement à définir · œuvre photographiée avant départ ·
+  emballage vérifié · lieu/date confirmés · preuve de remise prévue · **validation
+  humaine obligatoire**).
+- **Badges** : Informations prêtes · Brouillon prêt · Logistique prête · Preuve prévue ·
+  Validation humaine.
 
-### Limites volontaires (facture / logistique)
-- **Aucun paiement réel** : pas de « payer maintenant », pas de lien, **pas de Stripe /
-  PayPal**, aucune API.
-- **Pas de facture officielle définitive** : ce sont des **brouillons à vérifier
-  humainement**. Numéro « à compléter », montant « à valider », paiement « à définir ».
-- **Aucune comptabilité automatisée** : le cockpit **ne remplace pas un comptable** —
-  pour la comptabilité légale, **consulter un professionnel** si nécessaire.
-- **Aucune sauvegarde, aucun upload, aucune base de données** : tout est calculé
-  côté navigateur, rien n’est enregistré.
-- **Validation humaine obligatoire** : Armelle décide · Tom valide · Claude Code exécute.
+### Garde-fous — « Ce module ne remplace pas un comptable »
+- Il prépare un **brouillon** ; les informations doivent être **vérifiées humainement**.
+- **Aucun paiement** n’est déclenché (**pas de Stripe / PayPal**, aucun « payer maintenant »,
+  **aucun bouton « Payer »**).
+- **Aucune facture officielle définitive** n’est émise automatiquement (numéro « à
+  compléter », montant « à valider », paiement « à définir »).
+- **Aucun envoi automatique**, **aucune sauvegarde, aucun upload, aucune base de données** :
+  tout est calculé côté navigateur ; boutons **Copier** uniquement.
+- Pour la comptabilité : **consulter un professionnel** si nécessaire.
+- 🔮 **Futur possible** (hors scope) : **modèle de facture validé par un professionnel**.
 
 ## Module « Préparer un catalogue » (prototype, mini-assistant 3 étapes)
 
