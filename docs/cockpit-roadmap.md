@@ -321,6 +321,31 @@ puis l'**envoyer à la main**.
 - 🔮 **Futur possible** (hors scope) : **boîte de demandes / CRM léger** — seulement
   si bénéfice net, jamais d'API ni de secret.
 
+## Module « Ambiance visuelle » (prototype, mini-assistant 3 étapes)
+
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/theme.ts` →
+`visualModes`) pour **choisir une direction visuelle** et préparer une demande de
+changement — **sans rien modifier**.
+
+- **Étape 1 — Choisir une ambiance** : **Atelier pigment** · **Galerie claire** ·
+  **Bleu Cendres** (chaque mode : intention · couleurs dominantes · sensation · usage).
+- **Étape 2 — Ajuster le ressenti** (préparatoire) : intensité du bleu · intensité de
+  l’ocre · texture papier · style des cartes · style des boutons · sobriété/expressivité.
+- **Étape 3 — Copier la demande** : bloc copiable **« AMBIANCE VISUELLE — DEMANDE DE
+  MODIFICATION »** (mode, objectif, couleurs à renforcer/adoucir, texture, cartes,
+  boutons, commentaire artiste, **« Validation humaine : à vérifier avant
+  modification du site »**).
+- **Badges** : Ambiance choisie · Couleurs précisées · Texture dosée · Cartes définies ·
+  Validation prête.
+
+### Garde-fous — « Ce module ne modifie pas encore le site automatiquement »
+- Il **prépare une décision** ; les changements doivent être **validés**.
+- **Pas de switch réel maintenant**, **aucune sauvegarde**, **`theme.ts` n’est pas
+  touché par le cockpit** : le changement réel se fait **à la main** après accord.
+- Les **couleurs réelles** seront **ajustées après l’intégration des vraies œuvres HD**.
+- 🔮 **Futur possible** (hors scope) : **thème activable depuis le cockpit** (avec
+  validation humaine) — pas d’application automatique.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
