@@ -11,6 +11,32 @@
 export const pages = {
   // ----- ACCUEIL : un parcours, pas une landing -----
   home: {
+    // B — Signature d'univers : qui elle est / ce qu'elle peint, en un regard.
+    universe: {
+      eyebrow: 'L’univers',
+      title: 'La couleur, d’abord',
+      text:
+        'Née d’une nécessité vitale, sa peinture pose la couleur et la matière comme on pose le souffle. Des bleus profonds, des ors, la lumière de Collioure et la terre de Bourgogne : l’abstraction laisse affleurer la mémoire des lieux — et la joie d’être en vie.',
+      // Mots d'atelier (concrets, pas des slogans).
+      signs: [
+        'Couleur & matière',
+        'Bleus profonds & or',
+        'Acrylique, pigments, couteau',
+        'Toile recyclée',
+        'Collioure · Bourgogne',
+        'Peindre comme on respire',
+      ],
+    },
+    // C — Entrées principales : trois portes pour entrer dans l'œuvre.
+    doors: {
+      eyebrow: 'Par où entrer',
+      title: 'Trois portes vers l’atelier',
+      items: [
+        { index: '01', label: 'Explorer les œuvres', note: 'La galerie complète : séries, formats, matières.', href: '/oeuvres', cta: 'Voir la galerie' },
+        { index: '02', label: 'Tableaux disponibles', note: 'La sélection d’atelier à découvrir ou à réserver.', href: '/disponibles', cta: 'Voir les disponibles' },
+        { index: '03', label: 'Biographie & démarche', note: 'Le parcours, les lieux, la matière et le geste.', href: '/biographie', cta: 'Lire l’histoire' },
+      ],
+    },
     gallery: {
       eyebrow: 'Entrer dans l’atelier',
       title: 'Œuvres mises en lumière',
@@ -39,15 +65,17 @@ export const pages = {
         'Une chronologie vivante : expositions, performances, résidences et rencontres, entre la Bourgogne, Paris et Collioure.',
       cta: 'Voir la chronologie',
     },
-    // Transition de fin : inviter à entrer dans le récit de l'artiste.
+    // F — Contact doux : une invitation simple, en lien direct avec l'artiste.
     closing: {
-      eyebrow: 'Aller plus loin',
-      title: 'Derrière la couleur, une vie',
+      eyebrow: 'Écrire à l’artiste',
+      title: 'Une œuvre, une exposition, une rencontre',
       text:
-        'La peinture d’Armelle Mourier est née d’une nécessité : transformer l’émotion en geste, et transmettre la joie d’être en vie. Son parcours et sa démarche éclairent chaque toile.',
+        'L’acquisition reste une conversation, en lien direct avec l’artiste — jamais un panier, jamais une vitrine. Pour une œuvre, une exposition, un catalogue, ou simplement pour parler peinture : la porte de l’atelier est ouverte.',
+      // Intentions claires (le visiteur sait pourquoi écrire).
+      intents: ['Acquérir une œuvre', 'Proposer une exposition', 'Demander le catalogue', 'Rencontrer l’artiste'],
       links: [
+        { label: 'Écrire à l’artiste', href: '/contact' },
         { label: 'Lire la biographie', href: '/biographie' },
-        { label: 'Découvrir la démarche', href: '/demarche' },
       ],
     },
   },
