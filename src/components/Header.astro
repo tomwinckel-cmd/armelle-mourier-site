@@ -30,6 +30,9 @@ import { site, nav, contact, carnet } from '../data/site';
   </div>
   <div class="header-rule" aria-hidden="true"></div>
 
+  {/* Scrim DERRIÈRE le panneau (déclaré avant pour l'ordre de peinture + z-index). */}
+  <button class="nav-scrim" type="button" aria-label="Fermer le carnet" tabindex="-1" data-nav-scrim></button>
+
   {/* Le Carnet — menu éditorial (mobile/tablette) : une mini-page d'atelier */}
   <nav id="menu-atelier" class="atelier-menu" aria-label="Navigation" data-nav-menu>
     <p class="atelier-menu__title">{carnet.eyebrow}</p>
@@ -51,7 +54,6 @@ import { site, nav, contact, carnet } from '../data/site';
       <a href={`mailto:${contact.email}`} class="atelier-menu__mail" data-nav-close>{contact.email}</a>
     </div>
   </nav>
-  <button class="nav-scrim" type="button" aria-hidden="true" tabindex="-1" data-nav-scrim></button>
 </header>
 
 <style>
@@ -59,6 +61,8 @@ import { site, nav, contact, carnet } from '../data/site';
     position: sticky;
     top: 0;
     z-index: 50;
+    /* Hauteur de la barre — sert d'ancrage au Carnet et au scrim (mobile). */
+    --header-h: 5.5rem;
     background: rgb(var(--c-paper));
   }
   /* Filet de haut de papier : encre + trace d'or (pas une barre premium). */
@@ -80,6 +84,10 @@ import { site, nav, contact, carnet } from '../data/site';
     background: transparent;
     border: 0;
   }
+  .nav-toggle:focus-visible {
+    outline: 2px solid rgb(var(--c-or));
+    outline-offset: 3px;
+  }
   .nav-toggle__lines { display: inline-flex; flex-direction: column; gap: 5px; width: 22px; }
   .nav-toggle__lines span { height: 1.5px; width: 100%; background: currentColor; transition: transform .3s ease, opacity .3s ease; }
   [aria-expanded="true"] .nav-toggle__lines span:nth-child(1) { transform: translateY(3.25px) rotate(6deg); }
@@ -90,18 +98,21 @@ import { site, nav, contact, carnet } from '../data/site';
   .nav-scrim { display: none; }
 
   @media (max-width: 1023px) {
+    /* Panneau du Carnet : superposition fixe, fond papier OPAQUE, au-dessus de tout. */
     .atelier-menu {
-      display: block; /* annule le display:none global en mobile/tablette */
-      position: absolute;
+      display: block;
+      position: fixed;
+      top: var(--header-h, 5.5rem);
       left: 0;
       right: 0;
-      top: 100%;
+      z-index: 60; /* > scrim (55) : les liens restent cliquables */
       background: rgb(var(--c-paper));
       border-bottom: 1px solid rgb(var(--c-encre) / 0.18);
-      box-shadow: 0 18px 40px rgb(var(--c-encre) / 0.08);
+      box-shadow: 0 18px 40px rgb(var(--c-encre) / 0.12);
       padding: 1.25rem clamp(1rem, 5vw, 2rem) 1.5rem;
-      max-height: calc(100dvh - 5.5rem);
+      max-height: calc(100dvh - var(--header-h, 5.5rem));
       overflow-y: auto;
+      overscroll-behavior: contain;
       transform: translateY(-10px);
       opacity: 0;
       visibility: hidden;
@@ -124,6 +135,10 @@ import { site, nav, contact, carnet } from '../data/site';
       padding: 0.95rem 0.1rem;
       text-decoration: none;
       color: rgb(var(--c-encre));
+    }
+    .atelier-menu li a:focus-visible {
+      outline: 2px solid rgb(var(--c-or));
+      outline-offset: 2px;
     }
     .atelier-menu__num {
       font-family: var(--font-serif);
@@ -177,11 +192,13 @@ import { site, nav, contact, carnet } from '../data/site';
       opacity: 1;
       visibility: visible;
     }
+    /* Fond de page neutralisé — DERRIÈRE le panneau, capte le clic « extérieur ». */
     .site-header[data-open="true"] .nav-scrim {
       display: block;
       position: fixed;
-      inset: 5.5rem 0 0;
-      background: rgb(var(--c-noir) / 0.16);
+      inset: var(--header-h, 5.5rem) 0 0;
+      z-index: 55; /* < panneau (60), > contenu de page */
+      background: rgb(var(--c-noir) / 0.45);
       border: 0;
     }
   }
@@ -201,10 +218,14 @@ import { site, nav, contact, carnet } from '../data/site';
     header.setAttribute('data-open', String(open));
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Fermer le carnet' : 'Ouvrir le carnet');
+    // Verrou du scroll de la page quand le Carnet est ouvert (évite le double-scroll).
+    document.documentElement.style.overflow = open ? 'hidden' : '';
   };
 
   toggle?.addEventListener('click', () => setOpen(header?.getAttribute('data-open') !== 'true'));
   scrim?.addEventListener('click', () => setOpen(false));
+  // Les liens du Carnet sont de VRAIS liens : on ferme le menu, puis le
+  // navigateur suit le href normalement (pas de preventDefault, pas de hash).
   document.querySelectorAll('[data-nav-close]').forEach((link) =>
     link.addEventListener('click', () => setOpen(false)),
   );

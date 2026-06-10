@@ -90,3 +90,34 @@ la route attendue **en haut de page**.
 | Bleu Cendres | `/bleu-cendres` | ✅ |
 | Expositions | `/expositions` | ✅ |
 | Contact | `/contact` | ✅ |
+
+## Carnet mobile / tablette (overlay & fiabilité)
+
+Le Carnet (`< 1024px`) est une **superposition fixe** au-dessus de toute la page.
+Architecture (voir `src/components/Header.astro`) :
+
+- **Panneau** `.atelier-menu` : `position: fixed`, ancré sous la barre
+  (`top: var(--header-h)`), **fond papier opaque**, `overflow-y: auto`,
+  `overscroll-behavior: contain`, **`z-index: 60`**.
+- **Fond neutralisé** `.nav-scrim` : `position: fixed` **derrière** le panneau
+  (**`z-index: 55`**), déclaré **avant** le panneau dans le DOM. Capte le clic
+  « extérieur » pour fermer — **sans jamais recouvrir les liens**.
+- **Verrou du scroll** : `documentElement.overflow = 'hidden'` quand le Carnet
+  est ouvert (rétabli à la fermeture).
+
+> ⚠️ Régression historique corrigée : le scrim était peint **au-dessus** du
+> panneau (déclaré après, sans `z-index`) et **interceptait les taps** → cliquer
+> « Biographie » fermait le menu **sans naviguer** (on restait sur `/oeuvres`).
+> Le scrim est désormais **sous** le panneau.
+
+**Scénario de test (depuis `/oeuvres`, en mobile)** :
+
+1. Ouvrir le Carnet → le panneau **couvre proprement** l'écran sous la barre,
+   fond papier **lisible**, **aucun bloc noir** par-dessus, pas de scroll horizontal.
+2. Cliquer **Biographie** → l'URL devient **`/biographie`** et la page s'ouvre **en haut**.
+3. Refaire pour **Disponibles, Démarche, Bleu Cendres, Expositions, Contact** →
+   chaque lien ouvre **la bonne route, en haut**.
+4. Fermetures : **Échap**, **clic sur le fond (scrim)**, **bouton Carnet**, et
+   **clic sur un lien** ferment toutes le panneau.
+5. États ARIA : le bouton porte `aria-expanded` (true/false), `aria-controls="menu-atelier"`,
+   et un libellé qui passe à « Fermer le carnet » à l'ouverture ; focus visible au clavier.
