@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import SectionTitle from '../components/SectionTitle.astro';
 import Trait from '../components/Trait.astro';
-import { splitExhibitions, exhibitionYears, type Exhibition, type ExhibitionType } from '../data/exhibitions';
+import { exhibitions, splitExhibitions, exhibitionYears, type Exhibition, type ExhibitionType } from '../data/exhibitions';
 import { site } from '../data/site';
 
 const { upcoming, past } = splitExhibitions();
@@ -19,6 +19,16 @@ const typeLabel: Record<ExhibitionType, string> = {
   performance: 'Performance',
   event: 'Événement',
 };
+
+// Repères de parcours — STRICTEMENT dérivés de exhibitions.ts (aucune invention).
+const count = (t: ExhibitionType) => exhibitions.filter((e) => e.type === t).length;
+const yearsAsc = [...exhibitionYears].sort((a, b) => a - b);
+const repere = [
+  { value: String(exhibitions.length), label: 'expositions & événements' },
+  { value: `${yearsAsc[0]} → ${yearsAsc[yearsAsc.length - 1]}`, label: 'de parcours' },
+  { value: String(count('solo')), label: 'personnelles' },
+  { value: String(count('residence') + count('performance')), label: 'résidences & performances' },
+];
 
 // Données structurées Event pour les expositions datées
 function toEventLd(e: Exhibition) {
@@ -57,6 +67,16 @@ const eventsLd = [...upcoming, ...past].filter((e) => e.startDate).map(toEventLd
       poésie et danse — en Bourgogne, à Paris et du côté de Collioure. Depuis 2024, Armelle Mourier
       préside l’association ArtDi, qui réunit des artistes autour d’événements partagés.
     </p>
+
+    <!-- REPÈRES DE PARCOURS (dérivés des données) -->
+    <dl class="reveal mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {repere.map((r) => (
+        <div class="frame-gallery p-4">
+          <dt class="font-serif text-3xl text-encre">{r.value}</dt>
+          <dd class="mt-1 text-sm text-cendre">{r.label}</dd>
+        </div>
+      ))}
+    </dl>
   </section>
 
   <!-- À VENIR -->
@@ -111,6 +131,7 @@ const eventsLd = [...upcoming, ...past].filter((e) => e.startDate).map(toEventLd
                   {(e.location || e.city) && (
                     <p class="text-sm text-noir/70">{[e.location, e.city].filter(Boolean).join(' — ')}</p>
                   )}
+                  {e.type && <p class="mt-0.5 text-eyebrow uppercase tracking-[0.14em] text-cendre">{typeLabel[e.type]}</p>}
                   {e.description && <p class="mt-1 max-w-prose text-sm text-noir/65">{e.description}</p>}
                 </div>
               </li>
@@ -126,9 +147,12 @@ const eventsLd = [...upcoming, ...past].filter((e) => e.startDate).map(toEventLd
     <div class="rounded-card border border-cendre/25 bg-brume px-6 py-12 text-center sm:px-12">
       <h2 class="text-h2 font-serif text-encre">Un projet d’exposition ou de collaboration&nbsp;?</h2>
       <p class="mx-auto mt-4 max-w-xl text-noir/75">
-        Galeries, lieux, festivals, résidences&nbsp;: écrivez à l’artiste ou à l’association ArtDi.
+        Galeries, lieux, festivals, résidences, presse&nbsp;: écrivez à l’artiste ou à l’association ArtDi.
       </p>
-      <a href="/contact?objet=exposition" class="btn-primary mt-8">Proposer un projet</a>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/contact?objet=exposition" class="btn-primary">Proposer un projet</a>
+        <a href="/contact?objet=presse" class="btn-ghost">Contact presse</a>
+      </div>
     </div>
   </section>
 </Base>
