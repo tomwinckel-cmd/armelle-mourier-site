@@ -95,3 +95,43 @@ export const workflowBadges = [
   { id: 'social', label: 'Publication préparée' },
   { id: 'sale', label: 'Vente douce prête' },
 ];
+
+// =====================================================================
+//  MINI-ASSISTANT « AJOUTER UNE ŒUVRE » EN 3 ÉTAPES (cockpit V1)
+//  ---------------------------------------------------------------------
+//  Version simple et guidée pour une artiste non technique. Le module
+//  PRÉPARE seulement (aucune sauvegarde, aucun envoi). Aides très courtes.
+// =====================================================================
+export type AddArtworkStep = {
+  id: string;
+  n: string;
+  label: string;
+  /** Aide très courte (une phrase). */
+  help: string;
+  /** Champs à préparer pour l'étape (libellés humains). */
+  fields: string[];
+};
+
+export const addArtworkSteps: AddArtworkStep[] = [
+  {
+    id: 'essentials',
+    n: '1',
+    label: 'Informations essentielles',
+    help: 'L’identité de l’œuvre. Ne rien inventer : laisser vide si on ne sait pas.',
+    fields: ['Titre', 'Série', 'Année', 'Dimensions', 'Technique', 'Support', 'Statut'],
+  },
+  {
+    id: 'images',
+    n: '2',
+    label: 'Images & description',
+    help: 'Une image web (compressée), la HD gardée à l’abri, et quelques mots.',
+    fields: ['Image principale', 'Images détails', 'Description courte', 'Alt text', 'Version web compressée', 'HD privée conservée'],
+  },
+  {
+    id: 'check',
+    n: '3',
+    label: 'Vérification avant ajout',
+    help: 'On relit, on coche, on copie le résumé. Rien n’est publié automatiquement.',
+    fields: ['Prix non inventé', 'Statut vérifié', 'Image web prête', 'HD conservée', 'Alt text descriptif', 'Validation humaine'],
+  },
+];
