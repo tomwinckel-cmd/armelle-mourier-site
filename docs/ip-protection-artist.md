@@ -51,16 +51,20 @@
 3. **Déposer / horodater** via un service de preuve (ex. **e-Soleau**) **si
    l'œuvre est importante**.
 
-## Générateur « Fiche œuvre + preuve de création » (cockpit, prototype)
+## Module « Protéger une œuvre » (cockpit, prototype — 3 étapes)
 
-Dans `/cockpit-roadmap` (interne, noindex, hors nav), une section
-**« Fiche œuvre + preuve de création »** aide à documenter une œuvre en quelques
-minutes. Modèle : `src/data/proof.ts`.
+Dans `/cockpit` (interne, noindex, hors nav), un **mini-assistant 3 étapes**
+**« Protéger une œuvre »** aide à organiser un **dossier de preuve**. Modèle :
+`src/data/proof.ts`.
 
-- **Comment l'utiliser** : choisir une œuvre existante pour pré-remplir (ou
-  partir du modèle vide), compléter les champs, puis **copier la fiche** et la
-  **checklist**. Tout se calcule **côté navigateur** ; **rien n'est sauvegardé,
-  téléversé ni publié**.
+- **Comment l'utiliser** : **1.** identifier l'œuvre (titre, dimensions, technique,
+  **date/lieu de création**, description) — pré-remplissage possible depuis une
+  œuvre existante ; **2.** préparer les preuves (où sont la HD privée, la version
+  web, les photos de détails, l'historique, les expositions ; cases de
+  conservation) ; **3.** copier le dossier (**FICHE PREUVE DE CRÉATION**,
+  **CHECKLIST PROTECTION**, **NOTES POUR HORODATAGE**). Tout se calcule **côté
+  navigateur** ; **rien n'est sauvegardé, téléversé, publié ni déposé** — l'éventuel
+  **horodatage (e-Soleau / INPI) est une démarche manuelle, non connectée**.
 - **Pourquoi conserver la HD** : c'est l'original de référence (qualité, preuve,
   réédition). On la **garde hors du site**, en privé.
 - **Pourquoi préparer une version web** : on publie une **image compressée**

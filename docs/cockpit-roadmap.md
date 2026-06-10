@@ -161,32 +161,36 @@ Parcours guidé dans `/cockpit-roadmap` (modèle : `src/data/artworkWorkflow.ts`
 - **Validation humaine obligatoire** : aucun bouton « Publier », aucune sauvegarde,
   aucun envoi. Armelle décide · Tom valide · Claude Code exécute.
 
-## Générateur « Fiche œuvre + preuve de création » (prototype)
+## Module « Protéger une œuvre » (prototype, mini-assistant 3 étapes)
 
-Section opérationnelle dans `/cockpit-roadmap` (modèle : `src/data/proof.ts`) pour
-**documenter, protéger et archiver** une œuvre en quelques minutes.
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/proof.ts`) pour
+**organiser un dossier de preuve** d'une œuvre.
 
-- **Fonctionnement** : pré-remplir depuis une œuvre existante (ou modèle vide) →
-  compléter identité, technique, **preuve de création**, images, vente, web,
-  réseaux → **copier la fiche** + **copier la checklist**. Calcul **côté client**,
-  **aucune sauvegarde**, **aucun upload**.
-- **Fiche copiable** : bloc texte structuré « FICHE ŒUVRE — PREUVE DE CRÉATION »
-  (titre, série, année, dimensions, technique, support, description, date/lieu,
-  images conservées HD/web/détails, statut, **« Prix sur demande » par défaut**,
-  publication web, alt text, notes de protection, historique, demande/acquéreur,
-  logistique, réseaux, hashtags, **« Validation humaine : à vérifier avant
-  publication »**).
-- **Checklist de protection** (12 points) + blocs d'aide « Images à conserver »
-  et « Publication web recommandée ».
-- **Garde-fous PI** : ce n'est **pas un avis juridique** ; le droit d'auteur naît
-  à la création ; l'enjeu pratique est la **preuve de date et de paternité** ;
-  pour une œuvre importante, envisager **e-Soleau** ou un autre service de preuve
-  datée ; **ne pas publier la HD complète** ; conserver originaux et échanges.
-- **Gamification douce** (adulte, sobre) : préparation du dossier (brouillon /
-  presque prêt / prêt à valider) + badges (Fiche complète · Images prêtes ·
-  Protection pensée · Web prêt · Réseaux prêts · Vente douce prête).
-- **Limite assumée** : le cockpit **organise**, il ne **protège pas** à lui seul.
-  L'artiste garde la décision. Voir `docs/ip-protection-artist.md`.
+- **Étape 1 — Identifier l'œuvre** : titre, série, année, dimensions, technique,
+  date de création, lieu de création, description courte (pré-remplissage possible
+  depuis une œuvre existante).
+- **Étape 2 — Préparer les preuves** : où sont conservées HD / version web / photos
+  de détails / historique / publication web / expositions, + cases de conservation
+  (HD hors site, version web prête, photos de détails, brouillons/étapes, échanges
+  archivés, publication web notée, expositions notées, horodatage envisagé).
+- **Étape 3 — Copier le dossier de preuve** : **rappel version web**, **notes pour
+  horodatage**, **checklist protection**, validation humaine → blocs copiables
+  **« FICHE PREUVE DE CRÉATION — BROUILLON »**, **« CHECKLIST PROTECTION »** et
+  **« NOTES POUR HORODATAGE »** (Copier le dossier / la checklist / les notes).
+- **Badges** : Fiche complète · Images sécurisées · Preuve organisée · Web maîtrisé ·
+  Horodatage envisagé.
+
+### Garde-fous juridiques — « Ce module ne remplace pas un conseil juridique »
+- Le **droit d'auteur naît automatiquement** à la création ; le point pratique est de
+  pouvoir **prouver la date et la paternité**.
+- Pour une **œuvre importante**, envisager un **service de preuve / horodatage adapté**
+  (**e-Soleau / INPI** ou autre) — **démarche manuelle, non connectée** ici.
+- **Ne pas publier la HD complète** ; conserver la HD privée + une version web.
+- Le module **organise les preuves**, il **ne protège pas juridiquement à lui seul** ;
+  **consulter un professionnel** en cas d'enjeu important.
+- **Limites** : aucune sauvegarde, aucun upload, **aucune connexion INPI/e-Soleau**,
+  aucun service externe ; boutons **Copier** uniquement.
+- 🔮 **Futur possible** (hors scope) : **export du dossier de preuve**.
 
 ## Module « Facture & remise » (prototype, mini-assistant 3 étapes)
 

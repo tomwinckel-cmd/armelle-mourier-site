@@ -107,28 +107,26 @@ export const webPublicationTips = [
   'Conserver la HD originale hors du site, en lieu sûr et privé.',
 ];
 
-/** Checklist avant diffusion (garde-fou protection). */
+/** Checklist de protection (garde-fou — à cocher avant diffusion). */
 export const protectionChecklist = [
-  'La fiche œuvre est complète.',
-  'La date de création est renseignée.',
-  'Les images HD sont conservées hors site (privées).',
-  'Une version web compressée est préparée.',
-  'L’alt text est descriptif.',
-  'Le statut est correct.',
-  'Le prix n’est pas inventé.',
-  'La preuve de création est conservée.',
-  'L’œuvre importante peut être horodatée / déposée (e-Soleau ou autre).',
-  'Les échanges importants sont archivés.',
-  'La publication Instagram ne contient pas de HD complète.',
-  'La validation humaine est faite.',
+  'Fiche œuvre complète',
+  'Date renseignée',
+  'HD conservée hors site',
+  'Version web préparée',
+  'Photos de détail conservées',
+  'Preuve de création organisée',
+  'Échanges importants archivés',
+  'Statut de l’œuvre vérifié',
+  'Aucun fichier HD publié sans nécessité',
+  'Horodatage / dépôt envisagé si œuvre importante',
+  'Validation humaine',
 ];
 
 /** Badges encourageants (gamification douce, calculée côté client). */
 export const proofBadges = [
   { id: 'fiche', label: 'Fiche complète' },
-  { id: 'images', label: 'Images prêtes' },
-  { id: 'protection', label: 'Protection pensée' },
-  { id: 'web', label: 'Web prêt' },
-  { id: 'social', label: 'Réseaux prêts' },
-  { id: 'sale', label: 'Vente douce prête' },
+  { id: 'images', label: 'Images sécurisées' },
+  { id: 'proof', label: 'Preuve organisée' },
+  { id: 'web', label: 'Web maîtrisé' },
+  { id: 'horodatage', label: 'Horodatage envisagé' },
 ];
