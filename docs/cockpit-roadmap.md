@@ -262,6 +262,31 @@ La page est organisée en **tableau de bord** lisible en quelques secondes :
 Objectif : **réduire la charge mentale**, pas la déplacer dans une page trop
 longue. Aucune sauvegarde, aucun service externe — comportement inchangé.
 
+## Module « Préparer une publication » (prototype)
+
+Mini-assistant **3 étapes** dans `/cockpit` (modèle : `src/data/social.ts`) pour
+préparer une publication réseaux **en copier-coller**, sans complexité technique :
+
+- **Étape 1 — Choisir le contexte** : nouvelle œuvre · œuvre disponible · exposition ·
+  coulisse d'atelier · Bleu Cendres · rappel catalogue (pré-remplit légende + format).
+- **Étape 2 — Préparer** : format conseillé (carré 1:1 · portrait 4:5 · story 9:16),
+  ton (sobre / poétique / informatif), œuvre/sujet, **légende proposée** (ajustable),
+  **hashtags**, image web.
+- **Étape 3 — Copier & publier manuellement** : checklist « Avant de publier » +
+  bloc copiable **« PUBLICATION À PRÉPARER »** + boutons **Copier la légende /
+  Copier les hashtags / Copier la publication**.
+
+**Garde-fous** : image **web compressée** (jamais la HD complète), légende relue,
+hashtags sobres, **statut vérifié** (une œuvre vendue n'est pas présentée comme
+disponible), **aucun prix inventé**, **validation humaine**. Badges : Légende prête ·
+Hashtags prêts · Image web prête · Statut vérifié · Publication prête à copier.
+
+- ❌ **Pas d'API Instagram / Meta**, **aucune publication automatique**, aucun « Publier ».
+  Tout est **copié-collé à la main** par l'artiste — « À publier manuellement sur :
+  Instagram ».
+- 🔮 **Futur possible** (hors scope) : **export d'image sociale** « prête à poster »
+  et **calendrier éditorial** — seulement si bénéfice net, jamais d'API ni de secret.
+
 ## Volontairement exclu maintenant
 
 - 💳 **Paiement en ligne** / panier / checkout.
