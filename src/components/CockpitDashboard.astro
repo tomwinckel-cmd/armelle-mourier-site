@@ -1,0 +1,1599 @@
+---
+import { artworks, statusLabel, isForSale, hasImage, priceLabel, type ArtworkStatus } from '../data/artworks';
+import { shop } from '../data/shop';
+import { socialPublishing } from '../data/social';
+import { cockpit } from '../data/cockpit';
+import { theme } from '../data/theme';
+import { splitExhibitions } from '../data/exhibitions';
+import { operations, operationsPrinciple, operationActivation, type OperationStatus } from '../data/operations';
+import { artworkWorkflow, workflowBadges } from '../data/artworkWorkflow';
+import { designModes } from '../data/theme';
+import { artworkProof, webPublicationTips, protectionChecklist, proofBadges } from '../data/proof';
+import { transactionWorkflow, invoiceChecklist, deliveryChecklist, messageTemplates, transactionBadges } from '../data/transactionWorkflow';
+import { catalogTypes, catalogChecklist, catalogMessages, catalogBadges } from '../data/catalogWorkflow';
+
+// ---- Données (lecture seule) ----
+const totalArtworks = artworks.length;
+const withImage = artworks.filter(hasImage).length;
+const statuses: ArtworkStatus[] = ['available', 'reserved', 'sold', 'on-request'];
+const byStatus = Object.fromEntries(
+  statuses.map((s) => [s, artworks.filter((a) => a.status === s)]),
+) as Record<ArtworkStatus, typeof artworks>;
+const { upcoming, past } = splitExhibitions();
+
+// Champs requis pour ajouter une œuvre (depuis le schéma cockpit).
+
+// Zones éditoriales pilotables et où elles vivent aujourd'hui.
+const editorialZones = [
+  { label: 'Accueil (accroche + récit)', file: 'src/content/pages.ts · src/data/site.ts' },
+  { label: 'Biographie', file: 'src/content/bio.ts' },
+  { label: 'Démarche', file: 'src/content/bio.ts' },
+  { label: 'Bleu Cendres', file: 'src/content/bio.ts' },
+  { label: 'Expositions', file: 'src/data/exhibitions.ts' },
+  { label: 'Contact (e-mail, sujets)', file: 'src/data/site.ts · src/data/shop.ts' },
+];
+
+// Palette actuelle (depuis theme.ts) pour l'aperçu « Ambiance visuelle ».
+const palette = [
+  { key: 'paper', label: 'Papier (fond)', hex: theme.colors.paper },
+  { key: 'paperRaw', label: 'Papier brut', hex: theme.colors.paperRaw },
+  { key: 'bluePigment', label: 'Bleu pigment', hex: theme.colors.bluePigment },
+  { key: 'blueDeep', label: 'Bleu nuit', hex: theme.colors.blueDeep },
+  { key: 'blueWash', label: 'Bleu aquatique', hex: theme.colors.blueWash },
+  { key: 'ochreGold', label: 'Ocre / or', hex: theme.colors.ochreGold },
+  { key: 'inkBlack', label: 'Noir encre', hex: theme.colors.inkBlack },
+  { key: 'ashBlue', label: 'Cendre', hex: theme.colors.ashBlue },
+];
+
+// Navigation interne du tableau de bord (libellés courts, scannables).
+const dashboardNav = [
+  { id: 'apercu', label: 'Vue d’ensemble' },
+  { id: 'intake', label: 'Ajouter une œuvre' },
+  { id: 'proof', label: 'Protéger' },
+  { id: 'social', label: 'Réseaux' },
+  { id: 'catalog', label: 'Catalogue' },
+  { id: 'disponibilites', label: 'Vente douce' },
+  { id: 'transaction', label: 'Facture · remise' },
+  { id: 'ambiance', label: 'Ambiance' },
+  { id: 'etapes', label: 'Roadmap' },
+];
+
+// Actions rapides : « Que veux-tu faire maintenant ? » → ancres internes.
+type ActionState = 'active' | 'prepared' | 'future';
+const quickActions: { href: string; label: string; hint: string; state: ActionState }[] = [
+  { href: '#intake', label: 'Ajouter une œuvre', hint: 'Saisir une œuvre sans erreur', state: 'active' },
+  { href: '#intake', label: 'Vérifier une œuvre avant publication', hint: 'Garde-fou récapitulatif', state: 'active' },
+  { href: '#social', label: 'Préparer une publication Instagram', hint: 'Légende à copier-coller', state: 'active' },
+  { href: '#catalog', label: 'Préparer un catalogue', hint: 'Dossier collectionneur', state: 'active' },
+  { href: '#transaction', label: 'Répondre à une demande', hint: 'Message client + réservation', state: 'active' },
+  { href: '#transaction', label: 'Préparer facture & remise', hint: 'Brouillon + logistique', state: 'active' },
+  { href: '#proof', label: 'Protéger une œuvre', hint: 'Fiche + preuve de création', state: 'active' },
+  { href: '#ambiance', label: 'Ajuster l’ambiance visuelle', hint: 'Couleurs & ambiances', state: 'prepared' },
+];
+// Libellés d'état (ton adulte, pas de jeu vidéo).
+const actionStateLabel: Record<ActionState, string> = { active: 'actif', prepared: 'préparation', future: 'bientôt' };
+const actionStateColor: Record<ActionState, string> = { active: 'text-encre', prepared: 'text-or', future: 'text-cendre' };
+
+// Badges de progression (sobres) — ce qui est déjà en place / assisté.
+const cockpitBadges: { label: string; done: boolean }[] = [
+  { label: 'Site public prêt', done: true },
+  { label: 'Galerie prête', done: true },
+  { label: 'Vente douce prête', done: true },
+  { label: 'Protection assistée', done: true },
+  { label: 'Catalogue assisté', done: true },
+  { label: 'Facture brouillon', done: true },
+  { label: 'Logistique assistée', done: true },
+  { label: 'Réseaux sociaux préparés', done: true },
+];
+
+// Statut des modules du cockpit (vue d’ensemble, ton adulte, pas d’infantilisation).
+type ModuleState = 'prototype' | 'preparation' | 'future';
+const cockpitModuleStatus: { label: string; state: ModuleState; href: string }[] = [
+  { label: 'Ajouter une œuvre', state: 'prototype', href: '#intake' },
+  { label: 'Fiche œuvre + preuve', state: 'prototype', href: '#proof' },
+  { label: 'Vente douce', state: 'prototype', href: '#disponibilites' },
+  { label: 'Réseaux sociaux', state: 'prototype', href: '#social' },
+  { label: 'Catalogue', state: 'prototype', href: '#catalog' },
+  { label: 'Facture brouillon', state: 'prototype', href: '#transaction' },
+  { label: 'Remise / livraison', state: 'prototype', href: '#transaction' },
+  { label: 'Ambiance visuelle', state: 'preparation', href: '#ambiance' },
+  { label: 'Édition réelle (CMS)', state: 'future', href: '#etapes' },
+  { label: 'Dépôt d’images', state: 'future', href: '#etapes' },
+  { label: 'Authentification', state: 'future', href: '#etapes' },
+];
+const moduleStateLabel: Record<ModuleState, string> = {
+  prototype: 'Modules actifs',
+  preparation: 'En préparation',
+  future: 'Prochaines activations',
+};
+const moduleStateOrder: ModuleState[] = ['prototype', 'preparation', 'future'];
+const modulesByState = Object.fromEntries(
+  moduleStateOrder.map((s) => [s, cockpitModuleStatus.filter((m) => m.state === s)]),
+) as Record<ModuleState, typeof cockpitModuleStatus>;
+
+// Titres orientés action pour les cartes du centre opérationnel.
+const opCardTitle: Record<string, string> = {
+  ip: 'Protéger une œuvre',
+  social: 'Préparer une publication',
+  'soft-sale': 'Répondre à une demande',
+  invoicing: 'Préparer une facture brouillon',
+  logistics: 'Organiser la remise ou livraison',
+  catalog: 'Préparer un catalogue',
+};
+const opStatusLabel: Record<OperationStatus, string> = {
+  planned: 'à venir',
+  prototype: 'prototype',
+  active: 'actif',
+};
+const opStatusColor: Record<OperationStatus, string> = {
+  planned: 'text-cendre',
+  prototype: 'text-or',
+  active: 'text-encre',
+};
+const opCards = operations.filter((o) => o.id !== 'human-relation');
+
+const statusChipClass: Record<ArtworkStatus, string> = {
+  available: 'text-encre',
+  reserved: 'text-or',
+  sold: 'text-cendre',
+  'on-request': 'text-cendre',
+};
+---
+  <section class="shell pb-section pt-10 sm:pt-14">
+    <p class="eyebrow mb-3">Outil interne · non public</p>
+    <h1 class="signature text-display text-encre">Cockpit artiste</h1>
+    <p class="mt-3 max-w-prose font-serif text-xl italic leading-snug text-encre">
+      Centre opérationnel pour préparer, publier, protéger et organiser les œuvres.
+    </p>
+
+    <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+      <strong>Mode développement sécurisé.</strong> Certaines actions <strong>préparent</strong> et
+      <strong>copient</strong> les contenus. La <strong>sauvegarde réelle</strong> sera activée par
+      étapes. Aucune connexion, aucun mot de passe, aucun paiement.
+    </p>
+
+    <!-- ÉCRAN D'ACCUEIL OPÉRATIONNEL : « Que veux-tu faire maintenant ? » -->
+    <section aria-labelledby="quick-actions-title" class="mt-10">
+      <h2 id="quick-actions-title" class="text-h2 font-serif text-encre">Que veux-tu faire maintenant ?</h2>
+      <p class="mt-1 text-sm text-cendre">Choisis une action — chaque carte ouvre le module correspondant.</p>
+      <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {quickActions.map((a) => (
+          <a href={a.href} class="quick-action frame-gallery flex flex-col gap-1.5 p-5 transition-colors hover:border-or/60">
+            <span class="flex items-baseline justify-between gap-2">
+              <span class="font-serif text-lg italic leading-tight text-encre">{a.label}</span>
+              <span class={`shrink-0 text-eyebrow uppercase tracking-[0.14em] ${actionStateColor[a.state]}`}>{actionStateLabel[a.state]}</span>
+            </span>
+            <span class="text-sm text-cendre">{a.hint}</span>
+            <span class="mt-1 text-sm font-semibold text-encre underline decoration-or/50 decoration-1 underline-offset-4">Ouvrir →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- NAVIGATION INTERNE (sticky, libellés courts) -->
+    <nav aria-label="Navigation du cockpit" class="cockpit-nav mt-8 flex flex-wrap gap-2 border-y border-cendre/20 py-3 text-sm">
+      {dashboardNav.map((s) => (
+        <a href={`#${s.id}`} class="rounded-full border border-cendre/30 px-3 py-1 font-semibold text-encre transition-colors hover:border-or/60 hover:text-or">{s.label}</a>
+      ))}
+    </nav>
+
+    <!-- 1 — VUE D'ENSEMBLE -->
+    <section id="apercu" class="scroll-mt-28">
+      <h2 class="mt-14 text-h2 font-serif text-encre">Vue d’ensemble</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose font-serif text-lg italic text-encre">{cockpit.philosophy}</p>
+      <dl class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Œuvres</dt><dd class="mt-1 font-serif text-3xl text-encre">{totalArtworks}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Disponibles</dt><dd class="mt-1 font-serif text-3xl text-encre">{artworks.filter(isForSale).length}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Avec photo</dt><dd class="mt-1 font-serif text-3xl text-encre">{withImage}/{totalArtworks}</dd></div>
+        <div class="frame-gallery p-4"><dt class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Expositions</dt><dd class="mt-1 font-serif text-3xl text-encre">{upcoming.length + past.length}</dd></div>
+      </dl>
+      <ul class="mt-6 grid gap-2 sm:grid-cols-2">
+        {cockpit.modules.map((m) => (
+          <li class="border-l-2 border-cendre/30 pl-4">
+            <span class="text-encre">{m.label}</span>
+            <span class="block text-sm text-cendre">{m.description}</span>
+          </li>
+        ))}
+      </ul>
+
+      <!-- PROGRESSION DU COCKPIT (sobre, ton adulte) -->
+      <div class="mt-8 rounded-card border border-or/30 bg-or/5 px-5 py-5">
+        <p class="text-eyebrow uppercase tracking-[0.16em] text-or">Progression du cockpit</p>
+        <div class="mt-4 grid gap-5 sm:grid-cols-3">
+          {moduleStateOrder.map((state) => (
+            <div>
+              <p class="text-sm font-semibold text-encre">{moduleStateLabel[state]} <span class="text-cendre">({modulesByState[state].length})</span></p>
+              <ul class="mt-2 space-y-1 text-sm">
+                {modulesByState[state].map((m) => (
+                  <li>
+                    <a href={m.href} class="link-quiet text-noir/80">{m.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <ul class="mt-5 flex flex-wrap gap-2 border-t border-or/20 pt-4">
+          {cockpitBadges.map((b) => (
+            <li class={`rounded-full px-3 py-1 text-xs ${b.done ? 'border border-or/55 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre'}`}>
+              {b.done ? '✓ ' : ''}{b.label}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- CENTRE OPÉRATIONNEL -->
+    <section id="operations" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Centre opérationnel</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Le cockpit simplifie le quotidien : <strong>préparer, organiser, protéger</strong> —
+        pour qu’Armelle se concentre sur son art. Certaines fonctions sont <em>futures</em>.
+      </p>
+      <p class="mt-2 max-w-prose text-sm italic text-cendre">{operationsPrinciple}</p>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {opCards.map((o) => (
+          <article class="frame-gallery p-5">
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 class="font-serif text-lg italic text-encre">{opCardTitle[o.id] ?? o.label}</h3>
+              <span class={`text-eyebrow uppercase tracking-[0.14em] ${opStatusColor[o.status]}`}>{opStatusLabel[o.status]}</span>
+            </div>
+            <p class="mt-2 text-sm text-noir/75">{o.description}</p>
+            <ul class="mt-2 space-y-0.5 text-sm text-noir/70">
+              {o.actions.slice(0, 3).map((a) => <li>· {a}</li>)}
+            </ul>
+            {operationActivation[o.id] && (
+              <p class="mt-3 border-t border-cendre/20 pt-2 text-xs text-cendre">
+                Nécessite : {operationActivation[o.id].requirement}
+              </p>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <p class="mt-6 max-w-prose rounded-card border border-cendre/30 bg-brume/40 px-5 py-4 text-sm text-noir/80">
+        <strong>Aucune action sensible ne sera automatisée sans validation humaine.</strong>
+        Armelle décide · Tom valide · Claude Code exécute. L’objectif est de laisser l’artiste
+        se concentrer sur son art. Voir aussi <code class="text-cendre">docs/ip-protection-artist.md</code>.
+      </p>
+    </section>
+
+    <!-- 2 — ŒUVRES -->
+    <section id="oeuvres" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Œuvres</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">{totalArtworks} œuvres au catalogue · source : <code class="text-cendre">src/data/artworks.ts</code></p>
+
+      <ul class="mt-6 divide-y divide-cendre/20 border-y border-cendre/20">
+        {artworks.map((a) => (
+          <li class="flex items-center gap-4 py-3">
+            <span class="flex h-12 w-10 shrink-0 items-center justify-center overflow-hidden border border-cendre/25 bg-paper">
+              {a.image ? (
+                <img src={a.image} alt={a.alt} class="h-full w-full object-cover" loading="lazy" width="40" height="48" />
+              ) : (
+                <span class="font-serif text-base italic text-cendre" aria-hidden="true">{a.title.charAt(0)}</span>
+              )}
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-serif italic text-encre">{a.title}</span>
+              <span class="block truncate text-xs text-cendre">{[a.series, a.technique].filter(Boolean).join(' · ')}</span>
+            </span>
+            <span class={`shrink-0 text-[0.7rem] uppercase tracking-[0.16em] ${statusChipClass[a.status]}`}>{statusLabel[a.status]}</span>
+            <span class={`hidden shrink-0 text-xs sm:inline ${hasImage(a) ? 'text-encre' : 'text-cendre'}`}>{hasImage(a) ? 'photo presente' : 'photo a venir'}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p class="mt-10 max-w-prose text-noir/75">
+        Pour saisir une œuvre pas à pas — avec un <strong>garde-fou avant publication</strong> —
+        utilisez l’<a href="#intake" class="link-quiet font-semibold">assistant « Ajouter une œuvre »</a> ci-dessous.
+      </p>
+    </section>
+
+    <!-- ASSISTANT « AJOUTER UNE ŒUVRE » (prototype, ne sauvegarde pas) -->
+    <section id="intake" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Ajouter une œuvre — assistant prototype</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        On prépare la fiche pas à pas, on vérifie, on copie le récapitulatif.
+        <strong>Rien n’est sauvegardé ni publié ici</strong> : aucune base de données, aucun envoi.
+        La publication se fait ensuite, <em>à valider humainement</em>.
+      </p>
+
+      <!-- Étapes du parcours -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {artworkWorkflow.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h3>
+            <p class="mt-1 text-sm text-noir/75">{s.description}</p>
+            <p class="mt-2 text-xs text-cendre">À préparer : {s.requiredFields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Préparation de la fiche (NE SAUVEGARDE PAS) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer la fiche</h3>
+      <form id="w-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <label class="text-sm">Titre
+          <input id="w-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Série <span class="text-cendre">(optionnel)</span>
+          <input id="w-series" type="text" placeholder="Bleu Cendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Année <span class="text-cendre">(sinon vide)</span>
+          <input id="w-year" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut
+          <select id="w-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="available">Disponible</option>
+            <option value="reserved">Réservée</option>
+            <option value="sold">Vendue</option>
+            <option value="on-request">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="w-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="w-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Support
+          <input id="w-support" type="text" placeholder="Toile recyclée" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Mots-clés / ambiance
+          <input id="w-keywords" type="text" placeholder="bleu, or, matière" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Description (quelques mots)
+          <textarea id="w-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm">Photo principale (nom de fichier)
+          <input id="w-image" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Photos de détail <span class="text-cendre">(optionnel)</span>
+          <input id="w-detail" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Alt text (décrire vraiment l’œuvre)
+          <input id="w-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « Prix sur demande »)</span>
+          <input id="w-price" type="text" placeholder="laisser vide" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Date de création
+          <input id="w-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Légende Instagram (brouillon)
+          <textarea id="w-caption" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Hashtags
+          <input id="w-hashtags" type="text" placeholder="#ArmelleMourier #BleuCendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="w-web" type="checkbox" /> Version web compressée prête</label>
+          <label class="flex items-center gap-2"><input id="w-hd" type="checkbox" /> HD originale conservée hors du site (privée)</label>
+          <label class="flex items-center gap-2"><input id="w-proof" type="checkbox" /> Œuvre importante : preuve de création prévue (e-Soleau)</label>
+          <label class="flex items-center gap-2"><input id="w-saleok" type="checkbox" /> Vente douce vérifiée — « Prix sur demande » si rien n’est validé</label>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Niveau de préparation</p>
+          <p id="w-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="w-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="w-score">0</span> % de complétude — indicatif, pas une note.</p>
+        <ul id="w-badges" class="mt-4 flex flex-wrap gap-2">
+          {workflowBadges.map((b) => (
+            <li data-badge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Garde-fou : avant de publier -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Avant de publier cette œuvre, vérifier :</h3>
+      <ul class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
+        {[
+          'Le titre est correct.',
+          'La série est correcte.',
+          'Les dimensions sont renseignées.',
+          'La technique est renseignée.',
+          'Le statut est correct.',
+          'L’image principale existe.',
+          'L’alt text décrit vraiment l’œuvre.',
+          'La HD originale est conservée hors site.',
+          'La version web est compressée.',
+          'L’œuvre importante est documentée (preuve de création).',
+          'Le prix n’est pas inventé.',
+          'La vente reste « Prix sur demande » si rien n’est validé.',
+        ].map((item) => (
+          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+        ))}
+      </ul>
+
+      <!-- Récapitulatif copiable -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Récapitulatif avant publication</h3>
+      <p class="mt-2 text-sm text-cendre" id="w-missing">Champs manquants : —</p>
+      <pre id="w-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-recap-copy>Copier le récapitulatif</button>
+        <button type="button" class="btn btn-ghost" data-art-copy>Copier le bloc artworks.ts</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        À valider humainement. Rien n’est publié automatiquement : Armelle décide, Tom valide.
+      </p>
+      </details>
+    </section>
+
+    <!-- FICHE ŒUVRE + PREUVE DE CRÉATION (prototype, ne sauvegarde pas) -->
+    <section id="proof" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">{artworkProof.title}</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">{artworkProof.intro}</p>
+
+      <!-- Avertissement non juridique -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ {artworkProof.disclaimer}
+      </p>
+
+      <!-- Repères de propriété intellectuelle -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Ce qu’il faut savoir (repères)</h3>
+      <ul class="mt-4 max-w-prose space-y-2 text-sm text-noir/80">
+        {artworkProof.legalPoints.map((p) => (
+          <li class="flex items-start gap-2"><span class="mt-1 text-or" aria-hidden="true">·</span><span>{p}</span></li>
+        ))}
+      </ul>
+
+      <!-- Parties de la fiche -->
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {artworkProof.sections.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h4 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h4>
+            {s.note && <p class="mt-1 text-sm text-noir/70">{s.note}</p>}
+            <p class="mt-2 text-xs text-cendre">{s.fields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Générer une fiche œuvre -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Générer une fiche œuvre</h3>
+      <p class="mt-2 max-w-prose text-sm text-cendre">
+        Choisissez une œuvre existante pour pré-remplir, ou partez du modèle vide.
+        <strong>Rien n’est sauvegardé ni téléversé</strong> — on prépare un dossier texte à copier.
+      </p>
+
+      <label class="mt-4 block max-w-md text-sm">Pré-remplir depuis une œuvre existante
+        <select id="p-pick" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          <option value="">— Modèle vide —</option>
+          {artworks.map((a) => (
+            <option
+              value={a.slug}
+              data-title={a.title}
+              data-series={a.series ?? ''}
+              data-year={a.year ?? ''}
+              data-dimensions={a.dimensions ?? ''}
+              data-technique={a.technique ?? ''}
+              data-description={a.description ?? ''}
+              data-status={a.status}
+              data-statuslabel={statusLabel[a.status]}
+              data-alt={a.alt}
+              data-image={a.image ?? ''}
+            >{a.title}</option>
+          ))}
+        </select>
+      </label>
+
+      <form id="p-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <p class="sm:col-span-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Identité & description</p>
+        <label class="text-sm">Titre
+          <input id="p-title" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Série <span class="text-cendre">(optionnel)</span>
+          <input id="p-series" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Année <span class="text-cendre">(sinon vide)</span>
+          <input id="p-year" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut
+          <select id="p-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="available">Disponible</option>
+            <option value="reserved">Réservée</option>
+            <option value="sold">Vendue</option>
+            <option value="on-request">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm sm:col-span-2">Description (quelques mots)
+          <textarea id="p-description" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Données techniques</p>
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="p-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="p-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Support
+          <input id="p-support" type="text" placeholder="Toile recyclée" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Preuve de création</p>
+        <label class="text-sm">Date de création
+          <input id="p-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Lieu de création <span class="text-cendre">(optionnel)</span>
+          <input id="p-place" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Images à conserver</p>
+        <label class="text-sm">HD originale (où elle est conservée)
+          <input id="p-hd" type="text" placeholder="disque privé / cloud privé" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Version web compressée
+          <input id="p-web" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Photos de détail <span class="text-cendre">(optionnel)</span>
+          <input id="p-details" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Alt text (décrire vraiment l’œuvre)
+          <input id="p-alt" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Vente / statut · publication</p>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « Prix sur demande »)</span>
+          <input id="p-price" type="text" placeholder="laisser vide" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Publication web recommandée
+          <input id="p-webpub" type="text" placeholder="version web compressée uniquement" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Demande / acquéreur <span class="text-cendre">(optionnel)</span>
+          <input id="p-request" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Remise / logistique <span class="text-cendre">(optionnel)</span>
+          <input id="p-logistics" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes de protection <span class="text-cendre">(preuve datée, filigrane…)</span>
+          <textarea id="p-protect" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Historique d’exposition <span class="text-cendre">(optionnel)</span>
+          <input id="p-history" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Réseaux sociaux</p>
+        <label class="text-sm sm:col-span-2">Réseaux sociaux (légende brouillon)
+          <textarea id="p-social" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Hashtags
+          <input id="p-hashtags" type="text" placeholder="#ArmelleMourier #BleuCendres" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="p-hd-kept" type="checkbox" /> HD originale conservée hors du site (privée)</label>
+          <label class="flex items-center gap-2"><input id="p-web-ready" type="checkbox" /> Version web compressée prête</label>
+          <label class="flex items-center gap-2"><input id="p-proof-kept" type="checkbox" /> Œuvre importante : preuve datée envisagée (e-Soleau / autre)</label>
+          <label class="flex items-center gap-2"><input id="p-exchanges" type="checkbox" /> Échanges importants archivés</label>
+          <label class="flex items-center gap-2"><input id="p-saleok" type="checkbox" /> Vente douce vérifiée — « Prix sur demande » si rien n’est validé</label>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation du dossier</p>
+          <p id="p-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="p-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="p-score">0</span> % préparé — indicatif, pas une note.</p>
+        <ul id="p-badges" class="mt-4 flex flex-wrap gap-2">
+          {proofBadges.map((b) => (
+            <li data-pbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Blocs d'aide : Images à conserver + Publication web -->
+      <div class="mt-8 grid gap-5 lg:grid-cols-2">
+        <article class="frame-gallery p-5">
+          <h4 class="font-serif text-lg italic text-encre">Images à conserver</h4>
+          <ul class="mt-2 space-y-1 text-sm text-noir/80">
+            <li>· HD originale privée (haute résolution, non publiée).</li>
+            <li>· Version web compressée (site / réseaux).</li>
+            <li>· Photos de détail (matière, signature, dos de la toile).</li>
+            <li>· Alt text descriptif pour chaque image publiée.</li>
+          </ul>
+        </article>
+        <article class="frame-gallery p-5">
+          <h4 class="font-serif text-lg italic text-encre">Publication web recommandée</h4>
+          <ul class="mt-2 space-y-1 text-sm text-noir/80">
+            {webPublicationTips.map((t) => <li>· {t}</li>)}
+          </ul>
+        </article>
+      </div>
+
+      <!-- Checklist de protection -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Checklist de protection — avant diffusion</h3>
+      <ul id="p-checklist" class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
+        {protectionChecklist.map((item) => (
+          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+        ))}
+      </ul>
+
+      <!-- Fiche œuvre complète (copiable) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Fiche œuvre complète</h3>
+      <pre id="p-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-fiche-copy>Copier la fiche</button>
+        <button type="button" class="btn btn-ghost" data-checklist-copy>Copier la checklist</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        Organiser ne protège pas à soi seul. Pour une œuvre importante : envisager une preuve
+        datée (e-Soleau / autre) et, en cas d’enjeu réel, consulter un professionnel.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+      </details>
+    </section>
+
+    <!-- APRÈS UNE DEMANDE D'ACQUISITION (prototype, ne sauvegarde pas) -->
+    <section id="transaction" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Après une demande d’acquisition — facture &amp; remise</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Une fois la demande reçue, le cockpit aide à préparer la suite : informations client,
+        réservation, <strong>brouillon de facture</strong>, logistique de remise/livraison,
+        preuve de remise, archivage. <strong>Rien n’est sauvegardé, encaissé ni envoyé ici.</strong>
+      </p>
+
+      <!-- Avertissement comptable / non-paiement -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ <strong>Le cockpit ne remplace pas un comptable</strong> et ne produit pas de facture
+        officielle définitive. Il prépare un <strong>brouillon clair, vérifiable humainement</strong>,
+        pour réduire les erreurs et la charge mentale. <strong>Aucun paiement en ligne</strong>
+        (ni Stripe, ni PayPal), aucun « payer maintenant », aucun numéro de facture automatique.
+        Pour la comptabilité : <strong>consulter un professionnel</strong> si nécessaire.
+      </p>
+
+      <!-- Étapes du parcours -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {transactionWorkflow.map((s, i) => (
+          <article class="frame-gallery p-4">
+            <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="mt-1 font-serif text-lg italic text-encre">{s.label}</h3>
+            <p class="mt-1 text-sm text-noir/75">{s.description}</p>
+            <p class="mt-2 text-xs text-cendre">{s.fields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Préparer la transaction (NE SAUVEGARDE PAS) -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Préparer le dossier</h3>
+      <form id="t-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <p class="sm:col-span-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Client & œuvre</p>
+        <label class="text-sm">Artiste
+          <input id="t-artist" type="text" value="Armelle Mourier" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Client
+          <input id="t-client" type="text" placeholder="Nom du client" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">E-mail client
+          <input id="t-email" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Statut de l’œuvre
+          <select id="t-status" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="disponible">Disponible</option>
+            <option value="réservée">Réservée</option>
+            <option value="sur demande">Sur demande</option>
+          </select>
+        </label>
+        <label class="text-sm sm:col-span-2">Œuvre concernée (titre)
+          <input id="t-oeuvre" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Dimensions <span class="text-cendre">(ne pas inventer)</span>
+          <input id="t-dimensions" type="text" placeholder="60 × 73 cm" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Technique
+          <input id="t-technique" type="text" placeholder="Acrylique sur toile" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Brouillon de facture (à vérifier)</p>
+        <label class="text-sm">Prix <span class="text-cendre">(vide = « à valider »)</span>
+          <input id="t-price" type="text" placeholder="à valider / prix sur demande" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Date
+          <input id="t-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Numéro de facture <span class="text-cendre">(à compléter)</span>
+          <input id="t-invnum" type="text" placeholder="à compléter" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Mode de paiement <span class="text-cendre">(à définir)</span>
+          <input id="t-paymode" type="text" placeholder="à définir (hors ligne)" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Conditions <span class="text-cendre">(à compléter / valider)</span>
+          <input id="t-conditions" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes facture
+          <input id="t-notes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <p class="sm:col-span-2 mt-2 text-eyebrow uppercase tracking-[0.16em] text-cendre">Remise / livraison</p>
+        <label class="text-sm">Mode de remise
+          <select id="t-delmode" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            <option value="à définir">À définir</option>
+            <option value="Retrait atelier">Retrait atelier</option>
+            <option value="Livraison locale">Livraison locale</option>
+            <option value="Transporteur à définir">Transporteur à définir</option>
+          </select>
+        </label>
+        <label class="text-sm">Date prévue
+          <input id="t-deldate" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Adresse / lieu <span class="text-cendre">(si livraison)</span>
+          <input id="t-address" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Emballage
+          <input id="t-packaging" type="text" placeholder="carton renforcé, coins…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">État de l’œuvre avant départ
+          <input id="t-state" type="text" placeholder="bon état, noté" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Photos avant départ <span class="text-cendre">(où conservées)</span>
+          <input id="t-photos" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Assurance <span class="text-cendre">(si nécessaire)</span>
+          <input id="t-insurance" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Personne responsable
+          <input id="t-responsible" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Signature / confirmation
+          <input id="t-signature" type="text" placeholder="en main propre, e-mail de confirmation…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes logistique
+          <input id="t-delnotes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <fieldset class="sm:col-span-2 mt-1 space-y-2 text-sm">
+          <label class="flex items-center gap-2"><input id="t-priceok" type="checkbox" /> Prix validé par l’artiste (jamais inventé)</label>
+          <label class="flex items-center gap-2"><input id="t-proofok" type="checkbox" /> Preuve de remise prévue (photos + confirmation)</label>
+          <label class="flex items-center gap-2"><input id="t-archok" type="checkbox" /> Dossier à archiver (brouillon + logistique + échanges)</label>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation de la transaction</p>
+          <p id="t-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="t-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="t-score">0</span> % préparé — indicatif, pas une note.</p>
+        <ul id="t-badges" class="mt-4 flex flex-wrap gap-2">
+          {transactionBadges.map((b) => (
+            <li data-tbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Checklists -->
+      <div class="mt-8 grid gap-8 lg:grid-cols-2">
+        <div>
+          <h3 class="text-h3 font-serif text-encre">Avant d’envoyer une facture</h3>
+          <ul class="mt-4 grid gap-2 text-sm">
+            {invoiceChecklist.map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-h3 font-serif text-encre">Avant remise ou livraison</h3>
+          <ul id="t-delcheck" class="mt-4 grid gap-2 text-sm">
+            {deliveryChecklist.map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Message client -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Message client</h3>
+      <label class="mt-3 block max-w-md text-sm">Modèle de message
+        <select id="t-msg" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          {messageTemplates.map((m) => (
+            <option value={m.id} data-body={m.body}>{m.label}</option>
+          ))}
+        </select>
+      </label>
+      <pre id="t-msgout" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-ghost mt-3" data-msg-copy>Copier le message</button>
+
+      <!-- Brouillon de facture -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Brouillon de facture</h3>
+      <p class="mt-1 text-sm italic text-or">Document brouillon — à vérifier avant envoi.</p>
+      <pre id="t-invoice" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-primary mt-3" data-invoice-copy>Copier le brouillon de facture</button>
+
+      <!-- Fiche logistique -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Fiche logistique de remise</h3>
+      <pre id="t-logistics" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-3 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-logistics-copy>Copier la fiche logistique</button>
+        <button type="button" class="btn btn-ghost" data-deliverychecklist-copy>Copier la checklist remise</button>
+      </div>
+
+      <p class="mt-6 max-w-prose text-sm italic text-or">
+        Tous ces blocs sont des <strong>brouillons à vérifier humainement</strong>. Aucun paiement,
+        aucune facture officielle, aucune comptabilité automatisée.
+        <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+      </details>
+    </section>
+
+    <!-- CATALOGUE / DOSSIER COLLECTIONNEUR (prototype, ne sauvegarde pas) -->
+    <section id="catalog" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Préparer un catalogue</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">
+        Composer une <strong>sélection d’œuvres</strong> à transmettre (collectionneur, galerie,
+        exposition, presse) sous forme de <strong>dossier clair, copiable, réutilisable</strong>.
+        <strong>Rien n’est sauvegardé, téléversé ni envoyé ici</strong>, et <strong>aucun PDF</strong>
+        n’est généré pour l’instant.
+      </p>
+
+      <!-- Garde-fous images / prix / statuts -->
+      <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
+        ⚠️ Garde-fous : <strong>images web compressées uniquement</strong> (jamais de HD complète),
+        <strong>statuts vérifiés</strong>, <strong>aucun prix inventé</strong> (« Prix sur demande »
+        si rien n’est validé), orthographe des titres relue, <strong>validation humaine avant envoi</strong>.
+      </p>
+
+      <!-- Types de catalogues -->
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {catalogTypes.map((t) => (
+          <article class="frame-gallery p-4">
+            <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
+            <p class="mt-1 text-sm text-noir/75">{t.description}</p>
+            <p class="mt-2 text-xs text-cendre">{t.fields.join(' · ')}</p>
+          </article>
+        ))}
+      </div>
+
+      <!-- Préparer le dossier -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Composer le dossier</h3>
+      <form id="c-form" class="mt-5 grid max-w-3xl gap-4 frame-gallery p-5 sm:grid-cols-2" onsubmit="return false">
+        <label class="text-sm">Type de dossier
+          <select id="c-type" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+            {catalogTypes.map((t) => <option value={t.label}>{t.label}</option>)}
+          </select>
+        </label>
+        <label class="text-sm">Destinataire
+          <input id="c-dest" type="text" placeholder="Nom du collectionneur / de la galerie" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Contexte
+          <input id="c-context" type="text" placeholder="rencontre, salon, demande…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm">Date
+          <input id="c-date" type="text" placeholder="AAAA-MM-JJ" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Message d’introduction
+          <textarea id="c-intro" rows="2" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+        </label>
+        <label class="text-sm sm:col-span-2">Conditions
+          <textarea id="c-conditions" rows="4" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">- Acquisition en lien direct avec l’artiste.
+- Prix sur demande sauf information validée.
+- Images web compressées uniquement.
+- Validation humaine avant envoi.</textarea>
+        </label>
+        <label class="text-sm">Contact (e-mail)
+          <input id="c-email" type="text" placeholder="e-mail public de l’artiste" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+        <label class="text-sm sm:col-span-2">Notes <span class="text-cendre">(optionnel)</span>
+          <input id="c-notes" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+        </label>
+
+        <fieldset class="sm:col-span-2 mt-1">
+          <legend class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Œuvres sélectionnées</legend>
+          <div class="mt-3 grid gap-2 sm:grid-cols-2">
+            {artworks.map((a) => (
+              <label class="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  class="c-art mt-0.5"
+                  data-title={a.title}
+                  data-series={a.series ?? ''}
+                  data-dimensions={a.dimensions ?? ''}
+                  data-technique={a.technique ?? ''}
+                  data-status={statusLabel[a.status]}
+                  data-price={priceLabel(a)}
+                  data-slug={a.slug}
+                />
+                <span class="text-noir/80">{a.title} <span class="text-cendre">· {statusLabel[a.status]}</span></span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </form>
+
+      <!-- Gamification douce -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation du catalogue</p>
+          <p id="c-level" class="font-serif italic text-encre">Brouillon</p>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-brume">
+          <div id="c-bar" class="h-full bg-or transition-all" style="width:0%"></div>
+        </div>
+        <p class="mt-2 text-sm text-cendre"><span id="c-count">0</span> œuvre(s) sélectionnée(s) — indicatif.</p>
+        <ul id="c-badges" class="mt-4 flex flex-wrap gap-2">
+          {catalogBadges.map((b) => (
+            <li data-cbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Checklist de préparation -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Checklist de préparation</h3>
+      <ul class="mt-4 grid max-w-3xl gap-2 text-sm sm:grid-cols-2">
+        {catalogChecklist.map((item) => (
+          <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+        ))}
+      </ul>
+
+      <!-- Message d'envoi -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Message d’envoi</h3>
+      <label class="mt-3 block max-w-md text-sm">Modèle de message
+        <select id="c-msg" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+          {catalogMessages.map((m) => <option value={m.id} data-body={m.body}>{m.label}</option>)}
+        </select>
+      </label>
+      <pre id="c-msgout" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-ghost mt-3" data-cmsg-copy>Copier le message</button>
+
+      <!-- Liste d'œuvres sélectionnées -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Liste d’œuvres sélectionnées</h3>
+      <pre id="c-list" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-ghost mt-3" data-list-copy>Copier la liste d’œuvres</button>
+
+      <!-- Dossier collectionneur -->
+      <h3 class="mt-10 text-h3 font-serif text-encre">Dossier collectionneur</h3>
+      <pre id="c-dossier" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <button type="button" class="btn btn-primary mt-3" data-dossier-copy>Copier le dossier</button>
+
+      <p class="mt-6 max-w-prose text-sm italic text-or">
+        Brouillon à <strong>vérifier humainement</strong> avant envoi. Pas de PDF, pas d’envoi,
+        pas de sauvegarde. <strong>Armelle décide · Tom valide · Claude Code exécute.</strong>
+      </p>
+      </details>
+    </section>
+
+    <!-- 3 — DISPONIBILITÉS -->
+    <section id="disponibilites" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Disponibilités · vente douce</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/75">
+        Mode : <strong>{shop.mode}</strong> — acquisition en lien direct avec l’artiste,
+        <strong>« {shop.defaultPriceLabel} »</strong> par défaut. Pas de panier, pas de paiement en
+        ligne (<code class="text-cendre">enableCheckout = {String(shop.enableCheckout)}</code>).
+      </p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statuses.map((s) => (
+          <div class="frame-gallery p-4">
+            <p class={`text-[0.72rem] uppercase tracking-[0.18em] ${statusChipClass[s]}`}>{statusLabel[s]}</p>
+            <p class="mt-1 font-serif text-2xl text-encre">{byStatus[s].length}</p>
+            <ul class="mt-2 space-y-0.5 text-sm text-noir/70">
+              {byStatus[s].slice(0, 6).map((a) => <li class="truncate">{a.title}</li>)}
+              {byStatus[s].length === 0 && <li class="italic text-cendre">—</li>}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- 4 — PAGES -->
+    <section id="pages" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Pages · textes</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+        {editorialZones.map((z) => (
+          <li class="border-l-2 border-cendre/30 pl-4">
+            <span class="block text-encre">{z.label}</span>
+            <code class="text-xs text-cendre">{z.file}</code>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 5 — EXPOSITIONS -->
+    <section id="expositions" class="scroll-mt-28">
+      <h2 class="mt-16 text-h2 font-serif text-encre">Expositions</h2>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">{upcoming.length} à venir · {past.length} passées · source : <code class="text-cendre">src/data/exhibitions.ts</code></p>
+      {upcoming.length > 0 && (
+        <ul class="mt-4 space-y-1 text-sm text-noir/80">
+          {upcoming.slice(0, 5).map((e) => <li><span class="text-or">{e.dateLabel}</span> — {e.title}</li>)}
+        </ul>
+      )}
+    </section>
+
+    <!-- 6 — RÉSEAUX SOCIAUX -->
+    <section id="social" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Préparer une publication Instagram</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 max-w-prose text-noir/80">{socialPublishing.instruction}</p>
+      <p class="mt-2 max-w-prose text-sm italic text-cendre">
+        Le cockpit prépare la publication. L’artiste garde la main et copie-colle vers Instagram.
+        Aucune API, aucune publication automatique.
+      </p>
+      <p class="mt-4 text-sm text-cendre">
+        Formats : {socialPublishing.formats.map((f) => `${f.label} ${f.ratio} (${f.size})`).join(' · ')}
+      </p>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        {socialPublishing.templates.map((t) => {
+          const tags = [...(t.hashtags ?? []), ...socialPublishing.defaultHashtags].join(' ');
+          const full = `${t.caption}\n\n${tags}`;
+          return (
+            <article class="frame-gallery p-5">
+              <div class="flex items-baseline justify-between gap-3">
+                <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
+                <span class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{t.format}</span>
+              </div>
+              <p class="mt-2 whitespace-pre-line text-sm text-noir/80">{t.caption}</p>
+              <p class="mt-2 text-xs text-cendre">{tags}</p>
+              <button type="button" class="btn btn-ghost mt-3" data-copy={full}>Copier la légende</button>
+            </article>
+          );
+        })}
+      </div>
+      </details>
+    </section>
+
+    <!-- 7 — AMBIANCE VISUELLE -->
+    <section id="ambiance" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Ajuster l’ambiance visuelle</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <p class="mt-4 text-noir/75">
+        Identité : <strong>{theme.identity.visualIdentity}</strong> · boutons
+        <strong> {theme.identity.buttonMode}</strong> · cartes <strong>{theme.identity.cardMode}</strong>
+        · fragment <strong>{theme.identity.fragmentStyle}</strong>. Source : <code class="text-cendre">src/data/theme.ts</code>
+      </p>
+      <div class="mt-6 flex flex-wrap gap-4">
+        {palette.map((c) => (
+          <div class="text-center">
+            <span class="block h-14 w-14 rounded-sm border border-cendre/25" style={`background:${c.hex}`}></span>
+            <span class="mt-1 block text-[0.7rem] text-encre">{c.label}</span>
+            <code class="text-[0.65rem] text-cendre">{c.hex}</code>
+          </div>
+        ))}
+      </div>
+      <p class="mt-6 max-w-prose text-sm text-cendre">
+        Modifiables plus tard : couleur papier, bleu pigment, ocre, intensité de matière,
+        style des cartes, style des boutons — sans casser le design.
+      </p>
+
+      <h3 class="mt-8 text-h3 font-serif text-encre">Ambiances visuelles activables plus tard</h3>
+      <p class="mt-2 max-w-prose text-sm text-cendre">
+        Préparation : un futur cockpit pourra proposer ces ambiances. Aujourd’hui,
+        l’ambiance active reste « {designModes[0].label} ».
+      </p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+        {designModes.map((d, i) => (
+          <article class={`frame-gallery p-4 ${i === 0 ? 'border-or/45' : ''}`}>
+            <div class="flex items-baseline justify-between gap-2">
+              <h4 class="font-serif italic text-encre">{d.label}</h4>
+              {i === 0 && <span class="text-eyebrow uppercase tracking-[0.14em] text-or">active</span>}
+            </div>
+            <p class="mt-1 text-sm text-noir/75">{d.description}</p>
+          </article>
+        ))}
+      </div>
+      </details>
+    </section>
+
+    <!-- 8 — ROADMAP TECHNIQUE -->
+    <section id="etapes" class="scroll-mt-28">
+      <details class="cockpit-module mt-16">
+      <summary class="cockpit-summary">
+        <h2 class="text-h2 font-serif text-encre">Roadmap technique</h2>
+        <span class="cockpit-chevron" aria-hidden="true">▸</span>
+      </summary>
+      <div class="rule-gold mt-4" aria-hidden="true"></div>
+      <ol class="mt-6 max-w-prose space-y-2">
+        <li class="flex gap-3"><span class="font-serif italic text-or">V1</span><span class="text-noir/80">Centre opérationnel — préparation & copier-coller (cette page).</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V2</span><span class="text-noir/80">Édition réelle des œuvres et des textes.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V3</span><span class="text-noir/80">Dépôt et association des images.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V4</span><span class="text-noir/80">Assistant réseaux sociaux avancé.</span></li>
+        <li class="flex gap-3"><span class="font-serif italic text-or">V5</span><span class="text-noir/80">Authentification, si nécessaire.</span></li>
+      </ol>
+      <p class="mt-6 max-w-prose rounded-card border border-cendre/30 bg-brume/40 px-5 py-4 text-noir/80">
+        <strong>Architecture en cours de décision.</strong> Le choix de l’outil d’édition
+        (pour bientôt déposer des images et modifier les œuvres soi-même) est en cours :
+        on privilégie une solution <em>simple, peu coûteuse et sans dépendance lourde</em>,
+        qui garde la maîtrise de vos contenus.
+      </p>
+      <p class="mt-8 max-w-prose text-sm text-cendre">
+        Volontairement exclu pour l’instant : paiement, publication Instagram automatique,
+        stockage de secrets, complexité inutile.
+      </p>
+      <p class="mt-8 max-w-prose rounded-card border border-cendre/30 bg-brume/40 px-5 py-4 text-sm text-noir/80">
+        <strong>Guide de livraison.</strong> Le guide complet (présentation, accès, prochaines
+        activations) est disponible dans la documentation du projet — <code class="text-cendre">docs/livraison-artiste.md</code>.
+      </p>
+      <p class="mt-6 text-sm"><a href="/" class="link-quiet font-semibold">← Retour au site</a></p>
+      </details>
+    </section>
+  </section>
+
+  <style>
+    /* En-tête repliable des modules lourds (details/summary natif, accessible). */
+    .cockpit-summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      cursor: pointer;
+      list-style: none;
+    }
+    .cockpit-summary::-webkit-details-marker { display: none; }
+    .cockpit-summary:focus-visible {
+      outline: 2px solid rgb(var(--c-or));
+      outline-offset: 4px;
+    }
+    .cockpit-chevron {
+      flex: none;
+      color: rgb(var(--c-or));
+      transition: transform 0.2s ease;
+    }
+    .cockpit-module[open] > .cockpit-summary .cockpit-chevron { transform: rotate(90deg); }
+    /* Navigation interne accessible en permanence. */
+    .cockpit-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background-color: rgb(var(--c-paper));
+    }
+    @media (max-width: 640px) {
+      .cockpit-nav { flex-wrap: nowrap; overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cockpit-chevron { transition: none; }
+    }
+  </style>
+
+  <script is:inline>
+    // Tableau de bord : ouvrir le module replié ciblé par une ancre (clic / hash).
+    (function () {
+      function openTarget(hash) {
+        if (!hash || hash.charAt(0) !== '#') return;
+        var el;
+        try { el = document.querySelector(hash); } catch (e) { return; }
+        if (!el) return;
+        var d = el.tagName === 'DETAILS' ? el : el.querySelector('details.cockpit-module');
+        if (d) d.open = true;
+      }
+      document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        a.addEventListener('click', function () { openTarget(a.getAttribute('href')); });
+      });
+      window.addEventListener('hashchange', function () { openTarget(location.hash); });
+      if (location.hash) openTarget(location.hash);
+    })();
+  </script>
+
+  <script is:inline>
+    // Copier dans le presse-papier (sans API externe). Préparation seulement.
+    function flash(btn, msg) {
+      const old = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(function () { btn.textContent = old; }, 1600);
+    }
+    function copyText(text, btn) {
+      if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function () { flash(btn, 'Copie OK'); }); }
+      else { flash(btn, 'Selectionnez et copiez'); }
+    }
+    document.querySelectorAll('[data-copy]').forEach(function (btn) {
+      btn.addEventListener('click', function () { copyText(btn.getAttribute('data-copy') || '', btn); });
+    });
+
+    // --- Assistant « Ajouter une œuvre » (guide + vérifie, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('w-form');
+      if (!form) return;
+      var q = String.fromCharCode(0x2019);
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+      var statusFr = { available: 'Disponible', reserved: 'Réservée', sold: 'Vendue', 'on-request': 'Sur demande' };
+
+      function protectionNote() {
+        var p = [];
+        if (v('w-date')) p.push('date ' + v('w-date'));
+        if (c('w-hd')) p.push('HD privée conservée hors site');
+        if (c('w-proof')) p.push('preuve de création prévue (e-Soleau)');
+        return p.join(' ; ') || 'à compléter';
+      }
+      function buildRecap() {
+        return [
+          'Fiche œuvre prête à transmettre',
+          'Titre : ' + v('w-title'),
+          'Série : ' + v('w-series'),
+          'Année : ' + v('w-year'),
+          'Dimensions : ' + v('w-dimensions'),
+          'Technique : ' + v('w-technique'),
+          'Support : ' + v('w-support'),
+          'Description : ' + v('w-description'),
+          'Statut : ' + (statusFr[v('w-status')] || v('w-status')),
+          'Image principale : ' + v('w-image'),
+          'Alt text : ' + v('w-alt'),
+          'Notes protection : ' + protectionNote(),
+          'Caption Instagram : ' + v('w-caption'),
+          'Hashtags : ' + v('w-hashtags'),
+        ].join('\n');
+      }
+      function buildBlock() {
+        var title = v('w-title') || 'Sans titre';
+        var slug = slugify(title) || 'oeuvre';
+        var lines = ['{', "  id: '" + slug + "',", "  title: '" + title.split("'").join(q) + "',", "  slug: '" + slug + "',"];
+        if (v('w-dimensions')) { lines.push("  dimensions: '" + v('w-dimensions') + "',"); }
+        if (v('w-technique')) { lines.push("  technique: '" + v('w-technique') + "',"); }
+        if (v('w-series')) { lines.push("  series: '" + v('w-series') + "',"); }
+        if (v('w-year')) { lines.push("  year: '" + v('w-year') + "',"); }
+        if (v('w-description')) { lines.push("  description: '" + v('w-description').split("'").join(q) + "',"); }
+        lines.push("  image: '" + v('w-image') + "',");
+        lines.push("  alt: '" + (v('w-alt') || title).split("'").join(q) + "',");
+        lines.push("  status: '" + v('w-status') + "',");
+        lines.push('},');
+        return lines.join('\n');
+      }
+      var keys = ['w-title', 'w-series', 'w-year', 'w-dimensions', 'w-technique', 'w-support', 'w-description', 'w-keywords', 'w-image', 'w-alt', 'w-caption', 'w-hashtags', 'w-date'];
+      var checks = ['w-web', 'w-hd', 'w-proof', 'w-saleok'];
+      function update() {
+        var filled = 1, total = keys.length + checks.length + 1; // statut toujours renseigné
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('w-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('w-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('w-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          fiche: !!(v('w-title') && v('w-dimensions') && v('w-technique') && v('w-description')),
+          image: !!(v('w-image') && v('w-alt') && c('w-web') && c('w-hd')),
+          protection: !!(v('w-date') && c('w-proof')),
+          social: !!(v('w-caption') && v('w-hashtags')),
+          sale: c('w-saleok'),
+        };
+        document.querySelectorAll('[data-badge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-badge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var labels = { 'w-title': 'titre', 'w-dimensions': 'dimensions', 'w-technique': 'technique', 'w-image': 'image', 'w-alt': 'alt text' };
+        var miss = [];
+        Object.keys(labels).forEach(function (k) { if (!v(k)) miss.push(labels[k]); });
+        var mEl = document.getElementById('w-missing');
+        if (mEl) mEl.textContent = 'Champs manquants : ' + (miss.length ? miss.join(', ') : 'aucun');
+        var recapEl = document.getElementById('w-recap'); if (recapEl) recapEl.textContent = buildRecap();
+      }
+      form.addEventListener('input', update);
+      update();
+      var rc = document.querySelector('[data-recap-copy]'); if (rc) rc.addEventListener('click', function () { copyText(buildRecap(), rc); });
+      var ac = document.querySelector('[data-art-copy]'); if (ac) ac.addEventListener('click', function () { copyText(buildBlock(), ac); });
+    })();
+
+    // --- Fiche œuvre + preuve de création (organise + prépare, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('p-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      function set(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; }
+      var statusFr = { available: 'Disponible', reserved: 'Réservée', sold: 'Vendue', 'on-request': 'Sur demande' };
+
+      // Pré-remplir depuis une œuvre existante.
+      var pick = document.getElementById('p-pick');
+      if (pick) {
+        pick.addEventListener('change', function () {
+          var opt = pick.options[pick.selectedIndex];
+          if (!opt || !opt.value) return;
+          set('p-title', opt.getAttribute('data-title'));
+          set('p-series', opt.getAttribute('data-series'));
+          set('p-year', opt.getAttribute('data-year'));
+          set('p-dimensions', opt.getAttribute('data-dimensions'));
+          set('p-technique', opt.getAttribute('data-technique'));
+          set('p-description', opt.getAttribute('data-description'));
+          set('p-alt', opt.getAttribute('data-alt'));
+          set('p-web', opt.getAttribute('data-image'));
+          var st = document.getElementById('p-status');
+          if (st && opt.getAttribute('data-status')) st.value = opt.getAttribute('data-status');
+          update();
+        });
+      }
+
+      function price() { return v('p-price') || 'Prix sur demande'; }
+      function buildFiche() {
+        return [
+          'FICHE ŒUVRE — PREUVE DE CRÉATION',
+          '',
+          'Titre : ' + v('p-title'),
+          'Série : ' + v('p-series'),
+          'Année : ' + v('p-year'),
+          'Dimensions : ' + v('p-dimensions'),
+          'Technique : ' + v('p-technique'),
+          'Support : ' + v('p-support'),
+          'Description : ' + v('p-description'),
+          'Date de création : ' + v('p-date'),
+          'Lieu de création : ' + v('p-place'),
+          'Images conservées :',
+          '- HD originale : ' + v('p-hd'),
+          '- Version web : ' + v('p-web'),
+          '- Détails : ' + v('p-details'),
+          'Statut : ' + (statusFr[v('p-status')] || v('p-status')),
+          'Prix : ' + price(),
+          'Publication web : ' + v('p-webpub'),
+          'Alt text : ' + v('p-alt'),
+          'Notes de protection : ' + v('p-protect'),
+          'Historique d’exposition : ' + v('p-history'),
+          'Demande / acquéreur : ' + v('p-request'),
+          'Remise / logistique : ' + v('p-logistics'),
+          'Réseaux sociaux : ' + v('p-social'),
+          'Hashtags : ' + v('p-hashtags'),
+          'Validation humaine : à vérifier avant publication',
+        ].join('\n');
+      }
+      function buildChecklist() {
+        var items = ['CHECKLIST DE PROTECTION — avant diffusion', ''];
+        document.querySelectorAll('#p-checklist li span').forEach(function (el) {
+          items.push('[ ] ' + el.textContent);
+        });
+        return items.join('\n');
+      }
+
+      var keys = ['p-title', 'p-series', 'p-year', 'p-dimensions', 'p-technique', 'p-support', 'p-description', 'p-date', 'p-place', 'p-hd', 'p-web', 'p-details', 'p-alt', 'p-webpub', 'p-protect', 'p-history', 'p-social', 'p-hashtags'];
+      var checks = ['p-hd-kept', 'p-web-ready', 'p-proof-kept', 'p-exchanges', 'p-saleok'];
+      function update() {
+        var filled = 1, total = keys.length + checks.length + 1; // statut + prix par défaut
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('p-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('p-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('p-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          fiche: !!(v('p-title') && v('p-dimensions') && v('p-technique') && v('p-description')),
+          images: !!(v('p-web') && v('p-alt') && c('p-web-ready')),
+          protection: !!(v('p-date') && (c('p-proof-kept') || c('p-hd-kept'))),
+          web: !!(v('p-webpub') && v('p-alt')),
+          social: !!(v('p-social') && v('p-hashtags')),
+          sale: c('p-saleok'),
+        };
+        document.querySelectorAll('[data-pbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-pbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var recapEl = document.getElementById('p-recap'); if (recapEl) recapEl.textContent = buildFiche();
+      }
+      form.addEventListener('input', update);
+      update();
+      var fc = document.querySelector('[data-fiche-copy]'); if (fc) fc.addEventListener('click', function () { copyText(buildFiche(), fc); });
+      var cc = document.querySelector('[data-checklist-copy]'); if (cc) cc.addEventListener('click', function () { copyText(buildChecklist(), cc); });
+    })();
+
+    // --- Après une demande d'acquisition (prépare brouillons, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('t-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+
+      function buildInvoice() {
+        return [
+          'BROUILLON DE FACTURE — À VÉRIFIER',
+          '',
+          'Artiste : ' + (v('t-artist') || 'Armelle Mourier'),
+          'Client : ' + v('t-client'),
+          'Œuvre : ' + v('t-oeuvre'),
+          'Dimensions : ' + v('t-dimensions'),
+          'Technique : ' + v('t-technique'),
+          'Prix : ' + (v('t-price') || 'à valider / prix sur demande'),
+          'Date : ' + v('t-date'),
+          'Numéro de facture : ' + (v('t-invnum') || 'à compléter'),
+          'Mode de paiement : ' + (v('t-paymode') || 'à définir'),
+          'Conditions : ' + v('t-conditions'),
+          'Remise / livraison : ' + v('t-delmode'),
+          'Notes : ' + v('t-notes'),
+          'Validation humaine : obligatoire avant envoi',
+        ].join('\n');
+      }
+      function buildLogistics() {
+        return [
+          'FICHE LOGISTIQUE — REMISE D’ŒUVRE',
+          '',
+          'Œuvre : ' + v('t-oeuvre'),
+          'Client : ' + v('t-client'),
+          'Mode de remise : ' + (v('t-delmode') || 'à définir'),
+          '  (options : Retrait atelier · Livraison locale · Transporteur à définir)',
+          'Adresse / lieu : ' + v('t-address'),
+          'Date prévue : ' + v('t-deldate'),
+          'Emballage : ' + v('t-packaging'),
+          'État de l’œuvre avant départ : ' + v('t-state'),
+          'Photos avant départ : ' + v('t-photos'),
+          'Assurance : ' + v('t-insurance'),
+          'Personne responsable : ' + v('t-responsible'),
+          'Preuve de remise : ' + (c('t-proofok') ? 'prévue' : 'à prévoir'),
+          'Signature / confirmation : ' + v('t-signature'),
+          'Notes : ' + v('t-delnotes'),
+        ].join('\n');
+      }
+      function buildMessage() {
+        var sel = document.getElementById('t-msg');
+        var opt = sel ? sel.options[sel.selectedIndex] : null;
+        var body = opt ? (opt.getAttribute('data-body') || '') : '';
+        var client = v('t-client') || '…';
+        var oeuvre = v('t-oeuvre') || '…';
+        var statut = v('t-status') || 'disponible';
+        return body.split('{client}').join(client).split('{oeuvre}').join(oeuvre).split('{statut}').join(statut);
+      }
+      function buildDeliveryChecklist() {
+        var items = ['CHECKLIST REMISE / LIVRAISON', ''];
+        document.querySelectorAll('#t-delcheck li span').forEach(function (el) {
+          items.push('[ ] ' + el.textContent);
+        });
+        return items.join('\n');
+      }
+
+      var keys = ['t-client', 't-email', 't-oeuvre', 't-dimensions', 't-technique', 't-price', 't-date', 't-conditions', 't-address', 't-deldate', 't-packaging', 't-state', 't-photos', 't-responsible', 't-signature'];
+      var checks = ['t-priceok', 't-proofok', 't-archok'];
+      function update() {
+        var filled = 0, total = keys.length + checks.length;
+        keys.forEach(function (k) { if (v(k)) filled++; });
+        checks.forEach(function (k) { if (c(k)) filled++; });
+        var score = Math.round((filled / total) * 100);
+        var bar = document.getElementById('t-bar'); if (bar) bar.style.width = score + '%';
+        var sc = document.getElementById('t-score'); if (sc) sc.textContent = String(score);
+        var lvl = document.getElementById('t-level');
+        if (lvl) lvl.textContent = score >= 80 ? 'Prêt à valider' : (score >= 40 ? 'Presque prêt' : 'Brouillon');
+        var got = {
+          request: !!(v('t-client') && v('t-email')),
+          invoice: !!(v('t-oeuvre') && c('t-priceok')),
+          logistics: !!(v('t-delmode') && v('t-deldate')),
+          delivery: !!(v('t-photos') && v('t-state') && c('t-proofok')),
+          archive: c('t-archok'),
+        };
+        document.querySelectorAll('[data-tbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-tbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var iv = document.getElementById('t-invoice'); if (iv) iv.textContent = buildInvoice();
+        var lg = document.getElementById('t-logistics'); if (lg) lg.textContent = buildLogistics();
+        var mo = document.getElementById('t-msgout'); if (mo) mo.textContent = buildMessage();
+      }
+      form.addEventListener('input', update);
+      var msg = document.getElementById('t-msg'); if (msg) msg.addEventListener('change', update);
+      update();
+      var ib = document.querySelector('[data-invoice-copy]'); if (ib) ib.addEventListener('click', function () { copyText(buildInvoice(), ib); });
+      var lb = document.querySelector('[data-logistics-copy]'); if (lb) lb.addEventListener('click', function () { copyText(buildLogistics(), lb); });
+      var mb = document.querySelector('[data-msg-copy]'); if (mb) mb.addEventListener('click', function () { copyText(buildMessage(), mb); });
+      var db = document.querySelector('[data-deliverychecklist-copy]'); if (db) db.addEventListener('click', function () { copyText(buildDeliveryChecklist(), db); });
+    })();
+
+    // --- Catalogue / dossier collectionneur (prépare un brouillon, NE SAUVEGARDE PAS) ---
+    (function () {
+      var form = document.getElementById('c-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function selected() {
+        var out = [];
+        document.querySelectorAll('.c-art').forEach(function (el) { if (el.checked) out.push(el); });
+        return out;
+      }
+      function buildList() {
+        var arts = selected();
+        if (!arts.length) return '(aucune œuvre sélectionnée)';
+        var lines = [];
+        arts.forEach(function (el, i) {
+          lines.push(String(i + 1) + '.');
+          lines.push('Titre : ' + (el.getAttribute('data-title') || ''));
+          lines.push('Série : ' + (el.getAttribute('data-series') || ''));
+          lines.push('Dimensions : ' + (el.getAttribute('data-dimensions') || ''));
+          lines.push('Technique : ' + (el.getAttribute('data-technique') || ''));
+          lines.push('Statut : ' + (el.getAttribute('data-status') || ''));
+          lines.push('Prix : ' + (el.getAttribute('data-price') || 'Prix sur demande'));
+          lines.push('Lien fiche : /oeuvres/' + (el.getAttribute('data-slug') || ''));
+          lines.push('Notes : ');
+          lines.push('');
+        });
+        return lines.join('\n').replace(/\n+$/, '');
+      }
+      function buildDossier() {
+        return [
+          'DOSSIER COLLECTIONNEUR — BROUILLON',
+          '',
+          'Type : ' + v('c-type'),
+          'Destinataire : ' + v('c-dest'),
+          'Contexte : ' + v('c-context'),
+          'Date : ' + v('c-date'),
+          'Message d’introduction : ' + v('c-intro'),
+          '',
+          'Œuvres sélectionnées :',
+          buildList(),
+          '',
+          'Conditions :',
+          (v('c-conditions') || '- Acquisition en lien direct avec l’artiste.'),
+          '',
+          'Notes : ' + v('c-notes'),
+          'Contact :',
+          'Email : ' + v('c-email'),
+          '',
+          'Validation humaine : à vérifier avant envoi',
+        ].join('\n');
+      }
+      function buildMessage() {
+        var sel = document.getElementById('c-msg');
+        var opt = sel ? sel.options[sel.selectedIndex] : null;
+        var body = opt ? (opt.getAttribute('data-body') || '') : '';
+        var dest = v('c-dest') || '…';
+        return body.split('{destinataire}').join(dest);
+      }
+      function update() {
+        var count = selected().length;
+        var cc = document.getElementById('c-count'); if (cc) cc.textContent = String(count);
+        var pct = Math.min(100, count * 20);
+        var bar = document.getElementById('c-bar'); if (bar) bar.style.width = pct + '%';
+        var lvl = document.getElementById('c-level');
+        if (lvl) lvl.textContent = (count >= 3 ? 'Prêt à valider' : (count >= 1 ? 'En cours' : 'Brouillon'));
+        var got = {
+          selection: count >= 1,
+          status: count >= 1,
+          images: !!v('c-conditions'),
+          message: !!v('c-intro'),
+          ready: !!(count >= 1 && v('c-dest') && v('c-email') && v('c-intro')),
+        };
+        document.querySelectorAll('[data-cbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-cbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var lo = document.getElementById('c-list'); if (lo) lo.textContent = buildList();
+        var doo = document.getElementById('c-dossier'); if (doo) doo.textContent = buildDossier();
+        var mo = document.getElementById('c-msgout'); if (mo) mo.textContent = buildMessage();
+      }
+      form.addEventListener('input', update);
+      var msg = document.getElementById('c-msg'); if (msg) msg.addEventListener('change', update);
+      update();
+      var lc = document.querySelector('[data-list-copy]'); if (lc) lc.addEventListener('click', function () { copyText(buildList(), lc); });
+      var dc = document.querySelector('[data-dossier-copy]'); if (dc) dc.addEventListener('click', function () { copyText(buildDossier(), dc); });
+      var mc = document.querySelector('[data-cmsg-copy]'); if (mc) mc.addEventListener('click', function () { copyText(buildMessage(), mc); });
+    })();
+  </script>
