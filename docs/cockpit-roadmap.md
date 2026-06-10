@@ -5,6 +5,17 @@ Ce document décrit **où se modifie chaque élément du site aujourd'hui**, et
 à recoder l'interface. Le cockpit n'est **pas** développé maintenant : cette
 page sert de carte.
 
+> 🧭 **Accès au cockpit.** L'entrée interne **principale** est désormais **`/cockpit`**
+> (centre opérationnel V1). **`/cockpit-roadmap`** reste accessible comme page
+> **secondaire / documentation** (même contenu, composant partagé
+> `src/components/CockpitDashboard.astro`). **Les deux sont `noindex` et hors
+> navigation publique.**
+>
+> ⚠️ **Préparation ≠ sauvegarde réelle.** Le cockpit **prépare** et **copie** des
+> contenus (fiches, légendes, checklists, brouillons). La **sauvegarde réelle**
+> sera activée **par étapes**. **Aucune action sensible n'est automatisée sans
+> validation humaine** (Armelle décide · Tom valide · Claude Code exécute).
+
 > Principe : tout le contenu pilotable vit dans `src/data/` et `src/content/`.
 > Les composants (`src/components`, `src/layouts`) **consomment** ces données
 > et ne contiennent pas de texte important codé en dur.

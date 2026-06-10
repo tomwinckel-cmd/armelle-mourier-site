@@ -52,7 +52,7 @@ Ton : **simple, rassurant, valorisant**. Ouvrez la production avant de commencer
 
 ## ⏱️ 3:30 → 4:30 — Le cockpit (1 min)
 
-- Ouvrir `/cockpit-roadmap` (par l'URL directe).
+- Ouvrir `/cockpit` (par l'URL directe).
 - Montrer « **Que voulez-vous faire aujourd'hui ?** » et les modules :
   ajouter une œuvre, fiche + preuve, catalogue, facture brouillon, logistique.
 

@@ -17,7 +17,7 @@ faut pas encore toucher**.
 | Espace | À quoi ça sert | État |
 |---|---|---|
 | **Site public** | Ce que voient les visiteurs : œuvres, biographie, expositions, contact. | ✅ **Prêt et stable** |
-| **Cockpit interne** (`/cockpit-roadmap`) | Votre tableau de bord pour **préparer** œuvres, fiches, légendes, catalogue, factures brouillon, logistique. | 🟡 **Prototype** (prépare, ne sauvegarde pas) |
+| **Cockpit interne** (`/cockpit`) | Votre tableau de bord pour **préparer** œuvres, fiches, légendes, catalogue, factures brouillon, logistique. | 🟡 **Prototype** (prépare, ne sauvegarde pas) |
 | **Admin Decap** (`/admin/`) | La future interface pour **modifier vous-même** les contenus. | ⏳ **Préparé, pas encore activé** |
 
 - **Ce qui est prêt** : tout le site public (pages, fiches d'œuvres, contact,
@@ -32,7 +32,8 @@ faut pas encore toucher**.
 | Lien | Pour qui | Note |
 |---|---|---|
 | **Production** : <https://armelle-mourier-site.vercel.app> | Tout le monde | Le site public en ligne. |
-| **Cockpit** : `/cockpit-roadmap` | Armelle & Tom | Visible par **URL directe** (non listé, non indexé). |
+| **Cockpit** : `/cockpit` | Armelle & Tom | **Entrée interne principale** — par **URL directe** (non listé, non indexé). |
+| **Cockpit (alias)** : `/cockpit-roadmap` | Documentation | Même contenu, page secondaire (non listé, non indexé). |
 | **Admin préparatoire** : `/admin/` | Plus tard | L'écran s'affiche mais **ne publie pas encore**. |
 | **GitHub / Vercel** | **Tom / développement** | Gestion technique — pas nécessaire pour l'artiste. |
 
@@ -55,7 +56,7 @@ faut pas encore toucher**.
 8. **Bleu Cendres** — le recueil, le bleu, l'or, la poésie.
 9. **Expositions** — le parcours, dates et lieux réels.
 10. **Contact** — écrire à l'artiste (acquisition, catalogue, exposition…).
-11. **Cockpit** (`/cockpit-roadmap`) — votre futur tableau de bord.
+11. **Cockpit** (`/cockpit`) — votre futur tableau de bord.
 
 ---
 
@@ -75,7 +76,7 @@ faut pas encore toucher**.
 
 ## 5. Ce que le cockpit permet déjà (prototype)
 
-Dans `/cockpit-roadmap`, l'écran s'ouvre sur « **Que voulez-vous faire
+Dans `/cockpit`, l'écran s'ouvre sur « **Que voulez-vous faire
 aujourd'hui ?** » et propose de :
 
 - **Préparer une nouvelle œuvre** (assistant pas à pas) ;
@@ -115,7 +116,7 @@ L'accès d'édition (`/admin/`) sera créé **plus tard**, proprement et en séc
 - ✅ **Armelle créera elle-même son mot de passe** via un **lien d'invitation**
   reçu par e-mail (jamais partagé, jamais écrit dans le code).
 - ⏳ L'accès `/admin/` sera **activé plus tard** (voir `docs/decap-cms-setup.md`).
-- 👁️ `/cockpit-roadmap` est, lui, **déjà visible par URL directe** pour la phase
+- 👁️ `/cockpit` est, lui, **déjà visible par URL directe** pour la phase
   prototype (non listé dans le menu, non indexé par les moteurs).
 
 ---

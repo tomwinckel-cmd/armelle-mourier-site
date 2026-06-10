@@ -156,3 +156,65 @@ export const operations: OperationModule[] = [
 /** Principe directeur des services externes. */
 export const operationsPrinciple =
   "Un service externe n'est ajouté que s'il retire plus de charge mentale qu'il n'en crée.";
+
+// =====================================================================
+//  ACTIVATIONS — où en est chaque module et ce qu'il faut pour l'activer
+//  ---------------------------------------------------------------------
+//  Structure simple, lisible : phase (active / prepared / future),
+//  ce qu'on peut faire aujourd'hui (label), ce qu'il faut pour aller plus
+//  loin (requirement), et le niveau de prudence (risk).
+//  ⚠️ Aucune action sensible n'est automatisée sans validation humaine.
+// =====================================================================
+export type ActivationPhase = 'active' | 'prepared' | 'future';
+
+export type ModuleActivation = {
+  phase: ActivationPhase;
+  label: string;
+  requirement: string;
+  risk: 'low' | 'medium' | 'high';
+};
+
+export const operationActivation: Record<string, ModuleActivation> = {
+  ip: {
+    phase: 'active',
+    label: 'Préparer une fiche + preuve de création',
+    requirement: 'Validation humaine ; e-Soleau (INPI) pour une œuvre importante',
+    risk: 'low',
+  },
+  'soft-sale': {
+    phase: 'active',
+    label: 'Préparer une réponse / une réservation',
+    requirement: 'Validation humaine ; « Prix sur demande » par défaut',
+    risk: 'low',
+  },
+  social: {
+    phase: 'active',
+    label: 'Préparer une légende à copier-coller',
+    requirement: 'Publication manuelle par l’artiste (aucune API)',
+    risk: 'low',
+  },
+  catalog: {
+    phase: 'active',
+    label: 'Préparer un dossier collectionneur',
+    requirement: 'Validation humaine ; images web compressées',
+    risk: 'low',
+  },
+  invoicing: {
+    phase: 'prepared',
+    label: 'Préparer un brouillon de facture',
+    requirement: 'Vérification humaine ; comptabilité confiée à un professionnel',
+    risk: 'medium',
+  },
+  logistics: {
+    phase: 'prepared',
+    label: 'Préparer une fiche de remise',
+    requirement: 'Validation humaine ; preuve de remise conservée',
+    risk: 'low',
+  },
+  'human-relation': {
+    phase: 'active',
+    label: 'Cadre de décision',
+    requirement: 'Armelle décide · Tom valide · Claude Code exécute',
+    risk: 'low',
+  },
+};
