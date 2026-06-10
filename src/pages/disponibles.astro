@@ -11,86 +11,116 @@ import { shop } from '../data/shop';
 // respecte le statut et le drapeau showInAvailable).
 const forSale = availableArtworks;
 const hasFilter = new Set(forSale.map((a) => a.series).filter(Boolean)).size > 1;
+
+// Bloc rassurance : une posture d'atelier, pas une boutique.
+const reassurance = [
+  { title: 'Prix sur demande', text: 'Chaque toile est une pièce unique ; le prix se communique dans l’échange, sans étiquette.' },
+  { title: 'Échange direct', text: 'Vous écrivez à l’artiste, qui vous répond elle-même — une conversation, pas un tunnel de vente.' },
+  { title: 'Aucun paiement automatique', text: 'Pas de panier, pas de paiement en ligne : rien ne s’engage en un clic.' },
+  { title: 'Informations avant toute décision', text: 'Dimensions, technique, encadrement, remise : tout est précisé avant que vous décidiez.' },
+];
+
+// Parcours d'acquisition (vente douce, en trois temps).
+const steps = [
+  { n: '01', title: 'Choisir une œuvre', text: 'Parcourez la sélection, ouvrez la fiche pour voir le format, la technique et la série. Chaque toile est une pièce unique.' },
+  { n: '02', title: 'Demander les informations', text: 'Cliquez sur « Demander cette œuvre » : le titre est repris automatiquement. Prix, disponibilité et détails vous sont envoyés.' },
+  { n: '03', title: 'Réserver ou convenir d’une remise', text: 'Réservez la toile, puis convenez ensemble d’une remise en main propre dans la région de Dijon ou d’une expédition soignée.' },
+];
 ---
 <Base
   title={`Tableaux disponibles — ${site.artistName}`}
-  description="Œuvres originales d’Armelle Mourier disponibles à l’acquisition. Une galerie privée, sobre et humaine : prix sur demande, réservation et catalogue par contact direct avec l’artiste."
+  description="Œuvres originales d’Armelle Mourier disponibles à l’acquisition. Une sélection d’atelier, sobre et humaine : prix sur demande, réservation et catalogue par contact direct avec l’artiste."
   keywords={['acheter tableau artiste peintre', 'œuvre originale artiste française', 'tableaux contemporains', 'Armelle Mourier', 'acquisition tableau']}
 >
-  <!-- INTRO « galerie privée » -->
+  <!-- INTRO « sélection d'atelier » -->
   <section class="shell pb-section pt-12 sm:pt-16">
     <p class="eyebrow reveal is-visible mb-3">Sélection d’atelier</p>
     <h1 class="reveal is-visible text-h1 font-serif text-encre">Tableaux disponibles</h1>
     <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
-    <p class="reveal mt-7 max-w-prose font-serif text-xl italic leading-snug text-encre">
-      Acquisition en lien direct avec l’artiste — prix sur demande.
+    <p class="reveal mt-7 max-w-prose font-serif text-xl italic leading-snug text-encre sm:text-2xl">
+      Certaines œuvres sont disponibles à l’acquisition. Chaque demande se fait en lien direct avec l’artiste.
     </p>
     <p class="reveal mt-5 max-w-prose text-lg leading-relaxed text-noir/85">
-      Quelques œuvres quittent l’atelier. Pour connaître les conditions, réserver une toile ou
-      recevoir les informations, écrivez simplement à l’artiste.
+      Quelques toiles quittent l’atelier. Ce n’est pas une boutique : pas de panier ni de paiement en
+      ligne, simplement une conversation — le temps de répondre à vos questions, de réserver une œuvre
+      ou de recevoir le catalogue.
     </p>
-    <p class="reveal mt-4 max-w-prose text-noir/70">
-      Ce n’est pas une boutique automatique. Chaque toile est une pièce unique&nbsp;: pas de panier
-      ni de paiement en ligne, simplement une conversation — le temps de répondre à vos questions
-      sur le format, la technique ou l’encadrement, de réserver une œuvre ou de recevoir le catalogue.
-    </p>
+  </section>
+
+  <!-- BLOC RASSURANCE -->
+  <section class="bg-brume py-section">
+    <div class="shell">
+      <p class="eyebrow reveal mb-3">En toute confiance</p>
+      <h2 class="reveal text-h2 font-serif text-encre">Une acquisition douce, à votre rythme</h2>
+      <Trait class="reveal mt-5 text-or" width="7rem" />
+      <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {reassurance.map((r) => (
+          <div class="reveal frame-gallery flex flex-col p-5">
+            <h3 class="font-serif text-lg italic text-encre">{r.title}</h3>
+            <hr class="cartel-rule mt-3" />
+            <p class="mt-3 text-sm leading-relaxed text-noir/75">{r.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   </section>
 
   <!-- GRILLE DES ŒUVRES DISPONIBLES -->
-  <section class="bg-brume py-section">
-    <div class="shell">
-      <SectionTitle eyebrow="À acquérir" title="Les œuvres proposées" />
-      {forSale.length > 0 ? (
-        <div class="mt-12">
-          <ArtworkGrid artworks={forSale} filterable={hasFilter} />
-        </div>
-      ) : (
-        <p class="mt-10 max-w-prose text-noir/75">
-          Aucune œuvre n’est proposée à l’acquisition pour le moment. N’hésitez pas à écrire à
-          l’artiste pour être informé·e des prochaines disponibilités.
-        </p>
-      )}
-    </div>
+  <section class="shell py-section">
+    <SectionTitle eyebrow="À acquérir" title="Les œuvres proposées" lead="Une sélection restreinte, présentée comme en atelier : chaque toile a sa fiche, son format et sa série." />
+    {forSale.length > 0 ? (
+      <div class="mt-12">
+        <ArtworkGrid artworks={forSale} filterable={hasFilter} />
+      </div>
+    ) : (
+      <p class="mt-10 max-w-prose text-noir/75">
+        Aucune œuvre n’est proposée à l’acquisition pour le moment. N’hésitez pas à écrire à
+        l’artiste pour être informé·e des prochaines disponibilités.
+      </p>
+    )}
   </section>
 
   <!-- COMMENT ACQUÉRIR -->
-  <section class="shell py-section">
-    <SectionTitle eyebrow="En pratique" title="Acquérir une œuvre" />
-    <div class="mt-10 grid gap-8 sm:grid-cols-3">
-      <div class="reveal">
-        <span class="font-serif text-3xl text-or">01</span>
-        <h3 class="mt-2 text-h3 font-serif text-encre">Choisir une œuvre</h3>
-        <p class="mt-2 text-noir/75">
-          Parcourez la sélection, ouvrez la fiche d’une œuvre pour voir le format, la technique
-          et la série. Chaque toile est une pièce unique.
-        </p>
+  <section class="bg-encre py-section text-paper">
+    <div class="shell">
+      <p class="eyebrow reveal mb-3 text-or">En pratique</p>
+      <h2 class="reveal text-h2 font-serif text-paper">Acquérir une œuvre, en trois temps</h2>
+      <Trait class="reveal mt-5 text-or" width="7rem" />
+      <div class="mt-12 grid gap-8 sm:grid-cols-3">
+        {steps.map((s) => (
+          <div class="reveal border-t border-paper/25 pt-5">
+            <span class="font-serif text-3xl text-or">{s.n}</span>
+            <h3 class="mt-2 font-serif text-2xl text-paper">{s.title}</h3>
+            <p class="mt-3 leading-relaxed text-paper/75">{s.text}</p>
+          </div>
+        ))}
       </div>
-      <div class="reveal">
-        <span class="font-serif text-3xl text-or">02</span>
-        <h3 class="mt-2 text-h3 font-serif text-encre">Écrire à l’artiste</h3>
-        <p class="mt-2 text-noir/75">
-          Cliquez sur «&nbsp;Demander cette œuvre&nbsp;»&nbsp;: le titre est repris
-          automatiquement. Vous pouvez aussi simplement réserver ou poser vos questions.
-        </p>
-      </div>
-      <div class="reveal">
-        <span class="font-serif text-3xl text-or">03</span>
-        <h3 class="mt-2 text-h3 font-serif text-encre">Recevoir les informations</h3>
-        <p class="mt-2 text-noir/75">
-          Prix, disponibilité, dimensions exactes, encadrement, remise en main propre dans la
-          région de Dijon ou expédition soignée&nbsp;: tout se précise dans l’échange.
-        </p>
-      </div>
-    </div>
 
-    <div class="mt-12 flex flex-wrap gap-x-8 gap-y-4">
-      <a href="/contact?objet=acquisition" class="btn-primary">Demander une œuvre</a>
-      {shop.enableReservation && (
-        <a href="/contact?objet=reservation" class="btn-ghost">{shop.cta.reserve}</a>
-      )}
-      {shop.enableCatalogRequest && (
-        <a href="/contact?objet=catalogue" class="btn-gold">{shop.cta.catalog}</a>
-      )}
+      <div class="mt-12 flex flex-wrap gap-x-6 gap-y-4">
+        <a href="/contact?objet=acquisition" class="btn-gold">Demander une œuvre</a>
+        {shop.enableReservation && (
+          <a href="/contact?objet=reservation" class="inline-flex items-center font-semibold text-paper underline decoration-or underline-offset-4">{shop.cta.reserve} →</a>
+        )}
+        {shop.enableCatalogRequest && (
+          <a href="/contact?objet=catalogue" class="inline-flex items-center font-semibold text-paper underline decoration-or underline-offset-4">{shop.cta.catalog} →</a>
+        )}
+      </div>
     </div>
   </section>
+
+  <!-- CATALOGUE -->
+  {shop.enableCatalogRequest && (
+    <section class="shell py-section">
+      <div class="reveal max-w-prose">
+        <p class="eyebrow mb-3">Aller plus loin</p>
+        <h2 class="text-h2 font-serif text-encre">Recevoir le catalogue</h2>
+        <Trait class="mt-5 text-or" width="7rem" />
+        <p class="mt-6 leading-relaxed text-noir/80">
+          Vous préférez une vue d’ensemble&nbsp;? Demandez le catalogue&nbsp;: une sélection d’œuvres
+          et leurs informations vous sont envoyées, sans engagement.
+        </p>
+        <a href="/contact?objet=catalogue" class="btn-primary mt-7">{shop.cta.catalog}</a>
+      </div>
+    </section>
+  )}
 </Base>
