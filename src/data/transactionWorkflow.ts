@@ -184,11 +184,11 @@ export const messageTemplates: MessageTemplate[] = [
 
 /** Badges encourageants (gamification douce, calculée côté client). */
 export const transactionBadges = [
-  { id: 'request', label: 'Demande claire' },
-  { id: 'invoice', label: 'Facture préparée' },
+  { id: 'info', label: 'Informations prêtes' },
+  { id: 'draft', label: 'Brouillon prêt' },
   { id: 'logistics', label: 'Logistique prête' },
-  { id: 'delivery', label: 'Remise sécurisée' },
-  { id: 'archive', label: 'Archive prévue' },
+  { id: 'proof', label: 'Preuve prévue' },
+  { id: 'human', label: 'Validation humaine' },
 ];
 
 // =====================================================================
