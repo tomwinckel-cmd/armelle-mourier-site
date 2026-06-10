@@ -151,3 +151,17 @@ src/
 public/         fichiers servis tels quels (images, robots.txt, favicon)
 audit/          rapport d’audit du site précédent + stratégie
 ```
+
+---
+
+## 9. Livraison artiste
+
+Documentation **clé en main** pour présenter le site et le cockpit à Armelle :
+
+- **[`docs/livraison-artiste.md`](docs/livraison-artiste.md)** — guide de livraison :
+  ce qui est prêt, ce qu'elle peut voir, ce qu'elle pourra piloter, l'accès artiste,
+  la propriété intellectuelle, les prochaines activations.
+- **[`docs/demo-script.md`](docs/demo-script.md)** — script de présentation en 5 minutes.
+- **[`docs/cockpit-roadmap.md`](docs/cockpit-roadmap.md)** — feuille de route du cockpit.
+- **[`docs/decap-cms-setup.md`](docs/decap-cms-setup.md)** — futur accès d'édition (Decap).
+- **[`docs/ip-protection-artist.md`](docs/ip-protection-artist.md)** — protéger ses œuvres.
