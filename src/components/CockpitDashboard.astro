@@ -1035,32 +1035,122 @@ const statusChipClass: Record<ArtworkStatus, string> = {
         <span class="cockpit-chevron" aria-hidden="true">▸</span>
       </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
-      <p class="mt-4 max-w-prose text-noir/80">{socialPublishing.instruction}</p>
-      <p class="mt-2 max-w-prose text-sm italic text-cendre">
-        Le cockpit prépare la publication. L’artiste garde la main et copie-colle vers Instagram.
-        Aucune API, aucune publication automatique.
-      </p>
-      <p class="mt-4 text-sm text-cendre">
-        Formats : {socialPublishing.formats.map((f) => `${f.label} ${f.ratio} (${f.size})`).join(' · ')}
+      <p class="mt-4 max-w-prose text-noir/80">
+        Trois étapes pour préparer une publication, puis <strong>copier-coller</strong> vous-même
+        vers Instagram. <strong>Aucune API, aucune publication automatique</strong> : vous gardez la main.
       </p>
 
-      <div class="mt-6 grid gap-5 sm:grid-cols-2">
-        {socialPublishing.templates.map((t) => {
-          const tags = [...(t.hashtags ?? []), ...socialPublishing.defaultHashtags].join(' ');
-          const full = `${t.caption}\n\n${tags}`;
-          return (
-            <article class="frame-gallery p-5">
-              <div class="flex items-baseline justify-between gap-3">
-                <h3 class="font-serif text-lg italic text-encre">{t.label}</h3>
-                <span class="text-eyebrow uppercase tracking-[0.16em] text-cendre">{t.format}</span>
-              </div>
-              <p class="mt-2 whitespace-pre-line text-sm text-noir/80">{t.caption}</p>
-              <p class="mt-2 text-xs text-cendre">{tags}</p>
-              <button type="button" class="btn btn-ghost mt-3" data-copy={full}>Copier la légende</button>
-            </article>
-          );
-        })}
+      <!-- Progression -->
+      <div class="mt-6 frame-gallery p-5">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Préparation</p>
+          <p id="sp-level" class="font-serif italic text-encre">À préparer</p>
+        </div>
+        <ul id="sp-badges" class="mt-3 flex flex-wrap gap-2">
+          {[
+            { id: 'legende', label: 'Légende prête' },
+            { id: 'hashtags', label: 'Hashtags prêts' },
+            { id: 'image', label: 'Image web prête' },
+            { id: 'statut', label: 'Statut vérifié' },
+            { id: 'ready', label: 'Publication prête à copier' },
+          ].map((b) => (
+            <li data-spbadge={b.id} class="rounded-full border border-cendre/30 px-3 py-1 text-xs text-cendre">{b.label}</li>
+          ))}
+        </ul>
       </div>
+
+      <form id="sp-form" class="mt-6 grid max-w-3xl gap-6" onsubmit="return false">
+        <!-- ÉTAPE 1 — Choisir le contexte -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">1 · Choisir le contexte</legend>
+          <p class="mt-1 text-sm text-cendre">Le type de publication pré-remplit une légende et un format conseillé.</p>
+          <label class="mt-4 block text-sm">Type de publication
+            <select id="sp-type" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+              {socialPublishing.templates.map((t) => (
+                <option
+                  value={t.id}
+                  data-caption={t.caption}
+                  data-format={t.format}
+                  data-hashtags={[...(t.hashtags ?? []), ...socialPublishing.defaultHashtags].join(' ')}
+                >{t.label}</option>
+              ))}
+            </select>
+          </label>
+        </fieldset>
+
+        <!-- ÉTAPE 2 — Préparer la publication -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">2 · Préparer la publication</legend>
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="text-sm">Format recommandé
+              <select id="sp-format" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                {socialPublishing.formats.map((f) => (
+                  <option value={f.id}>{f.label} {f.ratio} ({f.size})</option>
+                ))}
+              </select>
+            </label>
+            <label class="text-sm">Ton
+              <select id="sp-tone" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none">
+                <option value="sobre">Sobre</option>
+                <option value="poétique">Poétique</option>
+                <option value="informatif">Informatif</option>
+              </select>
+            </label>
+            <label class="text-sm sm:col-span-2">Œuvre / sujet <span class="text-cendre">(titre ou thème)</span>
+              <input id="sp-subject" type="text" placeholder="Renaissance · Coulisse d’atelier…" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm sm:col-span-2">Légende proposée <span class="text-cendre">(à ajuster)</span>
+              <textarea id="sp-caption" rows="4" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none"></textarea>
+            </label>
+            <label class="text-sm sm:col-span-2">Hashtags
+              <input id="sp-hashtags" type="text" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+            <label class="text-sm">Image à utiliser <span class="text-cendre">(version web)</span>
+              <input id="sp-image" type="text" placeholder="/images/artworks/mon-oeuvre.webp" class="mt-1 w-full rounded-sm border border-cendre/35 bg-paper px-3 py-2 text-noir focus:border-or focus:outline-none" />
+            </label>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-3">
+            <button type="button" class="btn btn-ghost" data-sp-caption-copy>Copier la légende</button>
+            <button type="button" class="btn btn-ghost" data-sp-hashtags-copy>Copier les hashtags</button>
+          </div>
+        </fieldset>
+
+        <!-- ÉTAPE 3 — Copier et publier manuellement -->
+        <fieldset class="frame-gallery p-5">
+          <legend class="px-1 font-serif text-lg italic text-encre">3 · Copier et publier manuellement</legend>
+          <p class="mt-1 text-sm text-cendre">On relit, on coche, on copie. La publication se fait <strong>à la main</strong>.</p>
+          <p class="mt-4 text-eyebrow uppercase tracking-[0.16em] text-cendre">Avant de publier</p>
+          <ul class="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+            {[
+              'L’image est bien une version web (pas la HD complète).',
+              'La légende est relue.',
+              'Les hashtags sont sobres.',
+              'Le statut de l’œuvre est vérifié.',
+              'Si l’œuvre est vendue, ne pas la présenter comme disponible.',
+              'Aucun prix inventé.',
+            ].map((item) => (
+              <li class="flex items-start gap-2"><input type="checkbox" class="mt-0.5" /><span class="text-noir/80">{item}</span></li>
+            ))}
+          </ul>
+          <div class="mt-3 space-y-2 text-sm">
+            <label class="flex items-center gap-2"><input id="sp-web" type="checkbox" /> Version web compressée prête (pas de HD)</label>
+            <label class="flex items-center gap-2"><input id="sp-status" type="checkbox" /> Statut de l’œuvre vérifié</label>
+            <label class="flex items-center gap-2 font-semibold text-encre"><input id="sp-human" type="checkbox" /> Validation humaine faite — à publier manuellement</label>
+          </div>
+        </fieldset>
+      </form>
+
+      <!-- Publication prête à copier -->
+      <h3 class="mt-8 text-h3 font-serif text-encre">Publication à préparer</h3>
+      <pre id="sp-recap" class="mt-3 max-w-3xl overflow-x-auto whitespace-pre-wrap rounded-card border border-cendre/30 bg-brume/40 p-4 text-sm text-noir/85"></pre>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <button type="button" class="btn btn-primary" data-sp-recap-copy>Copier la publication</button>
+        <button type="button" class="btn btn-ghost" data-sp-caption-copy>Copier la légende</button>
+        <button type="button" class="btn btn-ghost" data-sp-hashtags-copy>Copier les hashtags</button>
+      </div>
+      <p class="mt-3 max-w-prose text-sm italic text-or">
+        À publier manuellement sur Instagram. Aucune API, aucune publication automatique : Armelle garde la main.
+      </p>
       </details>
     </section>
 
@@ -1570,5 +1660,71 @@ const statusChipClass: Record<ArtworkStatus, string> = {
       var lc = document.querySelector('[data-list-copy]'); if (lc) lc.addEventListener('click', function () { copyText(buildList(), lc); });
       var dc = document.querySelector('[data-dossier-copy]'); if (dc) dc.addEventListener('click', function () { copyText(buildDossier(), dc); });
       var mc = document.querySelector('[data-cmsg-copy]'); if (mc) mc.addEventListener('click', function () { copyText(buildMessage(), mc); });
+    })();
+
+    // --- Préparer une publication (copier-coller, AUCUNE API, AUCUNE publication auto) ---
+    (function () {
+      var form = document.getElementById('sp-form');
+      if (!form) return;
+      function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+      function c(id) { var el = document.getElementById(id); return !!(el && el.checked); }
+      var typeSel = document.getElementById('sp-type');
+      var fmtSel = document.getElementById('sp-format');
+      var fmtLabel = {}; // value -> texte lisible (depuis les options du select format)
+      if (fmtSel) { Array.prototype.forEach.call(fmtSel.options, function (o) { fmtLabel[o.value] = o.textContent; }); }
+      var typeLabel = {};
+      if (typeSel) { Array.prototype.forEach.call(typeSel.options, function (o) { typeLabel[o.value] = o.textContent; }); }
+
+      // Pré-remplir légende / format / hashtags depuis le type choisi.
+      function applyType() {
+        if (!typeSel) return;
+        var opt = typeSel.options[typeSel.selectedIndex];
+        if (!opt) return;
+        var cap = document.getElementById('sp-caption'); if (cap) cap.value = opt.getAttribute('data-caption') || '';
+        if (fmtSel && opt.getAttribute('data-format')) fmtSel.value = opt.getAttribute('data-format');
+        var tags = document.getElementById('sp-hashtags'); if (tags) tags.value = opt.getAttribute('data-hashtags') || '';
+        update();
+      }
+
+      function caption() { return v('sp-caption'); }
+      function hashtags() { return v('sp-hashtags'); }
+      function buildRecap() {
+        return [
+          'PUBLICATION À PRÉPARER',
+          '',
+          'Type : ' + (typeSel ? (typeLabel[typeSel.value] || typeSel.value) : ''),
+          'Format recommandé : ' + (fmtSel ? (fmtLabel[fmtSel.value] || fmtSel.value) : ''),
+          'Œuvre / sujet : ' + v('sp-subject'),
+          'Légende : ' + caption(),
+          'Hashtags : ' + hashtags(),
+          'Image à utiliser : ' + v('sp-image'),
+          'Version web compressée : ' + (c('sp-web') ? 'prête' : 'à préparer'),
+          'Ton : ' + v('sp-tone'),
+          'Validation humaine : à vérifier avant publication',
+          'À publier manuellement sur : Instagram',
+        ].join('\n');
+      }
+      function update() {
+        var got = {
+          legende: !!caption(),
+          hashtags: !!hashtags(),
+          image: !!(v('sp-image') && c('sp-web')),
+          statut: c('sp-status'),
+          ready: !!(caption() && hashtags() && c('sp-human')),
+        };
+        document.querySelectorAll('[data-spbadge]').forEach(function (el) {
+          var on = got[el.getAttribute('data-spbadge')];
+          el.className = 'rounded-full px-3 py-1 text-xs ' + (on ? 'border border-or/60 bg-or/10 text-encre' : 'border border-cendre/30 text-cendre');
+        });
+        var lvl = document.getElementById('sp-level');
+        if (lvl) lvl.textContent = got.ready ? 'Prête à copier' : (got.legende && got.hashtags ? 'Presque prête' : 'À préparer');
+        var rec = document.getElementById('sp-recap'); if (rec) rec.textContent = buildRecap();
+      }
+      if (typeSel) typeSel.addEventListener('change', applyType);
+      form.addEventListener('input', update);
+      applyType();
+      document.querySelectorAll('[data-sp-caption-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(caption(), b); }); });
+      document.querySelectorAll('[data-sp-hashtags-copy]').forEach(function (b) { b.addEventListener('click', function () { copyText(hashtags(), b); }); });
+      var rc = document.querySelector('[data-sp-recap-copy]'); if (rc) rc.addEventListener('click', function () { copyText(buildRecap(), rc); });
     })();
   </script>
