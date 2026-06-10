@@ -84,12 +84,33 @@ export const pages = {
   oeuvres: {
     eyebrow: 'Le portfolio',
     title: 'Les œuvres',
+    // Phrase d'ouverture, sensible : on regarde avant de demander.
+    lead: 'Chaque œuvre est une trace : couleur, matière, mouvement, mémoire des lieux.',
     intro:
       'Une peinture de la couleur et de la matière, le plus souvent à l’acrylique, sur toile recyclée, achetée ou créée. Du grand format — jusqu’à 2,50 × 1,10 m — au plus petit, chaque toile naît d’un même élan : coucher l’émotion, transmettre la joie d’être en vie.',
     seriesNote:
       'Les toiles se regroupent en séries — Bleu Cendres, Impressions, Performances — où la couleur cherche, à chaque fois, son paysage intérieur.',
-    filterNote: 'Filtrez par série ou par disponibilité pour parcourir l’atelier.',
+    filterNote:
+      'Filtrez par série ou par disponibilité. Les œuvres à acquérir sont aussi réunies sur la page Disponibles ; les formats sont indiqués sur chaque fiche.',
     pendingNote:
       'Les visuels haute définition seront ajoutés prochainement ; un fragment d’attente s’affiche en attendant. Pour le prix ou la disponibilité d’une œuvre, écrivez directement à l’artiste.',
+    // Bloc « Séries et fragments d'univers ». Notes courtes, fidèles à l'œuvre.
+    seriesHeading: { eyebrow: 'Les séries', title: 'Fragments d’univers' },
+    seriesNotes: {
+      'Bleu Cendres': 'Bleus profonds et ors — des paysages intérieurs, en dialogue avec la poésie du recueil Bleu Cendres.',
+      'Impressions': 'La mémoire des lieux affleure : la lumière de Collioure, portée par la couleur.',
+      'Performances': 'Des toiles nées en direct, où la peinture rejoint la danse et le geste.',
+    } as Record<string, string>,
+    // CTA doux : regarder d'abord, demander ensuite.
+    closing: {
+      eyebrow: 'Regarder, puis demander',
+      title: 'Entrer dans l’atelier',
+      text:
+        'Prenez le temps de regarder. Quand une œuvre vous appelle, écrivez à l’artiste — l’acquisition reste une conversation, jamais une vitrine.',
+      links: [
+        { label: 'Voir les œuvres disponibles', href: '/disponibles' },
+        { label: 'Lire la démarche', href: '/demarche' },
+      ],
+    },
   },
 };

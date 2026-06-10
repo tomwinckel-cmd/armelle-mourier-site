@@ -2,9 +2,41 @@
 import Base from '../layouts/Base.astro';
 import SectionTitle from '../components/SectionTitle.astro';
 import ArtworkGrid from '../components/ArtworkGrid.astro';
+import Trait from '../components/Trait.astro';
 import { artworks, allSeries } from '../data/artworks';
 import { site } from '../data/site';
 import { pages } from '../content/pages';
+
+// --- Séries et fragments d'univers (calculé sur données RÉELLES, sans rien inventer) ---
+function parseArea(dim?: string): number | null {
+  if (!dim) return null;
+  const nums = dim.replace(',', '.').match(/\d+(?:\.\d+)?/g);
+  if (!nums || nums.length < 2) return null;
+  return parseFloat(nums[0]) * parseFloat(nums[1]);
+}
+// Ordre de présentation préféré, restreint aux séries réellement présentes.
+const seriesOrder = ['Bleu Cendres', 'Impressions', 'Performances'];
+const orderedSeries = [
+  ...seriesOrder.filter((s) => allSeries.includes(s)),
+  ...allSeries.filter((s) => !seriesOrder.includes(s)),
+];
+const seriesData = orderedSeries.map((name) => {
+  const items = artworks.filter((a) => a.series === name);
+  const withDims = items.filter((a) => parseArea(a.dimensions) != null);
+  let formatNote = 'dimensions précisées sur chaque fiche';
+  if (withDims.length === 1) {
+    formatNote = `format ${withDims[0].dimensions}`;
+  } else if (withDims.length > 1) {
+    const sorted = [...withDims].sort((a, b) => (parseArea(a.dimensions)! - parseArea(b.dimensions)!));
+    formatNote = `du ${sorted[0].dimensions} au ${sorted[sorted.length - 1].dimensions}`;
+  }
+  return {
+    name,
+    count: items.length,
+    note: pages.oeuvres.seriesNotes[name] ?? '',
+    formatNote,
+  };
+});
 
 // Donnée structurée : galerie d'œuvres (ItemList)
 const galleryLd = {
@@ -31,16 +63,49 @@ const galleryLd = {
 ---
 <Base
   title={`Œuvres — ${site.artistName}, artiste peintre`}
-  description="Le portfolio d’Armelle Mourier : peintures à l’acrylique, abstraction, couleur et matière. Séries Bleu Cendres, La couleur des sentiments, Impression Collioure et grands formats."
+  description="Le portfolio d’Armelle Mourier : peintures à l’acrylique, abstraction, couleur et matière. Séries Bleu Cendres, Impressions / Collioure et performances — une galerie d’atelier à parcourir."
   keywords={['tableaux contemporains', 'peinture acrylique', 'peinture abstraite', 'Armelle Mourier', 'œuvre originale artiste française', 'Bleu Cendres']}
   jsonld={galleryLd}
 >
+  <!-- INTRO « galerie d'atelier » -->
   <section class="shell pb-section pt-12 sm:pt-16">
-    <SectionTitle eyebrow={pages.oeuvres.eyebrow} title={pages.oeuvres.title} as="h1" />
-    <p class="reveal mt-6 max-w-prose text-lg leading-relaxed text-noir/85">{pages.oeuvres.intro}</p>
-    <p class="reveal mt-4 max-w-prose font-serif text-lg italic leading-snug text-encre">{pages.oeuvres.seriesNote}</p>
+    <p class="eyebrow reveal is-visible mb-3">{pages.oeuvres.eyebrow}</p>
+    <h1 class="reveal is-visible text-h1 font-serif text-encre">{pages.oeuvres.title}</h1>
+    <Trait class="reveal is-visible mt-5 text-or" width="7rem" />
+    <p class="reveal mt-7 max-w-prose font-serif text-xl italic leading-snug text-encre sm:text-2xl">{pages.oeuvres.lead}</p>
+    <p class="reveal mt-5 max-w-prose text-lg leading-relaxed text-noir/85">{pages.oeuvres.intro}</p>
+  </section>
+
+  <!-- SÉRIES ET FRAGMENTS D'UNIVERS -->
+  {seriesData.length > 0 && (
+    <section class="bg-brume py-section">
+      <div class="shell">
+        <p class="eyebrow reveal mb-3">{pages.oeuvres.seriesHeading.eyebrow}</p>
+        <h2 class="reveal text-h2 font-serif text-encre">{pages.oeuvres.seriesHeading.title}</h2>
+        <Trait class="reveal mt-5 text-or" width="7rem" />
+        <p class="reveal mt-6 max-w-prose font-serif text-lg italic leading-snug text-encre">{pages.oeuvres.seriesNote}</p>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          {seriesData.map((s) => (
+            <a href="#galerie" class="reveal group frame-gallery flex flex-col p-6 transition-colors hover:border-or/60" data-series-jump={s.name}>
+              <div class="flex items-baseline justify-between gap-3">
+                <h3 class="font-serif text-2xl italic text-encre">{s.name}</h3>
+                <span class="shrink-0 text-eyebrow uppercase tracking-[0.16em] text-cendre">{s.count} œuvre{s.count > 1 ? 's' : ''}</span>
+              </div>
+              <hr class="cartel-rule mt-4" />
+              <p class="mt-4 flex-1 leading-relaxed text-noir/75">{s.note}</p>
+              <p class="mt-4 text-sm uppercase tracking-[0.14em] text-cendre">{s.formatNote}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- GALERIE (grille filtrable) -->
+  <section id="galerie" class="shell py-section scroll-mt-24">
+    <SectionTitle eyebrow="La galerie" title="Toutes les œuvres" />
     {allSeries.length > 1 && (
-      <p class="reveal mt-4 max-w-prose text-sm uppercase tracking-[0.16em] text-cendre">{pages.oeuvres.filterNote}</p>
+      <p class="reveal mt-6 max-w-prose text-noir/80">{pages.oeuvres.filterNote}</p>
     )}
     <p class="reveal mt-3 max-w-prose text-sm text-cendre">{pages.oeuvres.pendingNote}</p>
 
@@ -49,16 +114,29 @@ const galleryLd = {
     </div>
   </section>
 
+  <!-- CTA DOUX : regarder, puis demander -->
   <section class="shell pb-section">
-    <div class="rounded-card border border-cendre/25 bg-brume px-6 py-12 text-center sm:px-12">
-      <h2 class="text-h2 font-serif text-encre">Une œuvre vous attire&nbsp;?</h2>
-      <p class="mx-auto mt-4 max-w-xl text-noir/75">
-        Pour connaître le prix, la disponibilité ou recevoir le catalogue, écrivez à l’artiste.
-      </p>
-      <div class="mt-8 flex flex-wrap justify-center gap-3">
-        <a href="/contact" class="btn-primary">Contacter l’artiste</a>
-        <a href="/disponibles" class="btn-ghost">Voir les tableaux disponibles</a>
+    <div class="reveal rounded-card border border-cendre/25 bg-brume px-6 py-12 sm:px-12">
+      <p class="eyebrow mb-3">{pages.oeuvres.closing.eyebrow}</p>
+      <h2 class="text-h2 font-serif text-encre">{pages.oeuvres.closing.title}</h2>
+      <Trait class="mt-5 text-or" width="7rem" />
+      <p class="mt-6 max-w-prose text-noir/80">{pages.oeuvres.closing.text}</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/disponibles" class="btn-primary">{pages.oeuvres.closing.links[0].label}</a>
+        <a href="/demarche" class="btn-ghost">{pages.oeuvres.closing.links[1].label}</a>
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    // Cliquer une série en haut → activer le filtre série correspondant dans la galerie.
+    // Amélioration progressive : sans JS, le lien #galerie fait simplement défiler.
+    document.querySelectorAll('[data-series-jump]').forEach(function (card) {
+      card.addEventListener('click', function () {
+        var name = card.getAttribute('data-series-jump');
+        var chip = document.querySelector('.filter-chip[data-filter="series"][data-value="' + (name || '') + '"]');
+        if (chip) chip.click();
+      });
+    });
+  </script>
 </Base>
