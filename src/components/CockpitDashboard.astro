@@ -50,11 +50,10 @@ const dashboardNav = [
   { id: 'apercu', label: 'Vue d’ensemble' },
   { id: 'intake', label: 'Ajouter une œuvre' },
   { id: 'proof', label: 'Protéger' },
-  { id: 'social', label: 'Réseaux' },
+  { id: 'social', label: 'Publication' },
   { id: 'catalog', label: 'Catalogue' },
-  { id: 'disponibilites', label: 'Vente douce' },
   { id: 'respond', label: 'Répondre' },
-  { id: 'transaction', label: 'Facture · remise' },
+  { id: 'transaction', label: 'Facture & remise' },
   { id: 'ambiance', label: 'Ambiance' },
   { id: 'etapes', label: 'Roadmap' },
 ];
@@ -62,14 +61,13 @@ const dashboardNav = [
 // Actions rapides : « Que veux-tu faire maintenant ? » → ancres internes.
 type ActionState = 'active' | 'prepared' | 'future';
 const quickActions: { href: string; label: string; hint: string; state: ActionState }[] = [
-  { href: '#intake', label: 'Ajouter une œuvre', hint: 'Saisir une œuvre sans erreur', state: 'active' },
-  { href: '#intake', label: 'Vérifier une œuvre avant publication', hint: 'Garde-fou récapitulatif', state: 'active' },
-  { href: '#social', label: 'Préparer une publication Instagram', hint: 'Légende à copier-coller', state: 'active' },
-  { href: '#catalog', label: 'Préparer un catalogue', hint: 'Dossier collectionneur', state: 'active' },
+  { href: '#intake', label: 'Ajouter une œuvre', hint: 'Préparer une fiche sans erreur', state: 'active' },
+  { href: '#proof', label: 'Protéger une œuvre', hint: 'Préparer un dossier de preuve', state: 'active' },
+  { href: '#social', label: 'Préparer une publication', hint: 'Légende à copier-coller', state: 'active' },
+  { href: '#catalog', label: 'Préparer un catalogue', hint: 'Dossier à transmettre', state: 'active' },
   { href: '#respond', label: 'Répondre à une demande', hint: 'Réponse claire à copier', state: 'active' },
-  { href: '#transaction', label: 'Préparer facture & remise', hint: 'Brouillon + logistique', state: 'active' },
-  { href: '#proof', label: 'Protéger une œuvre', hint: 'Fiche + preuve de création', state: 'active' },
-  { href: '#ambiance', label: 'Ajuster l’ambiance visuelle', hint: 'Couleurs & ambiances', state: 'prepared' },
+  { href: '#transaction', label: 'Facture & remise', hint: 'Brouillons à copier', state: 'active' },
+  { href: '#ambiance', label: 'Ajuster l’ambiance visuelle', hint: 'Préparer une demande', state: 'prepared' },
 ];
 // Libellés d'état (ton adulte, pas de jeu vidéo).
 const actionStateLabel: Record<ActionState, string> = { active: 'actif', prepared: 'préparation', future: 'bientôt' };
@@ -144,14 +142,35 @@ const statusChipClass: Record<ArtworkStatus, string> = {
     <p class="eyebrow mb-3">Outil interne · non public</p>
     <h1 class="signature text-display text-encre">Cockpit artiste</h1>
     <p class="mt-3 max-w-prose font-serif text-xl italic leading-snug text-encre">
-      Centre opérationnel pour préparer, publier, protéger et organiser les œuvres.
+      Centre opérationnel pour préparer, protéger et organiser les œuvres.
+    </p>
+    <p class="mt-4 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-3 text-noir/85">
+      Choisis une action, <strong>prépare</strong> les informations, <strong>copie</strong> le
+      résultat, puis <strong>valide humainement</strong>.
     </p>
 
-    <p class="mt-5 max-w-prose rounded-card border border-or/40 bg-or/5 px-5 py-4 text-sm text-noir/80">
-      <strong>Mode développement sécurisé.</strong> Certaines actions <strong>préparent</strong> et
-      <strong>copient</strong> les contenus. La <strong>sauvegarde réelle</strong> sera activée par
-      étapes. Aucune connexion, aucun mot de passe, aucun paiement.
-    </p>
+    <!-- GARDE-FOUS : ce que le cockpit fait / ne fait pas encore -->
+    <div class="mt-5 grid max-w-3xl gap-4 sm:grid-cols-2">
+      <div class="frame-gallery p-5">
+        <p class="text-eyebrow uppercase tracking-[0.16em] text-or">Ce que le cockpit fait</p>
+        <ul class="mt-2 space-y-1 text-sm text-noir/80">
+          <li>· Prépare les contenus</li>
+          <li>· Vérifie (garde-fous, checklists)</li>
+          <li>· Structure (fiches, dossiers)</li>
+          <li>· Copie (à coller où tu veux)</li>
+        </ul>
+      </div>
+      <div class="frame-gallery p-5">
+        <p class="text-eyebrow uppercase tracking-[0.16em] text-cendre">Ce qu’il ne fait pas encore</p>
+        <ul class="mt-2 space-y-1 text-sm text-noir/70">
+          <li>· Sauvegarder</li>
+          <li>· Publier / envoyer</li>
+          <li>· Encaisser</li>
+          <li>· Remplacer un conseil professionnel</li>
+        </ul>
+      </div>
+    </div>
+    <p class="mt-3 text-sm text-cendre">Aucune sauvegarde automatique · validation humaine à chaque étape.</p>
 
     <!-- ÉCRAN D'ACCUEIL OPÉRATIONNEL : « Que veux-tu faire maintenant ? » -->
     <section aria-labelledby="quick-actions-title" class="mt-10">
@@ -1093,7 +1112,7 @@ const statusChipClass: Record<ArtworkStatus, string> = {
     <section id="social" class="scroll-mt-28">
       <details class="cockpit-module mt-16">
       <summary class="cockpit-summary">
-        <h2 class="text-h2 font-serif text-encre">Préparer une publication Instagram</h2>
+        <h2 class="text-h2 font-serif text-encre">Préparer une publication</h2>
         <span class="cockpit-chevron" aria-hidden="true">▸</span>
       </summary>
       <div class="rule-gold mt-4" aria-hidden="true"></div>
