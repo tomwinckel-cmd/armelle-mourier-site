@@ -1,0 +1,23 @@
+{
+  "id": "neverland",
+  "title": "Neverland",
+  "slug": "neverland",
+  "order": 50,
+  "series": "Bleu Cendres",
+  "year": "",
+  "dimensions": "40 × 30 cm",
+  "technique": "Acrylique sur toile",
+  "status": "available",
+  "detailEnabled": true,
+  "price": "",
+  "description": "Petit format de la série Bleu Cendres, entre matière et lumière.",
+  "descriptionLong": "",
+  "image": "",
+  "images": [],
+  "alt": "Petite toile abstraite, dominantes bleu et or, série Bleu Cendres, 40 × 30 cm.",
+  "videoEnabled": false,
+  "videoUrl": "",
+  "videoProvider": "",
+  "videoTitle": "",
+  "videoCaption": ""
+}

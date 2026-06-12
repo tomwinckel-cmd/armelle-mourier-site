@@ -45,6 +45,14 @@ données, aucun paiement, aucune API (Instagram…), aucun service externe.
 **Prochaine activation possible** : édition réelle (Decap CMS) + dépôt d'images,
 avec validation humaine — voir « Versions du cockpit » plus bas.
 
+> 🗂️ **Base des œuvres — fonctionnelle.** Les œuvres sont désormais une **base
+> éditoriale** (`src/data/artworks/<slug>.json`, un fichier par œuvre) éditable
+> depuis l'**admin** (`/admin` → Œuvres) avec **upload de photos**
+> (`/uploads/oeuvres/`), **galerie** et **champs vidéo**. Le site lit cette base
+> au build (rendu public **identique** après migration). **Seule étape restante** :
+> activer l'**accès artiste** (invitation, sans secret dans le repo) —
+> voir `docs/acces-armelle.md` et `docs/decap-cms-setup.md`.
+
 ## Où modifier quoi (aujourd'hui)
 
 | Domaine | Fichier | Contenu pilotable |
@@ -52,7 +60,7 @@ avec validation humaine — voir « Versions du cockpit » plus bas.
 | **Identité & nav** | `src/data/site.ts` | Nom, rôle, manifeste, ville/région, **Carnet** (nav : `label`/`href`/`index`/`note` + `carnet.eyebrow`/`intro`), e-mail public, réseaux, SEO par défaut |
 | **Design / DA** | `src/data/theme.ts` | Couleurs (palette pigment), typographie, identité `artist-studio` (boutons, cartes, hero, fragment), tokens (or, bleu, papier, texture) |
 | **Vente douce** | `src/data/shop.ts` | Mode `soft-contact`, `showPrices`, `defaultPriceLabel`, devise future, réservation/catalogue on-off, libellés CTA, **objets de contact** |
-| **Œuvres** | `src/data/artworks.ts` | Liste des œuvres : `title`, `slug`, `status`, `price?`, `image`/`images`, `alt`, `dimensions`, `technique`, `series`, `featured`, `showInAvailable` + helpers |
+| **Œuvres** | `src/data/artworks/<slug>.json` (1 fichier/œuvre) + chargeur `src/data/artworks.ts` | Base éditable (admin **ou** main) : `title`, `slug`, `order`, `status`, `price?`, `image` + `images` (galerie, upload `/uploads/oeuvres/`), `alt`, `dimensions`, `technique`, `series`, `year`, `featured`, `showInAvailable`, `detailEnabled`, `description`/`descriptionLong`, **vidéo** (`videoEnabled`/`videoUrl`/`videoProvider`/`videoTitle`/`videoCaption`) |
 | **Expositions** | `src/data/exhibitions.ts` | Chronologie (dates, lieux, types) |
 | **Textes bio** | `src/content/bio.ts` | Biographie, démarche, projet Bleu Cendres |
 | **Textes de pages** | `src/content/pages.ts` | Récit éditorial de l'accueil et des œuvres |

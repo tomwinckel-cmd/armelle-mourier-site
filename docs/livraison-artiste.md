@@ -18,10 +18,11 @@ faut pas encore toucher**.
 |---|---|---|
 | **Site public** | Ce que voient les visiteurs : œuvres, biographie, expositions, contact. | ✅ **Prêt et stable** |
 | **Cockpit interne** (`/cockpit`) | Votre tableau de bord pour **préparer** œuvres, fiches, légendes, catalogue, factures brouillon, logistique. | 🟡 **Prototype** (prépare, ne sauvegarde pas) |
-| **Admin Decap** (`/admin/`) | La future interface pour **modifier vous-même** les contenus. | ⏳ **Préparé, pas encore activé** |
+| **Admin éditorial** (`/admin/`) | Renseigner vos **œuvres** vous-même : photos, galerie, vidéo, textes. La **base est fonctionnelle** ; il reste à **activer votre accès**. | 🟡 **Base prête, accès à activer** |
 
 - **Ce qui est prêt** : tout le site public (pages, fiches d'œuvres, contact,
-  SEO et partage social).
+  SEO et partage social) **et** la **base éditable des œuvres** (un fichier par
+  œuvre, photos dans `/uploads/oeuvres/`, champ vidéo) — voir `docs/acces-armelle.md`.
 - **Ce qui reste prototype** : le cockpit *prépare* des textes et des
   vérifications, mais **n'enregistre rien** et **ne publie rien** automatiquement.
 
@@ -34,7 +35,7 @@ faut pas encore toucher**.
 | **Production** : <https://armelle-mourier-site.vercel.app> | Tout le monde | Le site public en ligne. |
 | **Cockpit** : `/cockpit` | Armelle & Tom | **Entrée interne principale** — par **URL directe** (non listé, non indexé). |
 | **Cockpit (alias)** : `/cockpit-roadmap` | Documentation | Même contenu, page secondaire (non listé, non indexé). |
-| **Admin préparatoire** : `/admin/` | Plus tard | L'écran s'affiche mais **ne publie pas encore**. |
+| **Admin éditorial** : `/admin/` | Armelle (bientôt) | Base œuvres **fonctionnelle** ; l'écran s'affiche mais **n'enregistre pas** tant que votre accès n'est pas activé. |
 | **GitHub / Vercel** | **Tom / développement** | Gestion technique — pas nécessaire pour l'artiste. |
 
 > Le domaine définitif (ex. `armellemourier.fr`) remplacera l'adresse Vercel le
@@ -140,8 +141,10 @@ L'accès d'édition (`/admin/`) sera créé **plus tard**, proprement et en séc
 
 ## 9. Prochaines activations
 
-1. **Accès artiste** (invitation, mot de passe créé par Armelle).
-2. **Vrai upload d'œuvres** (images depuis l'interface).
+1. **Accès artiste** (invitation, mot de passe créé par Armelle) — **seule étape**
+   restante pour éditer en ligne ; la base et l'upload sont déjà en place.
+2. **Upload d'œuvres** depuis l'admin → `/uploads/oeuvres/` *(mécanisme prêt,
+   s'active avec l'accès)*.
 3. **Migration d'une collection pilote** (les Œuvres en premier).
 4. **Images HD** (photos définitives des toiles).
 5. **Domaine définitif** (ex. `armellemourier.fr`).

@@ -1,21 +1,23 @@
 ---
 import Base from '../../layouts/Base.astro';
 import ArtworkPlaceholder from '../../components/ArtworkPlaceholder.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
 import Trait from '../../components/Trait.astro';
 import {
-  artworks,
+  detailArtworks,
   statusLabel,
   priceLabel,
   isForSale,
+  hasVideo,
   getArtworkRequestUrl,
   type Artwork,
 } from '../../data/artworks';
 import { shop } from '../../data/shop';
 import { site } from '../../data/site';
 
-// Une fiche par œuvre (slug stable défini dans artworks.ts).
+// Une fiche par œuvre dont la page détail est activée (detailEnabled !== false).
 export function getStaticPaths() {
-  return artworks.map((artwork) => ({ params: { slug: artwork.slug }, props: { artwork } }));
+  return detailArtworks.map((artwork) => ({ params: { slug: artwork.slug }, props: { artwork } }));
 }
 
 interface Props { artwork: Artwork }
@@ -126,6 +128,9 @@ const breadcrumbLd = {
         {a.description && (
           <p class="mt-5 max-w-prose leading-relaxed text-noir/80">{a.description}</p>
         )}
+        {a.descriptionLong && (
+          <p class="mt-4 max-w-prose leading-relaxed text-noir/75">{a.descriptionLong}</p>
+        )}
 
         <!-- ACQUISITION DOUCE -->
         <div class="mt-9 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
@@ -145,5 +150,15 @@ const breadcrumbLd = {
         </div>
       </div>
     </div>
+
+    {/* Vidéo (univers) — n'apparaît que si videoEnabled + videoUrl renseignés. */}
+    {hasVideo(a) && (
+      <VideoEmbed
+        url={a.videoUrl}
+        provider={a.videoProvider}
+        title={a.videoTitle || a.title}
+        caption={a.videoCaption}
+      />
+    )}
   </section>
 </Base>
