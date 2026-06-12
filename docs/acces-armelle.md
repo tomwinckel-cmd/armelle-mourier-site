@@ -26,6 +26,17 @@ fonctionne — il est là, à votre image.
 Votre espace pour **préparer** sereinement : fiche d'une œuvre, légende à publier,
 dossier de preuve, catalogue, brouillon de facture, ambiance visuelle.
 
+Dans **« Ajouter une œuvre »**, vous pouvez maintenant **choisir des photos**
+directement depuis votre **ordinateur, tablette ou téléphone** (boutons
+« Choisir une photo » et « Ajouter plusieurs images ») : vous voyez tout de suite
+un **aperçu** et le **nom des fichiers**, repris dans le résumé à copier.
+
+> 📷 **Important** : pour l'instant, **les images choisies dans le cockpit restent
+> sur votre appareil**. Le cockpit **prépare** le dossier d'ajout ; il n'envoie
+> rien, ne publie rien, n'enregistre rien. La **sauvegarde réelle** des photos
+> dans la base des œuvres se fera **ensuite depuis l'admin sécurisé** (étape 3),
+> une fois votre accès activé.
+
 > Le cockpit **prépare** et vous fait **copier-coller**. Il n'envoie rien, ne
 > publie rien, n'encaisse rien tout seul. **Vous validez**, toujours.
 

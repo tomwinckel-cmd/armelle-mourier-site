@@ -52,6 +52,13 @@ avec validation humaine — voir « Versions du cockpit » plus bas.
 > au build (rendu public **identique** après migration). **Seule étape restante** :
 > activer l'**accès artiste** (invitation, sans secret dans le repo) —
 > voir `docs/acces-armelle.md` et `docs/decap-cms-setup.md`.
+>
+> 📷 **Cockpit — choix d'images en local.** Le module « Ajouter une œuvre »
+> propose un bouton **« Choisir une photo »** (ordinateur / tablette / téléphone)
+> et **« Ajouter plusieurs images »** : aperçu **local** sur l'appareil, noms des
+> fichiers repris dans le résumé copiable. **Les images ne sont PAS encore
+> sauvegardées depuis le cockpit** (aucun upload, aucune écriture en base) — la
+> **sauvegarde réelle passe par l'admin sécurisé** une fois l'accès activé.
 
 ## Où modifier quoi (aujourd'hui)
 
