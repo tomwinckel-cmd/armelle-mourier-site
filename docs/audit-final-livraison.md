@@ -224,4 +224,26 @@ mécanisme d’upload réel ne sont présents sur le site ou dans le cockpit.
 
 *Documents liés : `docs/livraison-artiste.md`, `docs/demo-script.md`,
 `docs/cockpit-roadmap.md`, `docs/decap-cms-setup.md`,
-`docs/ip-protection-artist.md`, `docs/seo-checklist.md`.*
+`docs/ip-protection-artist.md`, `docs/seo-checklist.md`, `docs/acces-armelle.md`.*
+
+---
+
+## Addendum — 2026-06-12 · Base œuvres fonctionnelle
+
+Évolution **post-audit**, sans régression du site public :
+
+- Les œuvres sont désormais une **base éditoriale** : un fichier
+  `src/data/artworks/<slug>.json` par œuvre, chargé au build par
+  `src/data/artworks.ts` (`import.meta.glob`). **Rendu public vérifié
+  strictement identique** après migration (comparaison octet pour octet du
+  `dist/` des pages publiques + sitemap + CSS).
+- **Admin éditorial** (`/admin`, Decap) branché sur cette vraie source, avec
+  **upload d'images simple** (`public/uploads/oeuvres/`), **galerie** et
+  **champs vidéo** (`videoEnabled`/`videoUrl`/`videoProvider`/`videoTitle`/
+  `videoCaption`).
+- **Vidéo univers** : composant `src/components/VideoEmbed.astro` (embed sobre
+  YouTube/Vimeo *nocookie*, sans autoplay ; lien externe sinon ; rien si vide).
+- **Accès artiste** : seule étape restante (invitation, **aucun secret dans le
+  repo**) — voir `docs/acces-armelle.md`.
+- Inchangé : `/cockpit`, `/cockpit-roadmap`, `/admin` toujours **noindex** ;
+  aucun secret/mot de passe/téléphone/prix inventé/paiement ; Carnet intact.

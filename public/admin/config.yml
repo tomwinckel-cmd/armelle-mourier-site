@@ -31,48 +31,65 @@ local_backend: true
 publish_mode: editorial_workflow
 
 # --- MÉDIAS / IMAGES -------------------------------------------------
-# Cloudinary RECOMMANDÉ (upload + optimisation hors dépôt). À configurer
-# SANS clé dans le repo (panneau Decap / variables). Voir docs/cloudinary-setup.md.
+# V1 : upload SIMPLE vers un dossier du dépôt (aucun service externe,
+# aucune clé). Les images déposées depuis l'admin atterrissent dans
+# public/uploads/oeuvres/ et sont servies depuis /uploads/oeuvres/…
+# (le champ « image » d'une œuvre stocke ce chemin).
+media_folder: "public/uploads/oeuvres"
+public_folder: "/uploads/oeuvres"
 #
+# Plus tard (optionnel) : Cloudinary pour l'optimisation hors dépôt,
+# à configurer SANS clé dans le repo. Voir docs/cloudinary-setup.md.
 # media_library:
 #   name: cloudinary
 #   config:
 #     cloud_name: <DÉFINI HORS REPO>     # ne jamais committer
-#     # api_key géré côté Decap, jamais ici
-#
-# En attendant Cloudinary, dépôt local (préparation, léger) :
-media_folder: "public/images/uploads"
-public_folder: "/images/uploads"
 
 # --- COLLECTIONS -----------------------------------------------------
 collections:
   # 1) ŒUVRES ---------------------------------------------------------
+  #  SOURCE DE VÉRITÉ du site public : un fichier JSON par œuvre dans
+  #  src/data/artworks/<slug>.json (lu au build par src/data/artworks.ts).
+  #  Ajouter/modifier ici = éditer réellement la base des œuvres.
   - name: artworks
     label: "Œuvres"
     label_singular: "Œuvre"
-    folder: "content/cms/artworks"
+    folder: "src/data/artworks"
+    extension: json
+    format: json
     create: true
     slug: "{{slug}}"
+    identifier_field: title
     summary: "{{title}} — {{fields.status}}"
+    sortable_fields: ["order", "title", "status"]
     fields:
       - { name: title, label: "Titre", widget: string }
-      - { name: slug, label: "Identifiant (auto)", widget: string, required: false, hint: "Laisser vide : généré depuis le titre." }
-      - { name: status, label: "Statut", widget: select, default: "available", options: ["available", "reserved", "sold", "on-request"] }
-      - { name: featured, label: "Mise en avant (accueil)", widget: boolean, default: false }
-      - { name: showInAvailable, label: "Afficher dans « Disponibles »", widget: boolean, required: false, default: true }
+      - { name: slug, label: "Identifiant (slug)", widget: string, hint: "Lettres minuscules et tirets, ex. « bleu-renaissance ». Sert d'adresse /oeuvres/<slug> et de nom de fichier." }
+      - { name: id, label: "id (technique)", widget: string, required: false, hint: "Laisser = slug. Identifiant interne stable." }
+      - { name: order, label: "Ordre d'affichage", widget: number, required: false, value_type: int, hint: "Plus petit = affiché en premier (10, 20, 30…)." }
       - { name: series, label: "Série", widget: string, required: false }
       - { name: year, label: "Année", widget: string, required: false }
       - { name: dimensions, label: "Dimensions", widget: string, required: false, hint: "Ex. 60 × 73 cm. Laisser vide si inconnu — ne pas inventer." }
       - { name: technique, label: "Technique", widget: string, required: false }
-      - { name: image, label: "Photo principale", widget: image, required: false }
-      - { name: gallery, label: "Photos secondaires", widget: list, required: false, field: { name: image, label: "Image", widget: image } }
-      - { name: description, label: "Quelques mots", widget: text, required: false }
-      - { name: alt, label: "Description de l'image (accessibilité)", widget: string }
-      # Champs vente douce — PAS de prix imposé. Vide = « Prix sur demande ».
+      - { name: status, label: "Statut", widget: select, default: "available", options: ["available", "reserved", "sold", "on-request"] }
+      - { name: featured, label: "Mise en avant (accueil)", widget: boolean, default: false }
+      - { name: showInAvailable, label: "Afficher dans « Disponibles »", widget: boolean, required: false, default: true }
+      - { name: detailEnabled, label: "Page détail activée", widget: boolean, default: true, hint: "Désactiver pour ne pas générer la page /oeuvres/<slug>." }
+      # --- VISUELS : upload simple vers /uploads/oeuvres/ ---
+      - { name: image, label: "Photo principale", widget: image, required: false, hint: "Glissez une image : elle est déposée dans /uploads/oeuvres/. Vide = visuel d'attente." }
+      - { name: images, label: "Galerie (photos secondaires)", widget: list, required: false, field: { name: image, label: "Image", widget: image } }
+      - { name: alt, label: "Description de l'image (accessibilité — important)", widget: string, hint: "Décrivez l'image en une phrase (lecteurs d'écran + SEO)." }
+      # --- TEXTES ---
+      - { name: description, label: "Description courte", widget: text, required: false, hint: "Quelques mots affichés sur la carte et la fiche." }
+      - { name: descriptionLong, label: "Description longue (optionnelle)", widget: text, required: false, hint: "Texte plus développé, affiché sur la fiche si renseigné." }
+      # --- VENTE DOUCE : PAS de prix imposé. Vide = « Prix sur demande ». ---
       - { name: price, label: "Prix (optionnel)", widget: string, required: false, hint: "Laisser vide = « Prix sur demande ». Ne pas inventer." }
-      # Préparation réseaux sociaux (copier-coller, pas d'API) :
-      - { name: instagramCaptionDraft, label: "Brouillon de légende Instagram", widget: text, required: false }
-      - { name: hashtags, label: "Mots-clés (#)", widget: string, required: false }
+      # --- VIDÉO (optionnelle, univers) : rien ne s'affiche si désactivée ---
+      - { name: videoEnabled, label: "Activer la vidéo", widget: boolean, default: false }
+      - { name: videoUrl, label: "Lien vidéo (YouTube / Vimeo)", widget: string, required: false, hint: "Collez l'URL. Vide = aucune vidéo. Aucune URL inventée." }
+      - { name: videoProvider, label: "Plateforme", widget: select, required: false, default: "", options: ["", "youtube", "vimeo", "other"] }
+      - { name: videoTitle, label: "Titre de la vidéo", widget: string, required: false }
+      - { name: videoCaption, label: "Légende sous la vidéo", widget: string, required: false }
 
   # 2) EXPOSITIONS ----------------------------------------------------
   - name: exhibitions

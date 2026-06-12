@@ -1,0 +1,23 @@
+{
+  "id": "la-vie",
+  "title": "La Vie",
+  "slug": "la-vie",
+  "order": 60,
+  "series": "Bleu Cendres",
+  "year": "",
+  "dimensions": "30 × 40 cm",
+  "technique": "Acrylique sur toile",
+  "status": "available",
+  "detailEnabled": true,
+  "price": "",
+  "description": "Un geste vital condensé dans un petit format — coucher l’émotion sur la toile.",
+  "descriptionLong": "",
+  "image": "",
+  "images": [],
+  "alt": "Petite toile abstraite, série Bleu Cendres, dominantes bleu et or, 30 × 40 cm.",
+  "videoEnabled": false,
+  "videoUrl": "",
+  "videoProvider": "",
+  "videoTitle": "",
+  "videoCaption": ""
+}

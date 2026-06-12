@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { artworks } from '../data/artworks';
+import { detailArtworks } from '../data/artworks';
 import { site } from '../data/site';
 
 // Plan du site — généré au build (statique), sans dépendance externe.
@@ -17,7 +17,7 @@ const staticPaths = [
 ];
 
 export const GET: APIRoute = () => {
-  const paths = [...staticPaths, ...artworks.map((a) => `/oeuvres/${a.slug}`)];
+  const paths = [...staticPaths, ...detailArtworks.map((a) => `/oeuvres/${a.slug}`)];
   const urls = paths
     .map((p) => `  <url><loc>${new URL(p, site.url).href}</loc></url>`)
     .join('\n');

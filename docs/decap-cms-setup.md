@@ -8,14 +8,19 @@ Vercel (statique)**.
 
 ## Architecture
 ```
-public/admin/index.html   → charge Decap CMS (CDN officiel), noindex
-public/admin/config.yml    → collections + backend + médias (sans secret)
-content/cms/…              → contenus édités par Decap (préparation, voir README)
-docs/cloudinary-setup.md   → images
+public/admin/index.html     → charge Decap CMS (CDN officiel), noindex
+public/admin/config.yml      → collections + backend + médias (sans secret)
+src/data/artworks/<slug>.json → ŒUVRES : source de vérité, lue par le site
+public/uploads/oeuvres/      → photos uploadées depuis l'admin
+content/cms/…                → autres collections (préparation, voir README)
+docs/cloudinary-setup.md     → images (option future)
 ```
 - Decap est une **app statique** servie à `/admin` : aucun build Astro requis.
-- Le site **public** lit encore `src/data` / `src/content` (transition documentée
-  dans `content/cms/README.md`).
+- **Œuvres** : la collection écrit/lit **directement** `src/data/artworks/*.json`,
+  qui est la **source de vérité du site public** (lue au build par
+  `src/data/artworks.ts`). Éditer une œuvre dans l'admin = modifier réellement la base.
+- Les **autres collections** (expositions, pages, réglages) écrivent encore dans
+  `content/cms/…` (préparation, non lues par le site pour l'instant).
 
 ## Pourquoi Decap
 - **Git-backed** : les contenus restent dans le dépôt (export trivial, pas de prison).
@@ -39,17 +44,24 @@ docs/cloudinary-setup.md   → images
    - L'**API key/secret OAuth** vit dans les **Variables** du proxy, jamais dans le repo.
 3. **Autre proxy OAuth** (services tiers d'auth Git) — même principe.
 
-## Limites actuelles (Phase 2A)
-- Pas d'auth active → `/admin` ne publie pas encore.
-- `content/cms/…` n'est **pas** lu par le site (préparation).
-- Cloudinary commenté → médias en local (`public/images/uploads`) pour l'instant.
+## Limites actuelles
+- **Pas d'auth active** → `/admin` affiche l'interface mais **ne peut pas
+  encore enregistrer** (il manque le backend d'authentification, voir ci-dessous).
+  C'est la **seule** étape restante pour qu'Armelle édite réellement en ligne.
+- Médias : upload **local** vers `public/uploads/oeuvres/` (aucun service externe,
+  aucune clé). Cloudinary reste une option future commentée.
+- `content/cms/…` (hors œuvres) n'est **pas** encore lu par le site (préparation).
 
 ## Prochaines étapes
-- **2A (cette PR)** : structure Decap + exemples + docs. *(fait)*
-- **2B** : brancher l'auth (option 1 recommandée) + **migrer une collection pilote**
-  (Œuvres) : faire lire au site `content/cms/artworks/*.md`, retirer la liste TS
-  correspondante, valider le cycle édition → commit → déploiement.
-- **2C+** : migrer les autres collections une à une (chacune dans sa PR).
+- **2A** : structure Decap + exemples + docs. *(fait)*
+- **2B — Base œuvres fonctionnelle (cette PR)** : la collection « Œuvres » est
+  branchée sur la **vraie source** `src/data/artworks/*.json` (un fichier par
+  œuvre), avec **upload d'images** (`/uploads/oeuvres/`), **galerie** et **champs
+  vidéo**. Le site lit cette base. *(fait — rendu public identique)*
+- **2C — Activer l'accès artiste** : brancher l'auth (option 1 recommandée) puis
+  inviter Armelle → elle ajoute/modifie une œuvre, l'admin **commit** le JSON,
+  Vercel redéploie. *(à faire — configuration côté service, sans secret dans le repo)*
+- **2D+** : migrer les autres collections (expositions, pages) une à une.
 
 ## Création de l'accès artiste (invitation, sans mot de passe dans le repo)
 
