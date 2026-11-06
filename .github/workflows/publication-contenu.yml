@@ -1,0 +1,116 @@
+# =====================================================================
+#  PUBLICATION DU CONTENU — de l'admin d'Armelle jusqu'au site en ligne
+#  ---------------------------------------------------------------------
+#  L'admin (/admin) enregistre sur la branche `contenu`, jamais sur `main`
+#  (protégée : PR + check `validation` obligatoires). À chaque
+#  enregistrement, ce workflow :
+#    1. intègre les dernières évolutions de `main` dans `contenu` ;
+#    2. valide le site complet (astro check + build) sur ce commit exact ;
+#    3. marque le commit « validation » réussi ;
+#    4. ouvre (ou réutilise) la PR contenu → main et la fusionne.
+#  Vercel met ensuite le site à jour (≈ 2-3 min au total).
+#
+#  Si une saisie casse le build, RIEN n'est publié : le site en ligne
+#  reste intact, la PR reste ouverte avec le détail de l'erreur.
+#
+#  Prérequis (une fois, réglages du dépôt) :
+#    Settings → Actions → General → Workflow permissions →
+#    ✅ « Allow GitHub Actions to create and approve pull requests ».
+#  Carte complète : docs/architecture.md
+# =====================================================================
+name: publication-contenu
+
+on:
+  push:
+    branches: [contenu]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: write
+
+# Une publication à la fois ; un enregistrement arrivé pendant une
+# publication est traité juste après (avec tout ce qui a été saisi).
+concurrency:
+  group: publication-contenu
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    name: publier le contenu
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Récupérer la branche contenu
+        uses: actions/checkout@v4
+        with:
+          ref: contenu
+          fetch-depth: 0
+
+      - name: Intégrer les dernières évolutions du site (main → contenu)
+        id: sync
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main contenu
+          git reset --hard origin/contenu
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git merge --no-edit origin/main -m "contenu : intégrer les évolutions du site"
+            if ! git push origin HEAD:contenu; then
+              echo "La branche contenu a bougé entre-temps : la publication suivante s'en charge."
+              echo "skip=1" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          if git diff --quiet origin/main HEAD; then
+            echo "Aucune différence avec le site en ligne : rien à publier."
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Installer Node.js
+        if: steps.sync.outputs.skip != '1'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installer les dépendances
+        if: steps.sync.outputs.skip != '1'
+        run: npm ci
+
+      - name: Vérifier (astro check)
+        if: steps.sync.outputs.skip != '1'
+        run: npm run check
+
+      - name: Construire le site (build)
+        if: steps.sync.outputs.skip != '1'
+        run: npm run build
+
+      - name: Marquer le commit comme validé
+        if: steps.sync.outputs.skip != '1'
+        run: |
+          gh api "repos/${{ github.repository }}/statuses/${{ steps.sync.outputs.sha }}" \
+            -f state=success -f context=validation \
+            -f description="Contenu validé : astro check + build" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Ouvrir la PR contenu → main et publier
+        if: steps.sync.outputs.skip != '1'
+        run: |
+          PR=$(gh pr list --head contenu --base main --state open --json number --jq '.[0].number // empty')
+          if [ -z "$PR" ]; then
+            if ! URL=$(gh pr create --head contenu --base main \
+                  --title "Contenu : mise à jour depuis l'admin" \
+                  --body "Publication automatique des modifications faites dans l'admin (/admin). Validée par astro check + build avant fusion."); then
+              echo "::error::Impossible d'ouvrir la PR. Vérifier : Settings → Actions → General → « Allow GitHub Actions to create and approve pull requests »."
+              exit 1
+            fi
+            PR="${URL##*/}"
+          fi
+          # Fusion par commit de merge (et non squash) : `contenu` reste
+          # dans l'historique de `main`, sans divergence à la publication suivante.
+          gh pr merge "$PR" --merge
+          echo "Publié : PR #$PR fusionnée. Vercel met le site à jour."

@@ -18,7 +18,11 @@
 # /admin s'affiche mais ne peut pas enregistrer.
 backend:
   name: git-gateway        # placeholder — remplacé lors du branchement de la connexion
-  branch: main
+  repo: tomwinckel-cmd/armelle-mourier-site
+  # L'admin enregistre sur `contenu`, JAMAIS sur `main` (protégée).
+  # Chaque enregistrement est validé puis publié automatiquement
+  # (.github/workflows/publication-contenu.yml, ≈ 2-3 min).
+  branch: contenu
 
 # Édition locale sans connexion (développement) : npx decap-server
 local_backend: true

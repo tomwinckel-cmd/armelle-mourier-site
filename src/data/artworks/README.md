@@ -9,7 +9,7 @@ affiche sur `/oeuvres`, `/disponibles`, l'accueil et les fiches
 ## Deux façons d'éditer
 
 1. **Depuis l'admin (recommandé)** : `/admin` → « Œuvres » → « Nouveau »
-   (nécessite l'accès artiste — voir `docs/decap-cms-setup.md`).
+   (nécessite l'accès artiste — voir `docs/architecture.md`).
 2. **À la main** : copier un fichier existant, changer les valeurs, garder un
    `slug` **unique**.
 

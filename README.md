@@ -153,14 +153,11 @@ audit/          rapport d’audit du site précédent + stratégie
 
 ---
 
-## 9. Livraison artiste
+## 9. Architecture et documentation
 
-Documentation **clé en main** pour présenter le site et le cockpit à Armelle :
-
-- **[`docs/livraison-artiste.md`](docs/livraison-artiste.md)** — guide de livraison :
-  ce qui est prêt, ce qu'elle peut voir, ce qu'elle pourra piloter, l'accès artiste,
-  la propriété intellectuelle, les prochaines activations.
-- **[`docs/demo-script.md`](docs/demo-script.md)** — script de présentation en 5 minutes.
-- **[`docs/cockpit-roadmap.md`](docs/cockpit-roadmap.md)** — feuille de route du cockpit.
-- **[`docs/decap-cms-setup.md`](docs/decap-cms-setup.md)** — futur accès d'édition (Decap).
+- **[`docs/architecture.md`](docs/architecture.md)** — référence : où vit chaque contenu,
+  circuit de publication (branche `contenu` → validation → mise en ligne), règles de robustesse.
+- **[`docs/acces-armelle.md`](docs/acces-armelle.md)** — guide simple pour Armelle.
 - **[`docs/ip-protection-artist.md`](docs/ip-protection-artist.md)** — protéger ses œuvres.
+- **[`docs/seo-checklist.md`](docs/seo-checklist.md)** — domaine, partage, plan du site.
+- `docs/archive/` — notes de la première phase (cockpit, plan Decap/Netlify), pour l'historique.

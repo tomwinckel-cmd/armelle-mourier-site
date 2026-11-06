@@ -1,0 +1,57 @@
+# =====================================================================
+#  SYNCHRONISATION main → contenu
+#  ---------------------------------------------------------------------
+#  Quand le code du site évolue (PR fusionnée dans `main`), on reporte
+#  ces évolutions dans la branche `contenu` lue par l'admin, pour que
+#  l'éditeur travaille toujours sur la version la plus récente.
+#  (Le push fait ici avec le jeton du workflow ne relance aucun workflow.)
+# =====================================================================
+name: synchro-contenu
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: publication-contenu
+  cancel-in-progress: false
+
+jobs:
+  synchroniser:
+    name: reporter main dans contenu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fusionner main dans contenu
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! git ls-remote --exit-code --heads origin contenu >/dev/null; then
+            echo "La branche contenu n'existe pas encore : création depuis main."
+            git push origin "origin/main:refs/heads/contenu"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main contenu
+          git checkout -B contenu origin/contenu
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "contenu est déjà à jour."
+            exit 0
+          fi
+          git merge --no-edit origin/main -m "contenu : intégrer les évolutions du site"
+          git push origin contenu
+          # Du contenu attendait d'être publié ? On relance la publication
+          # (un push fait avec le jeton du workflow ne la déclenche pas seul).
+          if ! git diff --quiet origin/main HEAD; then
+            gh workflow run publication-contenu.yml --ref contenu
+          fi
