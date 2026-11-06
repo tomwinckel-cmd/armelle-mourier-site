@@ -1,0 +1,87 @@
+{
+  "universe": {
+    "eyebrow": "L’univers",
+    "title": "La couleur, d’abord",
+    "text": "Née d’une nécessité vitale, sa peinture pose la couleur et la matière comme on pose le souffle. Des bleus profonds, des ors, la lumière de Collioure et la terre de Bourgogne : l’abstraction laisse affleurer la mémoire des lieux — et la joie d’être en vie.",
+    "signs": [
+      "Couleur & matière",
+      "Bleus profonds & or",
+      "Acrylique, pigments, couteau",
+      "Toile recyclée",
+      "Collioure · Bourgogne",
+      "Peindre comme on respire"
+    ]
+  },
+  "doors": {
+    "eyebrow": "Par où entrer",
+    "title": "Trois portes vers l’atelier",
+    "items": [
+      {
+        "index": "01",
+        "label": "Explorer les œuvres",
+        "note": "La galerie complète : séries, formats, matières.",
+        "href": "/oeuvres",
+        "cta": "Voir la galerie"
+      },
+      {
+        "index": "02",
+        "label": "Tableaux disponibles",
+        "note": "La sélection d’atelier à découvrir ou à réserver.",
+        "href": "/disponibles",
+        "cta": "Voir les disponibles"
+      },
+      {
+        "index": "03",
+        "label": "Biographie & démarche",
+        "note": "Le parcours, les lieux, la matière et le geste.",
+        "href": "/biographie",
+        "cta": "Lire l’histoire"
+      }
+    ]
+  },
+  "gallery": {
+    "eyebrow": "Entrer dans l’atelier",
+    "title": "Œuvres mises en lumière",
+    "lead": "Une première traversée : la couleur d’abord, puis la matière et la mémoire des lieux — la lumière de Collioure, la terre de Bourgogne. Peindre, ici, comme on respire.",
+    "more": "Voir toute la galerie"
+  },
+  "sale": {
+    "eyebrow": "Sélection d’atelier",
+    "title": "Tableaux disponibles",
+    "text": "Certaines œuvres quittent l’atelier. L’acquisition reste une conversation, en lien direct avec l’artiste — jamais un panier, jamais une vitrine.",
+    "cta": "Voir les tableaux disponibles"
+  },
+  "bleu": {
+    "eyebrow": "Livre & poésie",
+    "title": "Bleu Cendres",
+    "text": "Un recueil où les bleus profonds et les ors d’Armelle Mourier dialoguent avec les poèmes de Louise Dupré — des paysages intérieurs partagés entre peinture et écriture.",
+    "cta": "Entrer dans Bleu Cendres"
+  },
+  "exhib": {
+    "eyebrow": "Présence",
+    "title": "Expositions & rencontres",
+    "lead": "Une chronologie vivante : expositions, performances, résidences et rencontres, entre la Bourgogne, Paris et Collioure.",
+    "cta": "Voir la chronologie"
+  },
+  "closing": {
+    "eyebrow": "Écrire à l’artiste",
+    "title": "Une œuvre, une exposition, une rencontre",
+    "text": "L’acquisition reste une conversation, en lien direct avec l’artiste — jamais un panier, jamais une vitrine. Pour une œuvre, une exposition, un catalogue, ou simplement pour parler peinture : la porte de l’atelier est ouverte.",
+    "intents": [
+      "Acquérir une œuvre",
+      "Proposer une exposition",
+      "Demander le catalogue",
+      "Rencontrer l’artiste"
+    ],
+    "links": [
+      {
+        "label": "Écrire à l’artiste",
+        "href": "/contact"
+      },
+      {
+        "label": "Lire la biographie",
+        "href": "/biographie"
+      }
+    ]
+  }
+}

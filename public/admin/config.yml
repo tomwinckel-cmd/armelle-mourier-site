@@ -1,59 +1,48 @@
 # =====================================================================
-#  DECAP CMS — configuration préparatoire (Phase 2A)
+#  ADMIN DU SITE — configuration de l'éditeur (format Decap / Sveltia)
 #  ---------------------------------------------------------------------
-#  ⚠️ AUCUN secret / token / clé / cloud_name privé dans ce fichier.
-#  L'authentification n'est pas encore branchée : voir docs/decap-cms-setup.md.
-#  Tant que le backend n'est pas finalisé, /admin s'affiche mais ne publie pas.
+#  ⚠️ AUCUN secret / token / clé dans ce fichier (il est public).
 #
-#  Le site PUBLIC continue de lire les données TypeScript actuelles
-#  (src/data/*.ts, src/content/*.ts). Les fichiers édités ici (content/cms/…)
-#  sont une PRÉPARATION : ils ne sont pas encore la source de vérité.
-#  Stratégie de transition : voir docs/decap-cms-setup.md.
+#  Chaque collection ci-dessous écrit DIRECTEMENT dans les fichiers que le
+#  site lit au build : ce qu'Armelle modifie ici apparaît sur le site.
+#    Œuvres       → src/data/artworks/<slug>.json
+#    Expositions  → src/data/exhibitions/<id>.json
+#    Textes       → src/content/textes/*.json
+#    Réglages     → src/data/settings/*.json
+#  Carte complète : docs/architecture.md
 # =====================================================================
 
-# --- BACKEND (à FINALISER, sans secret dans le repo) -----------------
-# Choix d'auth possibles (un seul) :
-#   1) Netlify Identity + Git Gateway  → décommenter `git-gateway`.
-#   2) OAuth GitHub (via Vercel/un proxy OAuth) → name: github + base_url du proxy.
-# Aucune clé n'est stockée ici : elles vivront dans les Variables Netlify/Vercel.
+# --- CONNEXION -------------------------------------------------------
+# Le mode de connexion d'Armelle est en cours de choix
+# (voir docs/connexion-armelle-options.md). Tant qu'il n'est pas branché,
+# /admin s'affiche mais ne peut pas enregistrer.
 backend:
-  name: git-gateway        # placeholder — nécessite Netlify Identity (à brancher)
+  name: git-gateway        # placeholder — remplacé lors du branchement de la connexion
   branch: main
-  # commit_messages personnalisés (facultatif) :
-  # commit_messages:
-  #   create: 'cockpit: ajout {{collection}} “{{slug}}”'
-  #   update: 'cockpit: modification {{collection}} “{{slug}}”'
 
-# Permet d'éditer en local sans backend distant (dev) :
+# Édition locale sans connexion (développement) : npx decap-server
 local_backend: true
 
-# Flux éditorial (brouillon → relecture → publication) :
-publish_mode: editorial_workflow
+# Noms de fichiers lisibles et sans accents (ils servent aussi d'adresse web).
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
 
-# --- MÉDIAS / IMAGES -------------------------------------------------
-# V1 : upload SIMPLE vers un dossier du dépôt (aucun service externe,
-# aucune clé). Les images déposées depuis l'admin atterrissent dans
-# public/uploads/oeuvres/ et sont servies depuis /uploads/oeuvres/…
-# (le champ « image » d'une œuvre stocke ce chemin).
-media_folder: "public/uploads/oeuvres"
-public_folder: "/uploads/oeuvres"
-#
-# Plus tard (optionnel) : Cloudinary pour l'optimisation hors dépôt,
-# à configurer SANS clé dans le repo. Voir docs/cloudinary-setup.md.
-# media_library:
-#   name: cloudinary
-#   config:
-#     cloud_name: <DÉFINI HORS REPO>     # ne jamais committer
+# --- MÉDIAS ----------------------------------------------------------
+# Les images déposées arrivent dans public/uploads/ (servies depuis /uploads/).
+# Les photos d'œuvres ont leur propre dossier (voir la collection Œuvres).
+media_folder: "public/uploads"
+public_folder: "/uploads"
 
-# --- COLLECTIONS -----------------------------------------------------
 collections:
-  # 1) ŒUVRES ---------------------------------------------------------
-  #  SOURCE DE VÉRITÉ du site public : un fichier JSON par œuvre dans
-  #  src/data/artworks/<slug>.json (lu au build par src/data/artworks.ts).
-  #  Ajouter/modifier ici = éditer réellement la base des œuvres.
+  # ===================================================================
+  # 1) ŒUVRES
+  # ===================================================================
   - name: artworks
     label: "Œuvres"
     label_singular: "Œuvre"
+    description: "Vos tableaux : photos, textes, disponibilité. Une fiche = une page du site."
     folder: "src/data/artworks"
     extension: json
     format: json
@@ -62,172 +51,339 @@ collections:
     identifier_field: title
     summary: "{{title}} — {{fields.status}}"
     sortable_fields: ["order", "title", "status"]
+    media_folder: "/public/uploads/oeuvres"
+    public_folder: "/uploads/oeuvres"
     fields:
       - { name: title, label: "Titre", widget: string }
-      - { name: slug, label: "Identifiant (slug)", widget: string, hint: "Lettres minuscules et tirets, ex. « bleu-renaissance ». Sert d'adresse /oeuvres/<slug> et de nom de fichier." }
-      - { name: id, label: "id (technique)", widget: string, required: false, hint: "Laisser = slug. Identifiant interne stable." }
-      - { name: order, label: "Ordre d'affichage", widget: number, required: false, value_type: int, hint: "Plus petit = affiché en premier (10, 20, 30…)." }
-      - { name: series, label: "Série", widget: string, required: false }
+      - name: status
+        label: "Disponibilité"
+        widget: select
+        default: "on-request"
+        options:
+          - { label: "Disponible", value: "available" }
+          - { label: "Réservée", value: "reserved" }
+          - { label: "Vendue", value: "sold" }
+          - { label: "Sur demande", value: "on-request" }
+      - { name: image, label: "Photo principale", widget: image, required: false, hint: "Version web uniquement (jamais la HD). Vide = visuel d'attente." }
+      - { name: alt, label: "Description de la photo", widget: string, required: false, hint: "Une phrase qui décrit l'image (pour les personnes malvoyantes et Google)." }
+      - { name: images, label: "Autres photos (détails, mise en situation)", widget: list, required: false, field: { name: image, label: "Photo", widget: image } }
+      - { name: series, label: "Série", widget: string, required: false, hint: "Ex. Bleu Cendres, Impressions, Performances." }
       - { name: year, label: "Année", widget: string, required: false }
-      - { name: dimensions, label: "Dimensions", widget: string, required: false, hint: "Ex. 60 × 73 cm. Laisser vide si inconnu — ne pas inventer." }
-      - { name: technique, label: "Technique", widget: string, required: false }
-      - { name: status, label: "Statut", widget: select, default: "available", options: ["available", "reserved", "sold", "on-request"] }
-      - { name: featured, label: "Mise en avant (accueil)", widget: boolean, default: false }
-      - { name: showInAvailable, label: "Afficher dans « Disponibles »", widget: boolean, required: false, default: true }
-      - { name: detailEnabled, label: "Page détail activée", widget: boolean, default: true, hint: "Désactiver pour ne pas générer la page /oeuvres/<slug>." }
-      # --- VISUELS : upload simple vers /uploads/oeuvres/ ---
-      - { name: image, label: "Photo principale", widget: image, required: false, hint: "Glissez une image : elle est déposée dans /uploads/oeuvres/. Vide = visuel d'attente." }
-      - { name: images, label: "Galerie (photos secondaires)", widget: list, required: false, field: { name: image, label: "Image", widget: image } }
-      - { name: alt, label: "Description de l'image (accessibilité — important)", widget: string, hint: "Décrivez l'image en une phrase (lecteurs d'écran + SEO)." }
-      # --- TEXTES ---
-      - { name: description, label: "Description courte", widget: text, required: false, hint: "Quelques mots affichés sur la carte et la fiche." }
-      - { name: descriptionLong, label: "Description longue (optionnelle)", widget: text, required: false, hint: "Texte plus développé, affiché sur la fiche si renseigné." }
-      # --- VENTE DOUCE : PAS de prix imposé. Vide = « Prix sur demande ». ---
-      - { name: price, label: "Prix (optionnel)", widget: string, required: false, hint: "Laisser vide = « Prix sur demande ». Ne pas inventer." }
-      # --- VIDÉO (optionnelle, univers) : rien ne s'affiche si désactivée ---
-      - { name: videoEnabled, label: "Activer la vidéo", widget: boolean, default: false }
-      - { name: videoUrl, label: "Lien vidéo (YouTube / Vimeo)", widget: string, required: false, hint: "Collez l'URL. Vide = aucune vidéo. Aucune URL inventée." }
-      - { name: videoProvider, label: "Plateforme", widget: select, required: false, default: "", options: ["", "youtube", "vimeo", "other"] }
+      - { name: dimensions, label: "Dimensions", widget: string, required: false, hint: "Ex. 60 × 73 cm. Laisser vide si inconnu." }
+      - { name: technique, label: "Technique", widget: string, required: false, hint: "Ex. Acrylique sur toile." }
+      - { name: description, label: "Description courte", widget: text, required: false, hint: "Quelques mots, affichés sur la carte et la fiche." }
+      - { name: descriptionLong, label: "Description longue", widget: text, required: false, hint: "Facultatif : texte plus développé sur la fiche." }
+      - { name: price, label: "Prix", widget: string, required: false, hint: "Ex. 850 €. Vide = « Prix sur demande »." }
+      - { name: featured, label: "Mettre en avant sur l'accueil", widget: boolean, default: false }
+      - { name: detailEnabled, label: "Avoir sa propre page", widget: boolean, default: true }
+      - { name: order, label: "Ordre d'affichage", widget: number, required: false, value_type: int, hint: "Plus petit = affiché en premier (10, 20, 30…)." }
+      # --- Vidéo (facultative) ---
+      - { name: videoEnabled, label: "Afficher une vidéo", widget: boolean, default: false }
+      - { name: videoUrl, label: "Lien de la vidéo (YouTube / Vimeo)", widget: string, required: false }
+      - name: videoProvider
+        label: "Plateforme de la vidéo"
+        widget: select
+        required: false
+        default: ""
+        options:
+          - { label: "Automatique", value: "" }
+          - { label: "YouTube", value: "youtube" }
+          - { label: "Vimeo", value: "vimeo" }
+          - { label: "Autre", value: "other" }
       - { name: videoTitle, label: "Titre de la vidéo", widget: string, required: false }
-      - { name: videoCaption, label: "Légende sous la vidéo", widget: string, required: false }
+      - { name: videoCaption, label: "Légende de la vidéo", widget: string, required: false }
+      # --- Technique (à laisser vide : rempli automatiquement) ---
+      - { name: slug, label: "Adresse de la page (technique)", widget: string, required: false, hint: "Laisser vide : déduite du titre à la création." }
+      - { name: id, label: "Identifiant (technique)", widget: string, required: false, hint: "Laisser vide." }
 
-  # 2) EXPOSITIONS ----------------------------------------------------
+  # ===================================================================
+  # 2) EXPOSITIONS
+  # ===================================================================
   - name: exhibitions
     label: "Expositions"
     label_singular: "Exposition"
-    folder: "content/cms/exhibitions"
+    description: "Expositions, résidences, performances. Les dates futures s'affichent dans « À venir »."
+    folder: "src/data/exhibitions"
+    extension: json
+    format: json
     create: true
     slug: "{{year}}-{{slug}}"
+    identifier_field: title
+    summary: "{{fields.startDate}} · {{title}}"
+    sortable_fields: ["startDate", "title"]
     fields:
       - { name: title, label: "Titre / événement", widget: string }
+      - name: type
+        label: "Type"
+        widget: select
+        required: false
+        options:
+          - { label: "Exposition personnelle", value: "solo" }
+          - { label: "Exposition collective", value: "group" }
+          - { label: "Résidence", value: "residence" }
+          - { label: "Performance", value: "performance" }
+          - { label: "Événement", value: "event" }
+      - name: startDate
+        label: "Date de début"
+        widget: string
+        hint: "Format AAAA-MM-JJ (ex. 2026-03-19), ou AAAA-MM si le jour n'est pas connu."
+        pattern: ['^\d{4}-\d{2}(-\d{2})?$', "Format attendu : AAAA-MM-JJ ou AAAA-MM"]
+      - name: endDate
+        label: "Date de fin"
+        widget: string
+        required: false
+        hint: "Facultatif. Même format."
+        pattern: ['^(\d{4}-\d{2}(-\d{2})?)?$', "Format attendu : AAAA-MM-JJ ou AAAA-MM"]
+      - { name: dateLabel, label: "Date affichée", widget: string, required: false, hint: "Facultatif : vide = écrite automatiquement (ex. « 19 mars → 6 avril 2026 »)." }
       - { name: location, label: "Lieu", widget: string, required: false }
       - { name: city, label: "Ville", widget: string, required: false }
-      - { name: startDate, label: "Date de début", widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false }
-      - { name: endDate, label: "Date de fin", widget: datetime, required: false, date_format: "YYYY-MM-DD", time_format: false }
-      - { name: type, label: "Type", widget: select, required: false, options: ["solo", "group", "residence", "performance", "event"] }
       - { name: description, label: "Description", widget: text, required: false }
+      - { name: year, label: "Année (technique)", widget: number, required: false, value_type: int, hint: "Laisser vide : déduite de la date de début." }
+      - { name: id, label: "Identifiant (technique)", widget: string, required: false, hint: "Laisser vide." }
 
-  # 3) PAGES (textes éditoriaux) --------------------------------------
-  - name: pages
-    label: "Pages"
+  # ===================================================================
+  # 3) TEXTES DES PAGES
+  # ===================================================================
+  - name: textes
+    label: "Textes des pages"
+    description: "Les textes du site, page par page."
     files:
-      - name: home
+      # --- Accueil ---------------------------------------------------
+      - name: accueil
         label: "Accueil"
-        file: "content/cms/pages/home.md"
+        file: "src/content/textes/accueil.json"
         fields:
-          - { name: eyebrow, label: "Petit intitulé", widget: string, required: false }
-          - { name: title, label: "Titre", widget: string, required: false }
-          - { name: lead, label: "Accroche", widget: text, required: false }
-          - { name: body, label: "Texte", widget: markdown, required: false }
+          - name: universe
+            label: "Univers"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+              - { name: signs, label: "Mots d'atelier", widget: list, field: { name: sign, label: "Mot", widget: string } }
+          - name: doors
+            label: "Trois portes"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - name: items
+                label: "Portes"
+                widget: list
+                fields:
+                  - { name: index, label: "Numéro", widget: string }
+                  - { name: label, label: "Titre", widget: string }
+                  - { name: note, label: "Note", widget: string }
+                  - { name: cta, label: "Texte du bouton", widget: string }
+                  - { name: href, label: "Lien (technique)", widget: string, hint: "Adresse interne, ex. /oeuvres." }
+          - name: gallery
+            label: "Œuvres mises en lumière"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: lead, label: "Texte", widget: text }
+              - { name: more, label: "Texte du lien", widget: string }
+          - name: sale
+            label: "Tableaux disponibles"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+              - { name: cta, label: "Texte du bouton", widget: string }
+          - name: bleu
+            label: "Bleu Cendres"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+              - { name: cta, label: "Texte du bouton", widget: string }
+          - name: exhib
+            label: "Expositions"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: lead, label: "Texte", widget: text }
+              - { name: cta, label: "Texte du bouton", widget: string }
+          - name: closing
+            label: "Invitation finale"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+              - { name: intents, label: "Raisons d'écrire", widget: list, field: { name: intent, label: "Raison", widget: string } }
+              - name: links
+                label: "Liens"
+                widget: list
+                fields:
+                  - { name: label, label: "Texte", widget: string }
+                  - { name: href, label: "Lien (technique)", widget: string }
+
+      # --- Œuvres (page galerie) --------------------------------------
+      - name: oeuvres
+        label: "Page Œuvres"
+        file: "src/content/textes/oeuvres.json"
+        fields:
+          - { name: eyebrow, label: "Petit intitulé", widget: string }
+          - { name: title, label: "Titre", widget: string }
+          - { name: lead, label: "Phrase d'ouverture", widget: text }
+          - { name: intro, label: "Introduction", widget: text }
+          - { name: seriesNote, label: "Note sur les séries", widget: text }
+          - { name: filterNote, label: "Note sur les filtres", widget: text }
+          - { name: pendingNote, label: "Note « visuels à venir »", widget: text }
+          - name: seriesHeading
+            label: "Titre du bloc séries"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+          - name: seriesNotes
+            label: "Notes par série"
+            widget: list
+            fields:
+              - { name: series, label: "Série (nom exact)", widget: string }
+              - { name: note, label: "Note", widget: text }
+          - name: closing
+            label: "Invitation finale"
+            widget: object
+            fields:
+              - { name: eyebrow, label: "Petit intitulé", widget: string }
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+              - name: links
+                label: "Liens"
+                widget: list
+                fields:
+                  - { name: label, label: "Texte", widget: string }
+                  - { name: href, label: "Lien (technique)", widget: string }
+
+      # --- Biographie ------------------------------------------------
       - name: biographie
         label: "Biographie"
-        file: "content/cms/pages/biographie.md"
+        file: "src/content/textes/biographie.json"
         fields:
-          - { name: title, label: "Titre", widget: string, required: false }
-          - { name: body, label: "Récit", widget: markdown, required: false }
+          - { name: lead, label: "Chapeau", widget: text }
+          - { name: portrait, label: "Portrait", widget: image, required: false, hint: "Vide = visuel d'attente." }
+          - { name: portraitAlt, label: "Description du portrait", widget: string }
+          - name: sections
+            label: "Récit"
+            widget: list
+            fields:
+              - { name: heading, label: "Intertitre", widget: string }
+              - { name: paragraphs, label: "Paragraphes", widget: list, field: { name: paragraph, label: "Paragraphe", widget: text } }
+          - { name: quotes, label: "Citations", widget: list, field: { name: quote, label: "Citation", widget: text } }
+          - name: repere
+            label: "Repères"
+            widget: object
+            fields:
+              - { name: title, label: "Titre", widget: string }
+              - name: items
+                label: "Repères"
+                widget: list
+                fields:
+                  - { name: label, label: "Intitulé", widget: string }
+                  - { name: value, label: "Valeur", widget: string }
+
+      # --- Démarche --------------------------------------------------
       - name: demarche
         label: "Démarche"
-        file: "content/cms/pages/demarche.md"
+        file: "src/content/textes/demarche.json"
         fields:
-          - { name: title, label: "Titre", widget: string, required: false }
-          - { name: body, label: "Texte", widget: markdown, required: false }
+          - { name: lead, label: "Chapeau", widget: text }
+          - name: materials
+            label: "Matières & gestes"
+            widget: object
+            fields:
+              - { name: title, label: "Titre", widget: string }
+              - { name: note, label: "Note", widget: text }
+              - { name: tools, label: "Outils", widget: list, field: { name: tool, label: "Outil", widget: string } }
+          - name: axes
+            label: "Les fils du travail"
+            widget: list
+            fields:
+              - { name: title, label: "Titre", widget: string }
+              - { name: text, label: "Texte", widget: text }
+          - { name: closing, label: "Phrase de clôture", widget: text }
+
+      # --- Bleu Cendres ----------------------------------------------
       - name: bleu-cendres
         label: "Bleu Cendres"
-        file: "content/cms/pages/bleu-cendres.md"
+        file: "src/content/textes/bleu-cendres.json"
         fields:
-          - { name: title, label: "Titre", widget: string, required: false }
-          - { name: body, label: "Texte", widget: markdown, required: false }
-      - name: contact
-        label: "Contact"
-        file: "content/cms/pages/contact.md"
-        fields:
-          - { name: title, label: "Titre", widget: string, required: false }
-          - { name: body, label: "Invitation", widget: markdown, required: false }
+          - { name: lead, label: "Chapeau", widget: text }
+          - { name: cover, label: "Couverture du recueil", widget: image, required: false, hint: "Vide = visuel d'attente." }
+          - { name: coverAlt, label: "Description de la couverture", widget: string }
+          - name: palette
+            label: "Bleu, cendre, or"
+            widget: object
+            fields:
+              - { name: title, label: "Titre", widget: string }
+              - { name: note, label: "Note", widget: string }
+              - name: items
+                label: "Mots"
+                widget: list
+                fields:
+                  - { name: word, label: "Mot", widget: string }
+                  - { name: text, label: "Texte", widget: string }
+          - { name: paragraphs, label: "Paragraphes", widget: list, field: { name: paragraph, label: "Paragraphe", widget: text } }
+          - name: facts
+            label: "Informations pratiques"
+            widget: list
+            fields:
+              - { name: label, label: "Intitulé", widget: string }
+              - { name: value, label: "Valeur", widget: string }
+          - { name: publisherUrl, label: "Lien vers l'éditeur", widget: string, required: false }
 
-  # 4) SITE (identité, contact, navigation) ---------------------------
-  - name: site
-    label: "Site"
+  # ===================================================================
+  # 4) RÉGLAGES
+  # ===================================================================
+  - name: reglages
+    label: "Réglages"
+    description: "Contact, réseaux sociaux, mentions légales, vente."
     files:
-      - name: settings
-        label: "Réglages du site"
-        file: "content/cms/settings/site.yml"
+      - name: site
+        label: "Site & mentions légales"
+        file: "src/data/settings/site.json"
         fields:
-          - { name: artistName, label: "Nom de l'artiste", widget: string }
-          - { name: role, label: "Rôle", widget: string }
-          - { name: email, label: "E-mail public", widget: string }
-          - { name: city, label: "Ville", widget: string, required: false }
-          - { name: region, label: "Région", widget: string, required: false }
+          - { name: manifesto, label: "Phrase manifeste", widget: string }
+          - { name: baseline, label: "Accroche", widget: text }
+          - { name: email, label: "E-mail public", widget: string, hint: "Affiché sur le site et utilisé par le formulaire de contact." }
           - name: social
-            label: "Réseaux"
+            label: "Réseaux sociaux"
             widget: list
             required: false
+            hint: "Uniquement vos vrais comptes. Un lien incomplet n'est pas affiché."
             fields:
-              - { name: label, label: "Nom", widget: string }
-              - { name: href, label: "Lien", widget: string }
-          - name: nav
-            label: "Navigation (Carnet)"
-            widget: list
+              - { name: label, label: "Nom (ex. Instagram)", widget: string }
+              - { name: href, label: "Adresse complète (https://…)", widget: string }
+          - name: legal
+            label: "Mentions légales"
+            widget: object
+            hint: "Obligatoires avant toute communication publique du site."
             fields:
-              - { name: label, label: "Libellé", widget: string }
-              - { name: href, label: "Lien", widget: string }
-              - { name: note, label: "Note du Carnet", widget: string, required: false }
+              - { name: address, label: "Adresse postale", widget: text, required: false }
+              - { name: status, label: "Statut / SIRET", widget: string, required: false, hint: "Ex. Artiste-auteur — SIRET 123 456 789 00012." }
+              - { name: photoCredits, label: "Crédits photo des œuvres", widget: string, required: false }
+              - { name: siteCredits, label: "Conception du site (crédit)", widget: string, required: false }
 
-  # 5) THÈME (ambiance visuelle) --------------------------------------
-  - name: theme
-    label: "Ambiance visuelle"
-    files:
-      - name: settings
-        label: "Couleurs & intensités"
-        file: "content/cms/settings/theme.yml"
-        fields:
-          - { name: paper, label: "Papier (fond)", widget: color }
-          - { name: bluePigment, label: "Bleu pigment", widget: color }
-          - { name: ochreGold, label: "Ocre / or", widget: color }
-          - { name: textureIntensity, label: "Intensité de matière", widget: select, options: ["none", "subtle", "medium"] }
-          - { name: buttonMode, label: "Style des boutons", widget: select, options: ["handline", "artist-line", "pill"] }
-          - { name: cardMode, label: "Style des cartes", widget: select, options: ["exhibition-label", "cartel", "card"] }
-
-  # 6) BOUTIQUE DOUCE -------------------------------------------------
-  - name: shop
-    label: "Boutique douce"
-    files:
-      - name: settings
+      - name: shop
         label: "Vente douce"
-        file: "content/cms/settings/shop.yml"
+        file: "src/data/settings/shop.json"
         fields:
-          - { name: showPrices, label: "Afficher les prix", widget: boolean, default: false }
-          - { name: defaultPriceLabel, label: "Texte par défaut", widget: string, default: "Prix sur demande" }
-          - { name: enableReservation, label: "Activer la réservation", widget: boolean, default: true }
-          - { name: enableCatalogRequest, label: "Activer la demande de catalogue", widget: boolean, default: true }
+          - { name: showPrices, label: "Afficher les prix renseignés", widget: boolean, default: false, hint: "Désactivé = « Prix sur demande » partout." }
+          - { name: defaultPriceLabel, label: "Texte à la place du prix", widget: string, default: "Prix sur demande" }
+          - { name: enableReservation, label: "Proposer la réservation", widget: boolean, default: true }
+          - { name: enableCatalogRequest, label: "Proposer la demande de catalogue", widget: boolean, default: true }
           - name: cta
-            label: "Libellés des boutons"
+            label: "Textes des boutons"
             widget: object
             fields:
               - { name: artwork, label: "Demander une œuvre", widget: string }
               - { name: info, label: "Recevoir les informations", widget: string }
               - { name: catalog, label: "Demander le catalogue", widget: string }
               - { name: reserve, label: "Réserver", widget: string }
-
-  # 7) RÉSEAUX SOCIAUX ------------------------------------------------
-  - name: social
-    label: "Réseaux sociaux"
-    files:
-      - name: settings
-        label: "Préparation des publications"
-        file: "content/cms/settings/social.yml"
-        fields:
-          - { name: defaultHashtags, label: "Mots-clés par défaut", widget: list, field: { name: tag, label: "#", widget: string } }
-          - name: formats
-            label: "Formats"
-            widget: list
-            fields:
-              - { name: label, label: "Nom", widget: string }
-              - { name: ratio, label: "Ratio", widget: string }
-              - { name: size, label: "Taille", widget: string }
-          - name: templates
-            label: "Modèles de légendes"
-            widget: list
-            fields:
-              - { name: label, label: "Type", widget: string }
-              - { name: format, label: "Format", widget: string }
-              - { name: caption, label: "Légende", widget: text }
+          - { name: contactSubjects, label: "Objets du formulaire de contact", widget: list, field: { name: subject, label: "Objet", widget: string } }

@@ -4,10 +4,16 @@
 //  Aucune boutique automatique, aucun paiement en ligne, aucun prix imposé.
 //  L'acquisition se fait EN LIEN DIRECT avec l'artiste (contact / réservation
 //  / demande d'informations / catalogue). Ce fichier centralise les réglages
-//  commerciaux et les libellés — futur point d'édition du « cockpit ».
+//  commerciaux et les libellés.
 //
 //  ⚠️ Ne JAMAIS mettre ici de secret, token, clé API ou mot de passe.
+//
+//  ÉDITABLE PAR L'ARTISTE (admin → Réglages → « Vente douce ») :
+//    src/data/settings/shop.json — affichage des prix, libellés des boutons,
+//    réservation / catalogue, objets du formulaire de contact.
+//  Les GARDE-FOUS (mode, paiement en ligne désactivé) restent ici, dans le code.
 // =====================================================================
+import settings from './settings/shop.json';
 
 export type SaleMode = 'soft-contact';
 
@@ -16,38 +22,30 @@ export const shop = {
   mode: 'soft-contact' as SaleMode,
 
   /** Afficher des prix chiffrés ? false ⇒ toujours « Prix sur demande ». */
-  showPrices: false,
+  showPrices: settings.showPrices === true,
   /** Libellé affiché à la place d'un prix. */
-  defaultPriceLabel: 'Prix sur demande',
+  defaultPriceLabel: settings.defaultPriceLabel || 'Prix sur demande',
 
   /** Devise prévue pour plus tard (aucun affichage tant que showPrices = false). */
   currency: 'EUR',
 
-  /** Garde-fous d'extension future (désactivés aujourd'hui). */
-  enableCheckout: false,      // paiement en ligne — NON (futur, hors-scope)
-  enableReservation: true,    // possibilité de réserver une œuvre par contact
-  enableCatalogRequest: true, // possibilité de demander le catalogue
+  /** Garde-fous d'extension future. */
+  enableCheckout: false, // paiement en ligne — NON (garde-fou, non éditable)
+  enableReservation: settings.enableReservation !== false, // réserver une œuvre par contact
+  enableCatalogRequest: settings.enableCatalogRequest !== false, // demander le catalogue
 
   /** Libellés d'appel à l'action (vente douce). */
   cta: {
-    artwork: 'Demander cette œuvre',
-    info: 'Recevoir les informations',
-    catalog: 'Demander le catalogue',
-    reserve: 'Réserver cette œuvre',
+    artwork: settings.cta?.artwork || 'Demander cette œuvre',
+    info: settings.cta?.info || 'Recevoir les informations',
+    catalog: settings.cta?.catalog || 'Demander le catalogue',
+    reserve: settings.cta?.reserve || 'Réserver cette œuvre',
   },
 
   /** Objets proposés dans le formulaire de contact (source unique). */
-  contactSubjects: [
-    'Acquisition d’une œuvre',
-    'Réservation d’une œuvre',
-    'Demande de catalogue',
-    'Exposition',
-    'Résidence',
-    'Atelier',
-    'Presse',
-    'Commande spéciale',
-    'Autre',
-  ],
+  contactSubjects: (settings.contactSubjects ?? []).filter(
+    (s): s is string => typeof s === 'string' && s.trim() !== '',
+  ),
 };
 
 /** Correspondance ?objet=… (URL) → libellé du formulaire (préremplissage). */

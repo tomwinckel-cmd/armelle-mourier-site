@@ -1,0 +1,59 @@
+{
+  "lead": "Bleu Cendres est un recueil de poésie illustré, où les tableaux dorés et bleus d’Armelle Mourier rencontrent les mots.",
+  "palette": {
+    "title": "Bleu, cendre, or",
+    "note": "Trois mots pour une même gamme — la matière du recueil.",
+    "items": [
+      {
+        "word": "Bleu",
+        "text": "Des bleus profonds, comme des paysages intérieurs."
+      },
+      {
+        "word": "Cendre",
+        "text": "Ce qui reste après le geste — la trace, la mémoire."
+      },
+      {
+        "word": "Or",
+        "text": "La lumière posée sur le bleu, l’éclat qui traverse."
+      }
+    ]
+  },
+  "cover": "",
+  "coverAlt": "Couverture du recueil Bleu Cendres, tableaux dorés et bleus d’Armelle Mourier.",
+  "paragraphs": [
+    "Paru en mars 2024 aux éditions L’Atelier des Noyers, avec l’éditrice Claire Delbard, Bleu Cendres associe une série de toiles d’Armelle Mourier — dans une gamme de bleus profonds et d’or — aux poèmes de Louise Dupré, poétesse et philosophe québécoise.",
+    "De cette rencontre est né un livre où peinture et poésie se répondent, ainsi qu’une déclinaison en cartes postales et en tableaux originaux.",
+    "Le projet a essaimé : il a nourri la résidence intergénérationnelle « Trait Bleu » à Sennecey-lès-Dijon, puis l’installation immersive « Balade en Bleu » présentée en 2025."
+  ],
+  "facts": [
+    {
+      "label": "Parution",
+      "value": "Mars 2024"
+    },
+    {
+      "label": "Éditions",
+      "value": "L’Atelier des Noyers"
+    },
+    {
+      "label": "Collection",
+      "value": "Carnets de Vie (A5 paysage)"
+    },
+    {
+      "label": "Éditrice",
+      "value": "Claire Delbard"
+    },
+    {
+      "label": "Poèmes",
+      "value": "Louise Dupré"
+    },
+    {
+      "label": "Le recueil",
+      "value": "15 €"
+    },
+    {
+      "label": "Lot de cartes postales",
+      "value": "15 €"
+    }
+  ],
+  "publisherUrl": "https://www.atelierdesnoyers.fr"
+}

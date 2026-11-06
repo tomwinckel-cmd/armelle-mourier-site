@@ -1,18 +1,27 @@
 // =====================================================================
 //  CONFIGURATION GÉNÉRALE DU SITE
 //  Ce fichier regroupe les informations qui reviennent partout :
-//  identité, navigation, contact. C'est ici qu'on modifie l'e-mail,
-//  les liens sociaux ou le menu, sans toucher au reste du code.
+//  identité, navigation, contact.
+//
+//  ÉDITABLE PAR L'ARTISTE (admin → Réglages → « Site & mentions légales ») :
+//    src/data/settings/site.json — manifeste, accroche, e-mail public,
+//    réseaux sociaux, informations des mentions légales.
+//  Le reste (menu, mots-clés, identité technique) reste ici, dans le code.
 // =====================================================================
 import { shop } from './shop';
+import settings from './settings/site.json';
+
+type SocialLink = { label: string; href: string };
+
+/** Champ texte nettoyé ('' si vide). */
+const clean = (v: unknown): string => (typeof v === 'string' ? v.trim() : '');
 
 export const site = {
   artistName: 'Armelle Mourier',
   role: 'Artiste peintre & plasticienne',
   // Phrase manifeste courte, fidèle à ses propres mots (voir bio).
-  manifesto: 'Peindre comme on respire, transmettre la joie d’être en vie.',
-  baseline:
-    'Une peinture de la couleur et de la matière, entre la lumière de Collioure et la terre de Bourgogne.',
+  manifesto: settings.manifesto,
+  baseline: settings.baseline,
   // ⚠️ Domaine définitif à mettre à jour ici ET dans astro.config.mjs
   url: 'https://www.armellemourier.fr',
   locale: 'fr_FR',
@@ -23,16 +32,34 @@ export const site = {
 };
 
 export const contact = {
-  email: 'armellemourier02@gmail.com',
-  // ⚠️ PLACEHOLDERS — à remplacer par les vrais comptes d'Armelle, ou à laisser
-  // vides (les liens vides ne s'affichent pas). NE PAS réutiliser les comptes
-  // de démonstration Wix de l'ancien site.
-  social: [
-    // { label: 'Instagram', href: 'https://instagram.com/votre_compte' },
-    // { label: 'Facebook', href: 'https://facebook.com/armelle.mourier' },
-  ] as { label: string; href: string }[],
+  email: settings.email,
+  // Réseaux sociaux : uniquement les comptes réels d'Armelle (jamais les
+  // comptes de démonstration Wix de l'ancien site). Un lien incomplet
+  // (nom ou adresse vide) n'est pas affiché.
+  social: ((settings.social ?? []) as SocialLink[])
+    .map((s) => ({ label: clean(s.label), href: clean(s.href) }))
+    .filter((s) => s.label && s.href),
   // Objets proposés dans le formulaire de contact (source unique : shop.ts)
   subjects: shop.contactSubjects,
+};
+
+/**
+ * MENTIONS LÉGALES — informations de l'éditrice (Armelle).
+ * Champ vide ⇒ la page affiche « [à compléter] » et un bandeau de rappel.
+ */
+export const legal = {
+  address: clean(settings.legal?.address),
+  status: clean(settings.legal?.status),
+  photoCredits: clean(settings.legal?.photoCredits),
+  siteCredits: clean(settings.legal?.siteCredits),
+};
+
+/** Hébergeur du site (obligation légale, LCEN). Source : vercel.com/legal. */
+export const host = {
+  name: 'Vercel Inc.',
+  address: '440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis',
+  phone: '+1 559 288 7060',
+  url: 'https://vercel.com',
 };
 
 // =====================================================================

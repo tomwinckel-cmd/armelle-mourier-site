@@ -1,0 +1,51 @@
+{
+  "lead": "Une peinture née d’une nécessité : poser la couleur et la matière comme on pose le souffle. Voici les fils qui traversent son travail.",
+  "materials": {
+    "title": "Matières & gestes",
+    "note": "À l’acrylique le plus souvent, sur toile recyclée — achetée ou créée.",
+    "tools": [
+      "Pinceaux",
+      "Couteaux",
+      "Rouleau",
+      "Bombe",
+      "Pastels",
+      "Pigments",
+      "Teintures"
+    ]
+  },
+  "closing": "Ces fils se rejoignent dans les toiles — et dans le recueil Bleu Cendres, où la peinture dialogue avec les mots.",
+  "axes": [
+    {
+      "title": "La couleur d’abord",
+      "text": "La couleur précède le sujet. Elle emporte tout, ouvre l’espace, décide. Ce qui reste, à la fin, c’est le plaisir de peindre."
+    },
+    {
+      "title": "La peinture comme catharsis",
+      "text": "Née d’une épreuve de santé, sa peinture est une libération. Les formes abstraites suivent une volonté propre — celle de transformer l’émotion en geste."
+    },
+    {
+      "title": "La joie d’être en vie",
+      "text": "Aucune complaisance dans l’ombre : le moteur reste la joie, le besoin de la transmettre, de la rendre visible et partageable."
+    },
+    {
+      "title": "La matière et le geste",
+      "text": "Pinceaux, couteaux, rouleau, bombe, pastels, pigments, teintures : tout sert à façonner la matière. La surface garde la trace du mouvement."
+    },
+    {
+      "title": "Entre abstraction et paysage",
+      "text": "Parfois, sans qu’elle le décide, un lieu cher remonte à la surface — la lumière de Collioure, la terre de Bourgogne. L’abstraction laisse affleurer la mémoire des lieux."
+    },
+    {
+      "title": "Peinture et écriture",
+      "text": "Nouvelles et poèmes accompagnent les toiles. Le recueil Bleu Cendres en est l’aboutissement : les tableaux dialoguent avec les mots."
+    },
+    {
+      "title": "Peinture et danse",
+      "text": "La danse, passion d’enfance, revient dans les performances : des tableaux créés en direct, des lectures dansées, le corps qui prolonge le geste du peintre."
+    },
+    {
+      "title": "La toile recyclée",
+      "text": "Rien ne se perd. La toile est recyclée, achetée ou créée — un soin porté au support comme à l’œuvre."
+    }
+  ]
+}
