@@ -22,8 +22,9 @@ export const site = {
   // Phrase manifeste courte, fidèle à ses propres mots (voir bio).
   manifesto: settings.manifesto,
   baseline: settings.baseline,
-  // ⚠️ Domaine définitif à mettre à jour ici ET dans astro.config.mjs
-  url: 'https://www.armellemourier.fr',
+  // URL canonique : définie une seule fois dans astro.config.mjs (suit
+  // automatiquement le domaine de production configuré dans Vercel).
+  url: import.meta.env.SITE,
   locale: 'fr_FR',
   lang: 'fr',
   city: 'Dijon',

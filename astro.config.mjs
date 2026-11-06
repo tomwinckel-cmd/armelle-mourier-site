@@ -1,9 +1,18 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 
-// ⚠️ Remplacez cette URL par le domaine définitif une fois en ligne
-// (ex. https://www.armellemourier.com). Elle sert au SEO et aux liens absolus.
-const SITE_URL = 'https://www.armellemourier.fr';
+// URL canonique du site (SEO, plan du site, robots.txt, partage).
+// Ordre de priorité :
+//  1. SITE_URL, si elle est définie (variable d'environnement Vercel ou locale) ;
+//  2. le domaine de production fourni par Vercel au build
+//     (VERCEL_PROJECT_PRODUCTION_URL) : il bascule TOUT SEUL sur le nom de
+//     domaine dès qu'il est ajouté au projet Vercel — aucune modification ici ;
+//  3. sinon (CI, poste local) l'adresse vercel.app actuelle.
+const SITE_URL =
+  process.env.SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'https://armelle-mourier-site.vercel.app');
 
 // https://astro.build
 export default defineConfig({

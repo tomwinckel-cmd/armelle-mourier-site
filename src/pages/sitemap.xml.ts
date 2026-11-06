@@ -4,7 +4,7 @@ import { site } from '../data/site';
 
 // Plan du site — généré au build (statique), sans dépendance externe.
 // ⚠️ Les pages INTERNES (/cockpit-roadmap, /admin) sont volontairement exclues.
-// Le domaine vient de `site.url` (src/data/site.ts) — à mettre à jour le jour J.
+// Le domaine vient de `site.url` (astro.config.mjs → domaine de production Vercel).
 const staticPaths = [
   '/',
   '/oeuvres',
