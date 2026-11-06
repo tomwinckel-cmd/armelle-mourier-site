@@ -5,19 +5,19 @@ Ce site est **statique (Astro)** : le référencement et les aperçus de partage
 par **`src/data/site.ts`**. Chaque page passe ses propres `title` / `description`
 / `keywords` / `image` à `Base`.
 
-## 1. Domaine définitif (à faire le jour de la mise en ligne)
+## 1. Domaine définitif — automatique
 
 Le domaine sert aux **URLs canoniques**, à l'**Open Graph**, au **sitemap** et au
-**robots.txt**. À mettre à jour à **trois** endroits :
+**robots.txt** (tous deux générés au build). Il est défini **une seule fois**, dans
+`astro.config.mjs`, et **suit automatiquement le domaine de production Vercel**
+(variable système `VERCEL_PROJECT_PRODUCTION_URL`).
 
-| Fichier | Quoi changer |
-|---|---|
-| `astro.config.mjs` | `const SITE_URL = 'https://www.armellemourier.fr'` |
-| `src/data/site.ts` | `url: 'https://www.armellemourier.fr'` |
-| `public/robots.txt` | la ligne `Sitemap: https://.../sitemap.xml` |
+Le jour où le nom de domaine est prêt :
+1. Vercel → projet → **Settings → Domains** → ajouter le domaine, configurer le DNS.
+2. Relancer un déploiement de production. C'est tout : canonical, sitemap et
+   robots.txt pointent alors vers le nouveau domaine.
 
-> `src/data/site.ts` → `site.url` est la source de vérité utilisée par `Base.astro`
-> (canonical, og:url, og:image absolue) et par `/sitemap.xml`.
+Pour forcer une autre valeur : variable d'environnement **`SITE_URL`** dans Vercel.
 
 ## 2. Image de partage (Open Graph / Twitter) — **1200 × 630**
 
