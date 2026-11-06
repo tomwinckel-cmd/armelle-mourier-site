@@ -71,27 +71,26 @@ Le site étant statique, l’hébergement est **gratuit** chez Vercel ou Netlify
 
 ## 4. Modifier le contenu (sans être technique)
 
-Tout se passe dans des fichiers texte clairs et commentés.
+**Tout le contenu éditable vit dans des fichiers JSON**, modifiables depuis l’admin
+(`/admin`) ou à la main. Le code (`.ts`, `.astro`) ne contient plus de texte éditorial.
 
-### Ajouter / modifier une œuvre → `src/data/artworks.ts`
-Copiez un bloc `{ ... }` existant et changez les valeurs.
-- Pour **afficher la photo** : déposez le fichier dans `public/images/` puis renseignez
-  `image: '/images/mon-fichier.jpg'`. (Sans photo, un visuel d’attente s’affiche.)
-- Pour **mettre en vente** : `status: 'available'` et, si souhaité, `price: '850 €'`.
-  Statuts possibles : `available` (disponible), `reserved` (réservée), `sold` (vendue),
-  `on-request` (sur demande, par défaut).
-- `featured: true` met l’œuvre en avant sur la page d’accueil.
+| Contenu | Fichier(s) | Dans l’admin |
+|---|---|---|
+| Œuvres (photos, textes, disponibilité, prix) | `src/data/artworks/<slug>.json` | Œuvres |
+| Expositions, résidences, performances | `src/data/exhibitions/<id>.json` | Expositions |
+| Textes : accueil, page Œuvres, biographie, démarche, Bleu Cendres | `src/content/textes/*.json` | Textes des pages |
+| E-mail, réseaux sociaux, manifeste, mentions légales | `src/data/settings/site.json` | Réglages → Site & mentions légales |
+| Vente douce (prix affichés, boutons, objets du contact) | `src/data/settings/shop.json` | Réglages → Vente douce |
+| Photos déposées | `public/uploads/` (œuvres : `public/uploads/oeuvres/`) | (glisser-déposer) |
 
-### Ajouter une exposition → `src/data/exhibitions.ts`
-Copiez un bloc et indiquez une `startDate` au format `'AAAA-MM-JJ'`. Les dates **futures**
-apparaissent automatiquement dans « À venir », les dates passées dans la chronologie.
-
-### Modifier la biographie, la démarche, Bleu Cendres → `src/content/bio.ts`
-Textes restructurés à partir des mots de l’artiste. Modifiez-les librement.
-
-### Régler l’e-mail, le menu, les réseaux sociaux → `src/data/site.ts`
-Les liens réseaux sociaux sont **désactivés par défaut** (placeholders en commentaire).
-Décommentez-les et mettez les vrais comptes pour les afficher.
+Règles utiles :
+- **Œuvre sans photo** → visuel d’attente élégant. **Sans prix** → « Prix sur demande ».
+- **Exposition** : seules la date de début (`AAAA-MM-JJ` ou `AAAA-MM`) et le titre sont
+  nécessaires ; la date affichée et l’année se déduisent automatiquement. Les dates futures
+  passent seules dans « À venir ».
+- **Réseaux sociaux** : un lien incomplet n’est pas affiché.
+- Le menu, les mots-clés SEO et les garde-fous (pas de paiement en ligne) restent dans le
+  code (`src/data/site.ts`, `src/data/shop.ts`).
 
 ---
 

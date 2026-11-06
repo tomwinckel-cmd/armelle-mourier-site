@@ -1,0 +1,23 @@
+{
+  "showPrices": false,
+  "defaultPriceLabel": "Prix sur demande",
+  "enableReservation": true,
+  "enableCatalogRequest": true,
+  "cta": {
+    "artwork": "Demander cette œuvre",
+    "info": "Recevoir les informations",
+    "catalog": "Demander le catalogue",
+    "reserve": "Réserver cette œuvre"
+  },
+  "contactSubjects": [
+    "Acquisition d’une œuvre",
+    "Réservation d’une œuvre",
+    "Demande de catalogue",
+    "Exposition",
+    "Résidence",
+    "Atelier",
+    "Presse",
+    "Commande spéciale",
+    "Autre"
+  ]
+}

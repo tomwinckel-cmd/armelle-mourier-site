@@ -93,15 +93,19 @@ function bool(v: unknown): boolean | undefined {
   return typeof v === 'boolean' ? v : undefined;
 }
 
-/** Normalise un objet JSON brut en Artwork typé (vides → undefined). */
-function toArtwork(raw: Record<string, unknown>): Artwork {
+/** Normalise un objet JSON brut en Artwork typé (vides → undefined).
+ *  `file` = nom du fichier sans extension : sert de slug/id si ces champs
+ *  sont vides (l'artiste n'a jamais à taper d'identifiant technique). */
+function toArtwork(raw: Record<string, unknown>, file: string): Artwork {
+  const slug = str(raw.slug) ?? file;
+  const title = String(raw.title ?? '');
   const images = Array.isArray(raw.images)
     ? (raw.images.filter((s): s is string => typeof s === 'string' && s.trim() !== '') as string[])
     : undefined;
   return {
-    id: String(raw.id ?? raw.slug ?? ''),
-    title: String(raw.title ?? ''),
-    slug: String(raw.slug ?? ''),
+    id: str(raw.id) ?? slug,
+    title,
+    slug,
     year: str(raw.year),
     dimensions: str(raw.dimensions),
     technique: str(raw.technique),
@@ -110,7 +114,7 @@ function toArtwork(raw: Record<string, unknown>): Artwork {
     descriptionLong: str(raw.descriptionLong),
     image: typeof raw.image === 'string' ? raw.image : '',
     images: images && images.length ? images : undefined,
-    alt: String(raw.alt ?? ''),
+    alt: str(raw.alt) ?? `${title} — œuvre d’Armelle Mourier.`,
     status: (raw.status as ArtworkStatus) ?? 'on-request',
     price: str(raw.price),
     featured: bool(raw.featured),
@@ -125,8 +129,8 @@ function toArtwork(raw: Record<string, unknown>): Artwork {
   };
 }
 
-export const artworks: Artwork[] = (Object.values(modules) as Record<string, unknown>[])
-  .map(toArtwork)
+export const artworks: Artwork[] = Object.entries(modules)
+  .map(([p, raw]) => toArtwork(raw as Record<string, unknown>, p.split('/').pop()!.replace(/\.json$/, '')))
   .sort(
     (a, b) =>
       (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER) ||

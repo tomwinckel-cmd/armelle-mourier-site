@@ -90,8 +90,8 @@ Pour le remplacer :
 1. Déposez le fichier optimisé dans le bon dossier (`artworks/`, `portraits/`…).
 2. Renseignez le chemin correspondant :
    - œuvre → `image` dans `src/data/artworks.ts` ;
-   - portrait → `bio.portrait` dans `src/content/bio.ts` ;
-   - couverture Bleu Cendres → `bleuCendres.cover` dans `src/content/bio.ts` ;
+   - portrait → champ « Portrait » (admin → Textes des pages → Biographie), fichier `src/content/textes/biographie.json` ;
+   - couverture Bleu Cendres → champ « Couverture » (admin → Textes des pages → Bleu Cendres), fichier `src/content/textes/bleu-cendres.json` ;
    - image de partage → remplacez `og/og-default.jpg` (gardez le nom).
 3. Vérifiez que le texte `alt` reste juste et descriptif.
 
